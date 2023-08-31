@@ -1,0 +1,22 @@
+{
+  "name": "actual-http-api",
+  "version": "1.0.0",
+  "description": "Basic Actual Budgeting API exposed through HTTP endpoints",
+  "main": "server.js",
+  "bin": "./server.js",
+  "scripts": {
+    "start": "node server.js",
+    "swagger-autogen": "node swagger.js"
+  },
+  "author": "jhonderson",
+  "license": "MIT",
+  "dependencies": {
+    "@actual-app/api": "^6.2.1",
+    "express": "^4.18.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
