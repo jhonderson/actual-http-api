@@ -36,3 +36,13 @@ exports.isEmpty = (obj) => {
 
   return true;
 }
+
+exports.listSubDirectories = (directory) => {
+  return fs.readdirSync(directory, { withFileTypes: true })
+  .filter(dirent => dirent.isDirectory())
+  .map(dirent => dirent.name)
+}
+
+exports.getFileContent = (filePath) => {
+  return fs.readFileSync(filePath, 'utf8');
+}

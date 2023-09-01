@@ -1,10 +1,19 @@
 
-const { currentLocalDate, formatDateToISOString } = require('../utils/utils');
+const { currentLocalDate, formatDateToISOString, listSubDirectories, getFileContent } = require('../utils/utils');
 const { getActualApiClient } = require('./actual-client-provider');
+var path = require('path');
+
+let syncIdToBudgetId = {};
 
 async function Budget(budgetSyncId) {
   const actualApi = await getActualApiClient();
-  await actualApi.downloadBudget(budgetSyncId);
+  if (budgetSyncId in syncIdToBudgetId) {
+    await actualApi.loadBudget(syncIdToBudgetId[budgetSyncId]);
+    await actualApi.sync();
+  } else {
+    await actualApi.downloadBudget(budgetSyncId);
+    refreshSincIdToBudgetIdMap();
+  }
 
   async function getMonths() {
     return actualApi.getBudgetMonths();
@@ -183,6 +192,22 @@ async function Budget(budgetSyncId) {
 
   async function shutdown() {
     actualApi.shutdown();
+  }
+
+  function refreshSincIdToBudgetIdMap() {
+    // Unfortunately Actual Node.js api doesn't provide functionality to get the
+    // budget id associated to the sync id, this is a hack to do that
+    try {
+      const directories = listSubDirectories(process.env.ACTUAL_DATA_DIR);
+      directories.forEach(subDir => {
+        const metadata = JSON.parse(getFileContent(path.join(process.env.ACTUAL_DATA_DIR, subDir, 'metadata.json')));
+        syncIdToBudgetId[metadata.groupId] = metadata.id;
+      });
+    } catch(err) {
+      // The system will continue working normally,the only thing is that the budget will be downloaded
+      // everytime the api is called
+      console.log('Error creating map from sync id to budget id', err);
+    }
   }
 
   return {
