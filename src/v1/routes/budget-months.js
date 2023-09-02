@@ -584,16 +584,6 @@ module.exports = (router) => {
    */
   router.post('/budgets/:budgetSyncId/months/:month/categorytransfers', async (req, res, next) => {
     try {
-      if (req.body.category
-        && req.body.category.fromCategoryId
-        && (await res.locals.budget.getMonthCategory(req.params.month, req.body.category.fromCategoryId)) === undefined) {
-        throw new Error('Source category not found');
-      }
-      if (req.body.category
-        && req.body.category.toCategoryId
-        && (await res.locals.budget.getMonthCategory(req.params.month, req.body.category.toCategoryId)) === undefined) {
-        throw new Error('Destination category not found');
-      }
       if (isEmpty(req.body.categorytransfer)) {
           throw new Error('categorytransfer information is required');
       }
