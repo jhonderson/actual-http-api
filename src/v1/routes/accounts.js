@@ -60,8 +60,8 @@ module.exports = (router) => {
    *                   type: array
    *                   items:
    *                     $ref: '#/components/schemas/Account'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   - id: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
    *                     name: 'Checking'
    *                     offbudget: false
@@ -102,8 +102,8 @@ module.exports = (router) => {
    *               properties:
    *                 data:
    *                   $ref: '#/components/schemas/Account'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   id: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
    *                   name: 'Checking'
    *                   offbudget: false
@@ -155,8 +155,8 @@ module.exports = (router) => {
    *                      type: string
    *                   offbudget:
    *                      type: boolean
-   *             example:
-   *               account:
+   *             examples:
+   *               - account:
    *                 name: 'Checking'
    *                 offbudget: false
    *     responses:
@@ -166,8 +166,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Account created
+   *               examples:
+   *                 - message: Account created
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -216,8 +216,8 @@ module.exports = (router) => {
    *                      type: string
    *                   offbudget:
    *                      type: boolean
-   *             example:
-   *               account:
+   *             examples:
+   *               - account:
    *                 name: 'Checking new name'
    *     responses:
    *       '200':
@@ -226,8 +226,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Account updated
+   *               examples:
+   *                 - message: Account updated
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -249,8 +249,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Account deleted
+   *               examples:
+   *                 - message: Account deleted
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':
@@ -307,8 +307,8 @@ module.exports = (router) => {
    *                      type: string
    *                   transferCategoryId:
    *                      type: string
-   *             example:
-   *               transfer:
+   *             examples:
+   *               - transfer:
    *                 transferAccountId: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
    *                 transferCategoryId: '3c1699a5-522a-435e-86dc-93d900a14f0e'
    *     responses:
@@ -318,8 +318,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Account closed
+   *               examples:
+   *                 - message: Account closed
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -355,8 +355,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Account reopened
+   *               examples:
+   *                 - message: Account reopened
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':

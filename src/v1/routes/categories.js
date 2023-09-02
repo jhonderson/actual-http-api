@@ -14,7 +14,7 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: true
  *       description: Category id
- *       example: 106963b3-ab82-4734-ad70-1d7dc2a52ff4
+ *       example: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
  *     categoryGroupId:
  *       name: categoryGroupId
  *       in: path
@@ -22,7 +22,7 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: true
  *       description: Category group id
- *       example: d4394761-0427-4ad4-bde7-9a83e118541a
+ *       example: 'd4394761-0427-4ad4-bde7-9a83e118541a'
  *   schemas:
  *     CategoryGroup:
  *       required:
@@ -81,8 +81,8 @@ module.exports = (router) => {
    *                   type: array
    *                   items:
    *                     $ref: '#/components/schemas/Category'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                     name: 'For Spending'
    *                     is_income: false
@@ -109,11 +109,11 @@ module.exports = (router) => {
    *             properties:
    *               category:
    *                 $ref: '#/components/schemas/Category'
-   *           example:
-   *             category:
-   *               name: 'For Spending'
-   *               is_income: false
-   *               group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *             examples:
+   *               - category:
+   *                 name: 'For Spending'
+   *                 is_income: false
+   *                 group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *     responses:
    *       '201':
    *         description: Category id
@@ -127,8 +127,8 @@ module.exports = (router) => {
    *                 data:
    *                   type: string
    *                   description: Category id
-   *               example:
-   *                 data: "106963b3-ab82-4734-ad70-1d7dc2a52ff4"
+   *               examples:
+   *                 - data: "106963b3-ab82-4734-ad70-1d7dc2a52ff4"
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -176,8 +176,8 @@ module.exports = (router) => {
    *               properties:
    *                 data:
    *                   $ref: '#/components/schemas/Category'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                   name: 'For Spending'
    *                   is_income: false
@@ -205,11 +205,11 @@ module.exports = (router) => {
    *             properties:
    *               category:
    *                 $ref: '#/components/schemas/Category'
-   *           example:
-   *             category:
-   *               name: 'For Spending'
-   *               is_income: false
-   *               group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *             examples:
+   *               - category:
+   *                 name: 'For Spending'
+   *                 is_income: false
+   *                 group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *     responses:
    *       '200':
    *         description: Category updated
@@ -217,8 +217,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Category updated
+   *               examples:
+   *                 - message: Category updated
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -233,22 +233,13 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/categoryId'
-   *     requestBody:
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               transfer:
-   *                 type: object
-   *                 properties:
-   *                   transferCategoryId:
-   *                     type: string
-   *                     description: Destination category id
-   *                     example: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *           example:
-   *             transfer:
-   *               transferCategoryId: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *       - name: transfer_category_id
+   *         in: query
+   *         schema:
+   *           type: string
+   *           description: Destination category id
+   *           examples:
+   *             - '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *     responses:
    *       '200':
    *         description: Category deleted
@@ -256,8 +247,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Category deleted
+   *               examples:
+   *                 - message: Category deleted
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':
@@ -295,7 +286,7 @@ module.exports = (router) => {
     try {
       const category = await res.locals.budget.getCategory(req.params.categoryId);
       if (category) {
-        await res.locals.budget.deleteCategory(req.params.categoryId, req.body?.transfer || {});
+        await res.locals.budget.deleteCategory(req.params.categoryId, {transferCategoryId: req.query.transfer_category_id});
         res.json({'message': 'Category deleted'});
       } else {
         throw new Error('Category not found');
@@ -326,10 +317,10 @@ module.exports = (router) => {
    *             properties:
    *               category_group:
    *                 $ref: '#/components/schemas/CategoryGroup'
-   *           example:
-   *             category_group:
-   *               name: 'Bills'
-   *               is_income: false
+   *             examples:
+   *               - category_group:
+   *                 name: 'Bills'
+   *                 is_income: false
    *     responses:
    *       '201':
    *         description: Category group id
@@ -343,8 +334,8 @@ module.exports = (router) => {
    *                 data:
    *                   type: string
    *                   description: Category group id
-   *               example:
-   *                 data: "2E1F5BDB-209B-43F9-AF2C-3CE28E380C00"
+   *               examples:
+   *                 - data: "2E1F5BDB-209B-43F9-AF2C-3CE28E380C00"
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -383,10 +374,10 @@ module.exports = (router) => {
    *             properties:
    *               category_group:
    *                 $ref: '#/components/schemas/Category'
-   *           example:
-   *             category_group:
-   *               name: 'Bills'
-   *               is_income: false
+   *             examples:
+   *               - category_group:
+   *                 name: 'Bills'
+   *                 is_income: false
    *     responses:
    *       '200':
    *         description: Category group updated
@@ -394,8 +385,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Category group updated
+   *               examples:
+   *                 - message: Category group updated
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -410,22 +401,13 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/categoryGroupId'
-   *     requestBody:
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               transfer:
-   *                 type: object
-   *                 properties:
-   *                   transferCategoryId:
-   *                     type: string
-   *                     description: Destination category id
-   *                     example: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *           example:
-   *             transfer:
-   *               transferCategoryId: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *       - name: transfer_category_id
+   *         in: query
+   *         schema:
+   *           type: string
+   *           description: Destination category id
+   *           examples:
+   *             - '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *     responses:
    *       '200':
    *         description: Category group deleted
@@ -433,8 +415,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Category group deleted
+   *               examples:
+   *                 - message: Category group deleted
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':
@@ -452,7 +434,7 @@ module.exports = (router) => {
   
   router.delete('/budgets/:budgetSyncId/categorygroups/:categoryGroupId', async (req, res, next) => {
     try {
-      await res.locals.budget.deleteCategoryGroup(req.params.categoryGroupId, req.body?.transfer || {});
+      await res.locals.budget.deleteCategoryGroup(req.params.categoryGroupId, {transferCategoryId: req.query.transfer_category_id});
       res.json({'message': 'Category group deleted'});
     } catch(err) {
       next(err);

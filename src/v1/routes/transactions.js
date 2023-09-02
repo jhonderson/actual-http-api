@@ -98,8 +98,8 @@ module.exports = (router) => {
    *                   type: array
    *                   items:
    *                     $ref: '#/components/schemas/Transaction'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   - id: "4d194727-2ab2-4b50-a1aa-d506f2790e68"
    *                     is_parent: false
    *                     is_child: false
@@ -148,8 +148,8 @@ module.exports = (router) => {
    *             properties:
    *               transaction:
    *                 $ref: '#/components/schemas/Transaction'
-   *             example:
-   *               transaction:
+   *             examples:
+   *               - transaction:
    *                 account: "729cb492-4eab-468b-9522-75d455cded22"
    *                 category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
    *                 amount: -7374
@@ -163,8 +163,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: ok
+   *               examples:
+   *                 - message: ok
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -222,8 +222,8 @@ module.exports = (router) => {
    *                 type: array
    *                 items:
    *                   $ref: '#/components/schemas/Transaction'
-   *             example:
-   *               transactions:
+   *             examples:
+   *               - transactions:
    *                 - account: "729cb492-4eab-468b-9522-75d455cded22"
    *                   category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
    *                   amount: -7374
@@ -237,8 +237,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: ok
+   *               examples:
+   *                 - message: ok
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -280,14 +280,14 @@ module.exports = (router) => {
    *                 type: array
    *                 items:
    *                   $ref: '#/components/schemas/Transaction'
-   *           example:
-   *             transactions:
-   *               - account: "729cb492-4eab-468b-9522-75d455cded22"
-   *                 category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
-   *                 amount: -7374
-   *                 payee_name: "Remitly"
-   *                 date: "2023-06-23"
-   *                 cleared: false
+   *             examples:
+   *               - transactions:
+   *                 - account: "729cb492-4eab-468b-9522-75d455cded22"
+   *                   category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
+   *                   amount: -7374
+   *                   payee_name: "Remitly"
+   *                   date: "2023-06-23"
+   *                   cleared: false
    *     responses:
    *       '201':
    *         description: Ids of transactions add and updated
@@ -309,15 +309,17 @@ module.exports = (router) => {
    *                        items:
    *                          type: string
    *                          description: Id of transaction added
-   *                          example: '1a152a80-af05-4efa-ba4a-95f814a9d1d1'
+   *                          examples:
+   *                            - '1a152a80-af05-4efa-ba4a-95f814a9d1d1'
    *                     updated:
    *                        type: array
    *                        items:
    *                          type: string
    *                          description: Id of transaction updated
-   *                          example: '1fbd4467-004d-4163-8569-6f83f8db6eca'
-   *               example:
-   *                 data:
+   *                          examples:
+   *                            - '1fbd4467-004d-4163-8569-6f83f8db6eca'
+   *               examples:
+   *                 - data:
    *                   added:
    *                     - "1a152a80-af05-4efa-ba4a-95f814a9d1d1"
    *                     - "f64fd861-ba21-481b-ac88-2c30c6660240"
@@ -389,8 +391,8 @@ module.exports = (router) => {
    *                     type: string
    *                   cleared:
    *                     type: string
-   *             example:
-   *               transaction:
+   *             examples:
+   *               - transaction:
    *                 account: "729cb492-4eab-468b-9522-75d455cded22"
    *                 category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
    *                 amount: -7374
@@ -403,8 +405,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Transaction updated
+   *               examples:
+   *                 - message: Transaction updated
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -426,8 +428,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Transaction deleted
+   *               examples:
+   *                 - message: Transaction deleted
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':

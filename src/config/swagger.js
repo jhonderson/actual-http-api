@@ -18,7 +18,6 @@ const openapiSpecification = swaggerJsdoc({
         },
         version: '1.0.0',
       },
-      basePath: '/',
       components: {
         securitySchemes: {
           apiKey: {

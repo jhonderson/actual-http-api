@@ -54,22 +54,22 @@ module.exports = router;
  *        application/json:
  *          schema:
  *            $ref: '#/components/schemas/GeneralError'
- *            example:
- *              error: 'Invalid month format, use YYYY-MM: 2019-999'
+ *            examples:
+ *              - error: 'Invalid month format, use YYYY-MM: 2019-999'
  *     '404':
  *      description: Resource not found
  *      content:
  *        application/json:
  *          schema:
  *            $ref: '#/components/schemas/GeneralError'
- *            example:
- *              error: 'No budget exists for month: 2019-01'
+ *            examples:
+ *              - error: 'No budget exists for month: 2019-01'
  *     '500':
  *      description: Internal server error
  *      content:
  *        application/json:
  *          schema:
  *            $ref: '#/components/schemas/GeneralError'
- *            example:
- *              error: 'Error accessing Actual Server, check Actual Server url'
+ *            examples:
+ *              - error: 'Error accessing Actual Server, check Actual Server url'
  */

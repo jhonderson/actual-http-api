@@ -55,8 +55,8 @@ module.exports = (router) => {
    *                   type: array
    *                   items:
    *                     $ref: '#/components/schemas/Payee'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   - id: 'f733399d-4ccb-4758-b208-7422b27f650a'
    *                     name: 'Fidelity'
    *                     category: null
@@ -83,9 +83,9 @@ module.exports = (router) => {
    *             properties:
    *               payee:
    *                 $ref: '#/components/schemas/Payee'
-   *           example:
-   *             payee:
-   *               name: 'Fidelity'
+   *             examples:
+   *               - payee:
+   *                 name: 'Fidelity'
    *     responses:
    *       '201':
    *         description: Payee id
@@ -99,8 +99,8 @@ module.exports = (router) => {
    *                 data:
    *                   type: string
    *                   description: Payee id
-   *               example:
-   *                 data: 'f733399d-4ccb-4758-b208-7422b27f650a'
+   *               examples:
+   *                 - data: 'f733399d-4ccb-4758-b208-7422b27f650a'
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -146,9 +146,9 @@ module.exports = (router) => {
    *             properties:
    *               payee:
    *                 $ref: '#/components/schemas/Payee'
-   *           example:
-   *             payee:
-   *               name: 'Fidelity'
+   *             examples:
+   *               - payee:
+   *                 name: 'Fidelity'
    *     responses:
    *       '200':
    *         description: Payee updated
@@ -156,8 +156,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Payee updated
+   *               examples:
+   *                 - message: Payee updated
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -179,8 +179,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Payee deleted
+   *               examples:
+   *                 - message: Payee deleted
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':

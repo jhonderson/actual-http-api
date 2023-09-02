@@ -15,22 +15,6 @@ const { isEmpty } = require('../../utils/utils');
  *       required: true
  *       description: Budget month
  *       example: 2023-08
- *     categoryId:
- *       name: categoryId
- *       in: path
- *       schema:
- *         type: string
- *       required: true
- *       description: Category id
- *       example: 106963b3-ab82-4734-ad70-1d7dc2a52ff4
- *     categoryGroupId:
- *       name: categoryGroupId
- *       in: path
- *       schema:
- *         type: string
- *       required: true
- *       description: Category group id
- *       example: d4394761-0427-4ad4-bde7-9a83e118541a
  *   schemas:
  *     BudgetMonth:
  *       required:
@@ -154,9 +138,10 @@ module.exports = (router) => {
    *                   items:
    *                     type: string
    *                     description: Budget month
-   *                     example: '2023-08'
-   *               example:
-   *                 data:
+   *                     examples:
+   *                       - '2023-08'
+   *               examples:
+   *                 - data:
    *                   - 2023-05
    *                   - 2023-06
    *                   - 2023-07
@@ -198,8 +183,8 @@ module.exports = (router) => {
    *               properties:
    *                 data:
    *                   $ref: '#/components/schemas/BudgetMonth'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   month: '2023-08'
    *                   incomeAvailable: 13041
    *                   lastMonthOverspent: 0
@@ -266,8 +251,8 @@ module.exports = (router) => {
    *                   type: array
    *                   items:
    *                     $ref: '#/components/schemas/BudgetMonthCategory'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                     name: 'For Spending'
    *                     is_income: false
@@ -315,8 +300,8 @@ module.exports = (router) => {
    *               properties:
    *                 data:
    *                   $ref: '#/components/schemas/BudgetMonthCategory'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                   name: 'For Spending'
    *                   is_income: false
@@ -356,8 +341,8 @@ module.exports = (router) => {
    *                     type: integer
    *                   carryover:
    *                     type: boolean
-   *             example:
-   *               category:
+   *             examples:
+   *               - category:
    *                 budgeted: 1000
    *                 carryover: false
    *     responses:
@@ -367,8 +352,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Category updated
+   *               examples:
+   *                 - message: Category updated
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -433,8 +418,8 @@ module.exports = (router) => {
    *                   type: array
    *                   items:
    *                     $ref: '#/components/schemas/BudgetMonthCategoryGroup'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   - id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                     name: 'Frequent'
    *                     is_income: false
@@ -489,8 +474,8 @@ module.exports = (router) => {
    *               properties:
    *                 data:
    *                   $ref: '#/components/schemas/BudgetMonthCategoryGroup'
-   *               example:
-   *                 data:
+   *               examples:
+   *                 - data:
    *                   id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                   name: 'Frequent'
    *                   is_income: false
@@ -561,8 +546,8 @@ module.exports = (router) => {
    *                     type: string
    *                   amount:
    *                     type: integer
-   *             example:
-   *               categorytransfer:
+   *             examples:
+   *               - categorytransfer:
    *                 fromCategoryId: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                 toCategoryId: '1affe7a5-a87a-45d2-9888-32225f8f5fd2'
    *                 amount: 10000
@@ -573,8 +558,8 @@ module.exports = (router) => {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/GeneralResponseMessage'
-   *               example:
-   *                 message: Category transfer created
+   *               examples:
+   *                 - message: Category transfer created
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
