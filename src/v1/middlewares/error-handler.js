@@ -5,7 +5,7 @@ function clientError(res, status, error, message) {
 }
 
 function serverError(res, error, message) {
-  console.log(message, error);
+  console.error(message, error);
   res.status(500).json({"error": message});
 }
 

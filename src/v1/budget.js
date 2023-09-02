@@ -206,7 +206,7 @@ async function Budget(budgetSyncId) {
     } catch(err) {
       // The system will continue working normally,the only thing is that the budget will be downloaded
       // everytime the api is called
-      console.log('Error creating map from sync id to budget id', err);
+      console.error('Error creating map from sync id to budget id', err);
     }
   }
 
