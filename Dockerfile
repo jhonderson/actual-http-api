@@ -1,13 +1,21 @@
-FROM node:18
+FROM node:18-alpine AS BUILD_IMAGE
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --production
 RUN npm ci --omit=dev
 
 COPY . .
+
+FROM node:18-alpine AS RUNNER_IMAGE
+
+WORKDIR /usr/src/app
+
+COPY --from=BUILD_IMAGE /usr/src/app/node_modules ./node_modules
+ADD src ./src
+ADD package*.json server.js entrypoint.sh ./
 
 RUN chmod +x entrypoint.sh
 

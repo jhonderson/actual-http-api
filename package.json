@@ -5,8 +5,7 @@
   "main": "server.js",
   "bin": "./server.js",
   "scripts": {
-    "start": "node server.js",
-    "swagger-autogen": "node swagger.js"
+    "start": "node server.js"
   },
   "author": "jhonderson",
   "license": "MIT",
