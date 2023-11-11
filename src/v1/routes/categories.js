@@ -67,6 +67,7 @@ module.exports = (router) => {
    *       - apiKey: []
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: The list of categories
@@ -98,6 +99,7 @@ module.exports = (router) => {
    *       - apiKey: []
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -164,6 +166,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/categoryId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Category information
@@ -194,6 +197,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/categoryId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -233,6 +237,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/categoryId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *       - name: transfer_category_id
    *         in: query
    *         schema:
@@ -306,6 +311,7 @@ module.exports = (router) => {
    *       - apiKey: []
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -363,6 +369,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/categoryGroupId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -401,6 +408,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/categoryGroupId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *       - name: transfer_category_id
    *         in: query
    *         schema:

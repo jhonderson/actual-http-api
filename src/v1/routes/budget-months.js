@@ -123,6 +123,7 @@ module.exports = (router) => {
    *       - apiKey: []
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: The list of months for the specified budget
@@ -171,6 +172,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Budget month information
@@ -237,6 +239,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: List of categories for the month specified
@@ -288,6 +291,7 @@ module.exports = (router) => {
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/month'
    *       - $ref: '#/components/parameters/categoryId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Category information for the month specified
@@ -325,6 +329,7 @@ module.exports = (router) => {
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/month'
    *       - $ref: '#/components/parameters/categoryId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -404,6 +409,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: List of category groups for the month specified
@@ -462,6 +468,7 @@ module.exports = (router) => {
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/month'
    *       - $ref: '#/components/parameters/categoryGroupId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Category group information for the month specified
@@ -528,6 +535,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:

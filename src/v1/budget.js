@@ -5,13 +5,19 @@ var path = require('path');
 
 let syncIdToBudgetId = {};
 
-async function Budget(budgetSyncId) {
+async function Budget(budgetSyncId, budgetEncryptionPassword) {
   const actualApi = await getActualApiClient();
   if (budgetSyncId in syncIdToBudgetId) {
     await actualApi.loadBudget(syncIdToBudgetId[budgetSyncId]);
     await actualApi.sync();
   } else {
-    await actualApi.downloadBudget(budgetSyncId);
+    if (budgetEncryptionPassword) {
+      await actualApi.downloadBudget(budgetSyncId, {
+        password: budgetEncryptionPassword
+      });
+    } else {
+      await actualApi.downloadBudget(budgetSyncId);
+    }
     refreshSincIdToBudgetIdMap();
   }
 

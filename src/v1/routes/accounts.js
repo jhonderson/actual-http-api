@@ -46,6 +46,7 @@ module.exports = (router) => {
    *       - apiKey: []
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: The list of accounts for the specified budget
@@ -90,6 +91,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Account information
@@ -136,6 +138,7 @@ module.exports = (router) => {
    *       - apiKey: []
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -195,6 +198,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -242,6 +246,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Account deleted
@@ -294,6 +299,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       content:
    *         application/json:
@@ -348,6 +354,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Account reopened

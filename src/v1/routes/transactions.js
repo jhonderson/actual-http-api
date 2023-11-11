@@ -84,6 +84,7 @@ module.exports = (router) => {
    *       - $ref: '#/components/parameters/accountId'
    *       - $ref: '#/components/parameters/sinceDate'
    *       - $ref: '#/components/parameters/untilDate'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: The list of transactions for an account
@@ -137,6 +138,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -209,6 +211,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -267,6 +270,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -354,6 +358,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/transactionId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     requestBody:
    *       required: true
    *       content:
@@ -421,6 +426,7 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/transactionId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
    *         description: Transaction deleted
