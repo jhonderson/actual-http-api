@@ -14,23 +14,20 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: true
  *       description: Transaction id
- *       example: 671b669d-b616-4bf1-8a04-c82d73f87d5b
  *     sinceDate:
  *       name: since_date
  *       in: query
  *       schema:
  *         type: string
  *       required: true
- *       description: Starting date
- *       example: 2023-08-01
+ *       description: Starting date. Example 2023-08-01
  *     untilDate:
  *       name: until_date
  *       in: query
  *       schema:
  *         type: string
  *       required: false
- *       description: End date
- *       example: 2023-08-31
+ *       description: End date. Example 2023-08-31
  *   schemas:
  *     Transaction:
  *       required:
@@ -152,12 +149,12 @@ module.exports = (router) => {
    *                 $ref: '#/components/schemas/Transaction'
    *             examples:
    *               - transaction:
-   *                 account: "729cb492-4eab-468b-9522-75d455cded22"
-   *                 category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
-   *                 amount: -7374
-   *                 payee_name: "Remitly"
-   *                 date: "2023-06-23"
-   *                 cleared: false
+   *                   account: "729cb492-4eab-468b-9522-75d455cded22"
+   *                   category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
+   *                   amount: -7374
+   *                   payee_name: "Remitly"
+   *                   date: "2023-06-23"
+   *                   cleared: false
    *     responses:
    *       '200':
    *         description: ok
@@ -398,11 +395,11 @@ module.exports = (router) => {
    *                     type: string
    *             examples:
    *               - transaction:
-   *                 account: "729cb492-4eab-468b-9522-75d455cded22"
-   *                 category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
-   *                 amount: -7374
-   *                 date: "2023-06-23"
-   *                 cleared: true
+   *                   account: "729cb492-4eab-468b-9522-75d455cded22"
+   *                   category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
+   *                   amount: -7374
+   *                   date: "2023-06-23"
+   *                   cleared: true
    *     responses:
    *       '200':
    *         description: Transaction updated

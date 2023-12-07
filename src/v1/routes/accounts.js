@@ -15,7 +15,6 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: true
  *       description: Account id
- *       example: '729cb492-4eab-468b-9522-75d455cded22'
  *   schemas:
  *     Account:
  *       required:
@@ -106,10 +105,10 @@ module.exports = (router) => {
    *                   $ref: '#/components/schemas/Account'
    *               examples:
    *                 - data:
-   *                   id: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
-   *                   name: 'Checking'
-   *                   offbudget: false
-   *                   closed: false
+   *                     id: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
+   *                     name: 'Checking'
+   *                     offbudget: false
+   *                     closed: false
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':
@@ -160,8 +159,8 @@ module.exports = (router) => {
    *                      type: boolean
    *             examples:
    *               - account:
-   *                 name: 'Checking'
-   *                 offbudget: false
+   *                   name: 'Checking'
+   *                   offbudget: false
    *     responses:
    *       '200':
    *         description: Account created
@@ -222,7 +221,7 @@ module.exports = (router) => {
    *                      type: boolean
    *             examples:
    *               - account:
-   *                 name: 'Checking new name'
+   *                   name: 'Checking new name'
    *     responses:
    *       '200':
    *         description: Account updated
@@ -315,8 +314,8 @@ module.exports = (router) => {
    *                      type: string
    *             examples:
    *               - transfer:
-   *                 transferAccountId: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
-   *                 transferCategoryId: '3c1699a5-522a-435e-86dc-93d900a14f0e'
+   *                   transferAccountId: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
+   *                   transferCategoryId: '3c1699a5-522a-435e-86dc-93d900a14f0e'
    *     responses:
    *       '200':
    *         description: Account closed

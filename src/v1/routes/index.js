@@ -35,7 +35,6 @@ module.exports = router;
  *         type: string
  *       required: true
  *       description: This is the Synchronization ID from Actual Budget → Settings → Show advanced settings → Sync ID
- *       example: 7195a54b-dc6b-4875-b0ef-d60eaff8c98e
  *     budgetEncryptionPassword:
  *       name: budget-encryption-password
  *       in: header
@@ -43,7 +42,6 @@ module.exports = router;
  *         type: string
  *       required: false
  *       description: Optional encryption password for end-to-end encrypted budgets. Only needed in the first interaction with the encrypted budget, subsequent requests don't need to provide this value
- *       example: sample-encryption-password
  *   schemas:
  *     GeneralError:
  *      type: object

@@ -13,8 +13,7 @@ const { isEmpty } = require('../../utils/utils');
  *       schema:
  *         type: string
  *       required: true
- *       description: Budget month
- *       example: 2023-08
+ *       description: Budget month. Example 2023-08
  *   schemas:
  *     BudgetMonth:
  *       required:
@@ -138,9 +137,7 @@ module.exports = (router) => {
    *                   type: array
    *                   items:
    *                     type: string
-   *                     description: Budget month
-   *                     examples:
-   *                       - '2023-08'
+   *                     description: Budget month. Example 2023-08
    *               examples:
    *                 - data:
    *                   - 2023-05
@@ -187,32 +184,32 @@ module.exports = (router) => {
    *                   $ref: '#/components/schemas/BudgetMonth'
    *               examples:
    *                 - data:
-   *                   month: '2023-08'
-   *                   incomeAvailable: 13041
-   *                   lastMonthOverspent: 0
-   *                   forNextMonth: 0
-   *                   totalBudgeted: -13041
-   *                   toBudget: 0
-   *                   fromLastMonth: 1667
-   *                   totalIncome: 11374
-   *                   totalSpent: -661485
-   *                   totalBalance: 1648273
-   *                   categoryGroups:
-   *                     - id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
-   *                       name: 'Frequent'
-   *                       is_income: false
-   *                       budgeted: 287610
-   *                       spent: -294337
-   *                       balance: 3273
-   *                       categories:
-   *                         - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *                           name: 'For Spending'
-   *                           is_income: false
-   *                           group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
-   *                           budgeted: 0
-   *                           spent: 0
-   *                           balance: 0
-   *                           carryover: false
+   *                     month: '2023-08'
+   *                     incomeAvailable: 13041
+   *                     lastMonthOverspent: 0
+   *                     forNextMonth: 0
+   *                     totalBudgeted: -13041
+   *                     toBudget: 0
+   *                     fromLastMonth: 1667
+   *                     totalIncome: 11374
+   *                     totalSpent: -661485
+   *                     totalBalance: 1648273
+   *                     categoryGroups:
+   *                       - id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                         name: 'Frequent'
+   *                         is_income: false
+   *                         budgeted: 287610
+   *                         spent: -294337
+   *                         balance: 3273
+   *                         categories:
+   *                           - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *                             name: 'For Spending'
+   *                             is_income: false
+   *                             group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                             budgeted: 0
+   *                             spent: 0
+   *                             balance: 0
+   *                             carryover: false
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -306,14 +303,14 @@ module.exports = (router) => {
    *                   $ref: '#/components/schemas/BudgetMonthCategory'
    *               examples:
    *                 - data:
-   *                   id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *                   name: 'For Spending'
-   *                   is_income: false
-   *                   group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
-   *                   budgeted: 0
-   *                   spent: 0
-   *                   balance: 0
-   *                   carryover: false
+   *                     id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *                     name: 'For Spending'
+   *                     is_income: false
+   *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                     budgeted: 0
+   *                     spent: 0
+   *                     balance: 0
+   *                     carryover: false
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -348,8 +345,8 @@ module.exports = (router) => {
    *                     type: boolean
    *             examples:
    *               - category:
-   *                 budgeted: 1000
-   *                 carryover: false
+   *                   budgeted: 1000
+   *                   carryover: false
    *     responses:
    *       '200':
    *         description: Category information updated for the month specified
@@ -483,21 +480,21 @@ module.exports = (router) => {
    *                   $ref: '#/components/schemas/BudgetMonthCategoryGroup'
    *               examples:
    *                 - data:
-   *                   id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
-   *                   name: 'Frequent'
-   *                   is_income: false
-   *                   budgeted: 287610
-   *                   spent: -294337
-   *                   balance: 3273
-   *                   categories:
-   *                     - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *                       name: 'For Spending'
-   *                       is_income: false
-   *                       group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
-   *                       budgeted: 0
-   *                       spent: 0
-   *                       balance: 0
-   *                       carryover: false
+   *                     id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                     name: 'Frequent'
+   *                     is_income: false
+   *                     budgeted: 287610
+   *                     spent: -294337
+   *                     balance: 3273
+   *                     categories:
+   *                       - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *                         name: 'For Spending'
+   *                         is_income: false
+   *                         group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                         budgeted: 0
+   *                         spent: 0
+   *                         balance: 0
+   *                         carryover: false
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -556,9 +553,9 @@ module.exports = (router) => {
    *                     type: integer
    *             examples:
    *               - categorytransfer:
-   *                 fromCategoryId: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *                 toCategoryId: '1affe7a5-a87a-45d2-9888-32225f8f5fd2'
-   *                 amount: 10000
+   *                   fromCategoryId: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *                   toCategoryId: '1affe7a5-a87a-45d2-9888-32225f8f5fd2'
+   *                   amount: 10000
    *     responses:
    *       '200':
    *         description: Category transfer created

@@ -14,7 +14,6 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: true
  *       description: Category id
- *       example: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
  *     categoryGroupId:
  *       name: categoryGroupId
  *       in: path
@@ -22,7 +21,6 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: true
  *       description: Category group id
- *       example: 'd4394761-0427-4ad4-bde7-9a83e118541a'
  *   schemas:
  *     CategoryGroup:
  *       required:
@@ -113,9 +111,9 @@ module.exports = (router) => {
    *                 $ref: '#/components/schemas/Category'
    *             examples:
    *               - category:
-   *                 name: 'For Spending'
-   *                 is_income: false
-   *                 group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                   name: 'For Spending'
+   *                   is_income: false
+   *                   group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *     responses:
    *       '201':
    *         description: Category id
@@ -181,10 +179,10 @@ module.exports = (router) => {
    *                   $ref: '#/components/schemas/Category'
    *               examples:
    *                 - data:
-   *                   id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *                   name: 'For Spending'
-   *                   is_income: false
-   *                   group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                     id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *                     name: 'For Spending'
+   *                     is_income: false
+   *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':
@@ -211,9 +209,9 @@ module.exports = (router) => {
    *                 $ref: '#/components/schemas/Category'
    *             examples:
    *               - category:
-   *                 name: 'For Spending'
-   *                 is_income: false
-   *                 group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                   name: 'For Spending'
+   *                   is_income: false
+   *                   group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *     responses:
    *       '200':
    *         description: Category updated
@@ -325,8 +323,8 @@ module.exports = (router) => {
    *                 $ref: '#/components/schemas/CategoryGroup'
    *             examples:
    *               - category_group:
-   *                 name: 'Bills'
-   *                 is_income: false
+   *                   name: 'Bills'
+   *                   is_income: false
    *     responses:
    *       '201':
    *         description: Category group id
@@ -383,8 +381,8 @@ module.exports = (router) => {
    *                 $ref: '#/components/schemas/Category'
    *             examples:
    *               - category_group:
-   *                 name: 'Bills'
-   *                 is_income: false
+   *                   name: 'Bills'
+   *                   is_income: false
    *     responses:
    *       '200':
    *         description: Category group updated

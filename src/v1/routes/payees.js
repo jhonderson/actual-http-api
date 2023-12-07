@@ -13,7 +13,6 @@
  *         type: string
  *       required: true
  *       description: Payee id
- *       example: '5bd3f624-53c1-4901-bfb7-4f01ee217983'
  *   schemas:
  *     Payee:
  *       required:
@@ -87,7 +86,7 @@ module.exports = (router) => {
    *                 $ref: '#/components/schemas/Payee'
    *             examples:
    *               - payee:
-   *                 name: 'Fidelity'
+   *                   name: 'Fidelity'
    *     responses:
    *       '201':
    *         description: Payee id
@@ -151,7 +150,7 @@ module.exports = (router) => {
    *                 $ref: '#/components/schemas/Payee'
    *             examples:
    *               - payee:
-   *                 name: 'Fidelity'
+   *                   name: 'Fidelity'
    *     responses:
    *       '200':
    *         description: Payee updated
