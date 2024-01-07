@@ -33,6 +33,8 @@ const { isEmpty } = require('../../utils/utils');
  *            type: integer
  *         is_income:
  *            type: boolean
+ *         hidden:
+ *            type: boolean
  *         categories:
  *           type: array
  *           items:
@@ -49,6 +51,8 @@ const { isEmpty } = require('../../utils/utils');
  *         name:
  *            type: integer
  *         is_income:
+ *            type: boolean
+ *         hidden:
  *            type: boolean
  *         group_id:
  *           type: string
@@ -85,6 +89,7 @@ module.exports = (router) => {
    *                   - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                     name: 'For Spending'
    *                     is_income: false
+   *                     hidden: false
    *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *       '404':
    *         $ref: '#/components/responses/404'
@@ -113,6 +118,7 @@ module.exports = (router) => {
    *               - category:
    *                   name: 'For Spending'
    *                   is_income: false
+   *                   hidden: false
    *                   group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *     responses:
    *       '201':
@@ -182,6 +188,7 @@ module.exports = (router) => {
    *                     id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                     name: 'For Spending'
    *                     is_income: false
+   *                     hidden: false
    *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *       '404':
    *         $ref: '#/components/responses/404'
@@ -211,6 +218,7 @@ module.exports = (router) => {
    *               - category:
    *                   name: 'For Spending'
    *                   is_income: false
+   *                   hidden: false
    *                   group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *     responses:
    *       '200':
@@ -325,6 +333,7 @@ module.exports = (router) => {
    *               - category_group:
    *                   name: 'Bills'
    *                   is_income: false
+   *                   hidden: false
    *     responses:
    *       '201':
    *         description: Category group id
@@ -383,6 +392,7 @@ module.exports = (router) => {
    *               - category_group:
    *                   name: 'Bills'
    *                   is_income: false
+   *                   hidden: false
    *     responses:
    *       '200':
    *         description: Category group updated

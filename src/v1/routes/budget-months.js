@@ -71,6 +71,8 @@ const { isEmpty } = require('../../utils/utils');
  *            type: integer
  *         is_income:
  *            type: boolean
+ *         hidden:
+ *            type: boolean
  *         categories:
  *           type: array
  *           items:
@@ -98,6 +100,8 @@ const { isEmpty } = require('../../utils/utils');
  *         name:
  *            type: integer
  *         is_income:
+ *            type: boolean
+ *         hidden:
  *            type: boolean
  *         group_id:
  *           type: string
@@ -198,6 +202,7 @@ module.exports = (router) => {
    *                       - id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                         name: 'Frequent'
    *                         is_income: false
+   *                         hidden: false
    *                         budgeted: 287610
    *                         spent: -294337
    *                         balance: 3273
@@ -205,6 +210,7 @@ module.exports = (router) => {
    *                           - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                             name: 'For Spending'
    *                             is_income: false
+   *                             hidden: false
    *                             group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                             budgeted: 0
    *                             spent: 0
@@ -256,6 +262,7 @@ module.exports = (router) => {
    *                   - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                     name: 'For Spending'
    *                     is_income: false
+   *                     hidden: false
    *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                     budgeted: 0
    *                     spent: 0
@@ -306,6 +313,7 @@ module.exports = (router) => {
    *                     id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                     name: 'For Spending'
    *                     is_income: false
+   *                     hidden: false
    *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                     budgeted: 0
    *                     spent: 0
@@ -426,6 +434,7 @@ module.exports = (router) => {
    *                   - id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                     name: 'Frequent'
    *                     is_income: false
+   *                     hidden: false
    *                     budgeted: 287610
    *                     spent: -294337
    *                     balance: 3273
@@ -433,6 +442,7 @@ module.exports = (router) => {
    *                       - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                         name: 'For Spending'
    *                         is_income: false
+   *                         hidden: false
    *                         group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                         budgeted: 0
    *                         spent: 0
@@ -483,6 +493,7 @@ module.exports = (router) => {
    *                     id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                     name: 'Frequent'
    *                     is_income: false
+   *                     hidden: false
    *                     budgeted: 287610
    *                     spent: -294337
    *                     balance: 3273
@@ -490,6 +501,7 @@ module.exports = (router) => {
    *                       - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
    *                         name: 'For Spending'
    *                         is_income: false
+   *                         hidden: false
    *                         group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
    *                         budgeted: 0
    *                         spent: 0
