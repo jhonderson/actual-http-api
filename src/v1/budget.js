@@ -73,6 +73,13 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     const accounts = await getAccounts();
     return accounts.find((account) => accountId == account.id);
   }
+                                                                                                
+  async function getAccountBalance(accountId) {                                               
+    return actualApi.runQuery(actualApi.q('transactions')                                     
+      .filter({ account: accountId })                                                         
+      .options({ splits: 'none' })                                                                      
+      .calculate({ $sum: '$amount' }));                                                       
+  } 
 
   async function createAccount(account) {
     return actualApi.createAccount(account);
@@ -226,6 +233,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     getMonthCategoryGroup: getMonthCategoryGroup,
     getAccounts: getAccounts,
     getAccount: getAccount,
+    getAccountBalance: getAccountBalance,
     createAccount: createAccount,
     updateAccount: updateAccount,
     deleteAccount: deleteAccount,
