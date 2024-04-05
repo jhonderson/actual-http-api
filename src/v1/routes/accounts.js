@@ -32,6 +32,8 @@ const { isEmpty } = require('../../utils/utils');
  *           type: boolean
  *         closed:
  *           type: boolean
+ *     Amount:
+ *       type: integer
  */
 
 module.exports = (router) => {
@@ -126,6 +128,50 @@ module.exports = (router) => {
       next(err);
     }
   });
+
+  /**                                                                                                                                                                                                                                       
+   * @swagger                                                                                                                                                                                                                               
+   * /budgets/{budgetSyncId}/accounts/{accountId}/balance:                                                                                                                                                                                  
+   *   get:                                                                                                                                                                                                                                 
+   *     summary: Returns account balance                                                                                                                                                                                                   
+   *     tags: [Accounts]                                                                                                                                                                                                                   
+   *     security:                                                                                                                                                                                                                          
+   *       - apiKey: []                                                                                                                                                                                                                     
+   *     parameters:                                                                                                                                                                                                                        
+   *       - $ref: '#/components/parameters/budgetSyncId'                                                                                                                                                                                   
+   *       - $ref: '#/components/parameters/accountId'                                                                                                                                                                                      
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'                                                                                                                                                                       
+   *     responses:                                                                                                                                                                                                                         
+   *       '200':                                                                                                                                                                                                                           
+   *         description: Account balance                                                                                                                                                                                                   
+   *         content:                                                                                                                                                                                                                       
+   *           application/json:                                                                                                                                                                                                            
+   *             schema:                                                                                                                                                                                                                    
+   *               required:                                                                                                                                                                                                                
+   *                 - data                                                                                                                                                                                                                 
+   *               type: object                                                                                                                                                                                                             
+   *               properties:                                                                                                                                                                                                              
+   *                 data:                                                                                                                                                                                                                  
+   *                   $ref: '#/components/schemas/Amount'                                                                                                                                                                                  
+   *               examples:                                                                                                                                                                                                                
+   *                 - data: 2000                                                                                                                                                                                                           
+   *       '404':                                                                                                                                                                                                                           
+   *         $ref: '#/components/responses/404'                                                                                                                                                                                             
+   *       '500':                                                                                                                                                                                                                           
+   *         $ref: '#/components/responses/500'                                                                                                                                                                                             
+   */                                                                                                                                                                                                                                       
+  router.get('/budgets/:budgetSyncId/accounts/:accountId/balance', async (req, res, next) => {                                                                                                                                              
+    try {                                                                                                                                                                                                                                   
+      const balance = await res.locals.budget.getAccountBalance(req.params.accountId);                                                                                                                                                      
+      if (balance) {                                                                                                                                                                                                                        
+        res.json(balance);                                                                                                                                                                                                                  
+      } else {                                                                                                                                                                                                                              
+        throw new Error('Account not found');                                                                                                                                                                                               
+      }                                                                                                                                                                                                                                     
+    } catch(err) {                                                                                                                                                                                                                          
+      next(err);                                                                                                                                                                                                                            
+    }                                                                                                                                                                                                                                       
+  });                                                                                                                                                                                                                                       
   
   /**
    * @swagger
