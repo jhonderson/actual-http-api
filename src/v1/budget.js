@@ -151,6 +151,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteCategory(categoryId, transferCategoryId);
   }
 
+  async function getCategoryGroups() {
+    return actualApi.getCategoryGroups();
+  }
+
   async function createCategoryGroup(categoryGroup) {
     return actualApi.createCategoryGroup(categoryGroup);
   }
@@ -250,6 +254,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     createCategory: createCategory,
     updateCategory: updateCategory,
     deleteCategory: deleteCategory,
+    getCategoryGroups: getCategoryGroups,
     createCategoryGroup: createCategoryGroup,
     updateCategoryGroup: updateCategoryGroup,
     deleteCategoryGroup: deleteCategoryGroup,
