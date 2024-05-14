@@ -310,6 +310,39 @@ module.exports = (router) => {
   /**
    * @swagger
    * /budgets/{budgetSyncId}/categorygroups:
+   *   get:
+   *     summary: Returns list of category groups
+   *     tags: [Categories]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: The list of category groups
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/CategoryGroup'
+   *               examples:
+   *                 - data:
+   *                   - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *                     name: 'For Spending'
+   *                     is_income: false
+   *                     hidden: false
+   *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
    *   post:
    *     summary: Creates a category group
    *     tags: [Categories]
@@ -356,6 +389,15 @@ module.exports = (router) => {
    *       '500':
    *         $ref: '#/components/responses/500'
    */
+
+  router.get('/budgets/:budgetSyncId/categorygroups', async (req, res, next) => {
+    try {
+      res.json({'data': await res.locals.budget.getCategoryGroups()});
+    } catch(err) {
+      next(err);
+    }
+  });
+  
   router.post('/budgets/:budgetSyncId/categorygroups', async (req, res, next) => {
     try {
       validateCategoryGroupBody(req.body.category_group);
