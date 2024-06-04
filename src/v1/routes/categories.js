@@ -1,4 +1,4 @@
-const { isEmpty } = require('../../utils/utils');
+const { isEmpty, parseNumericBoolean } = require('../../utils/utils');
 
 /**
  * @swagger
@@ -334,11 +334,15 @@ module.exports = (router) => {
    *                     $ref: '#/components/schemas/CategoryGroup'
    *               examples:
    *                 - data:
-   *                   - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
-   *                     name: 'For Spending'
+   *                   - id: 'd4394761-0427-4ad4-bde7-9a83e118541a4'
+   *                     name: 'Misc'
    *                     is_income: false
    *                     hidden: false
-   *                     group_id: 'd4394761-0427-4ad4-bde7-9a83e118541a'
+   *                     categories:
+   *                     - id: '106963b3-ab82-4734-ad70-1d7dc2a52ff4'
+   *                       name: 'For Spending'
+   *                       is_income: false
+   *                       hidden: false
    *       '404':
    *         $ref: '#/components/responses/404'
    *       '500':
@@ -392,7 +396,24 @@ module.exports = (router) => {
 
   router.get('/budgets/:budgetSyncId/categorygroups', async (req, res, next) => {
     try {
-      res.json({'data': await res.locals.budget.getCategoryGroups()});
+      const categoryGroups = (await res.locals.budget.getCategoryGroups()) || [];
+      res.json({'data': categoryGroups.map(categoryGroup => {
+        const categories = categoryGroup.categories || [];
+        return {
+          ...categoryGroup,
+          is_income: parseNumericBoolean(categoryGroup.is_income),
+          tombstone: parseNumericBoolean(categoryGroup.tombstone),
+          hidden: parseNumericBoolean(categoryGroup.hidden),
+          categories: categories.map(category => {
+            return {
+              ...category,
+              is_income: parseNumericBoolean(category.is_income),
+              tombstone: parseNumericBoolean(category.tombstone),
+              hidden: parseNumericBoolean(category.hidden),
+            };
+          })
+        }
+      })});
     } catch(err) {
       next(err);
     }

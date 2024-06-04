@@ -46,3 +46,7 @@ exports.listSubDirectories = (directory) => {
 exports.getFileContent = (filePath) => {
   return fs.readFileSync(filePath, 'utf8');
 }
+
+exports.parseNumericBoolean = (numericBoolean) => {
+  return numericBoolean === 0 ? false : (numericBoolean === 1 ? true : numericBoolean);
+}
