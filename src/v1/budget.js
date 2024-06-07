@@ -207,6 +207,16 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     }
   }
 
+  async function runBankSync(accountId) {
+    let bankSyncArgs = undefined;
+    if (accountId) {
+      bankSyncArgs = {
+        accountId
+      };
+    }
+    return actualApi.runBankSync(bankSyncArgs);
+  }
+
   async function shutdown() {
     actualApi.shutdown();
   }
@@ -263,6 +273,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updatePayee: updatePayee,
     deletePayee: deletePayee,
     addCategoryTransfer: addCategoryTransfer,
+    runBankSync: runBankSync,
     shutdown: shutdown,
   };
 }

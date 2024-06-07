@@ -427,6 +427,71 @@ module.exports = (router) => {
     }
   });
 
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/accounts/{accountId}/banksync:
+   *   post:
+   *     summary: Triggers a bank sync for a specific account
+   *     tags: [Accounts]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: Bank sync started
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Bank sync started
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.post('/budgets/:budgetSyncId/accounts/:accountId/banksync', async (req, res, next) => {
+    try {
+      await res.locals.budget.runBankSync(req.params.accountId);
+      res.json({ message: 'Bank sync started' });
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/accounts/banksync:
+   *   post:
+   *     summary: Triggers a bank sync
+   *     tags: [Accounts]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: Bank sync started
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Bank sync started
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.post('/budgets/:budgetSyncId/accounts/banksync', async (req, res, next) => {
+    try {
+      await res.locals.budget.runBankSync();
+      res.json({ message: 'Bank sync started' });    
+    } catch(err) {
+      next(err);
+    }
+  });
+
   async function validateAccountExists(res, accountId) {
     const account = await res.locals.budget.getAccount(accountId);
     if (!account) {
