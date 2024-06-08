@@ -18,6 +18,7 @@ require('./budget-months')(router);
 require('./accounts')(router);
 require('./transactions')(router);
 require('./categories')(router);
+require('./rules')(router);
 require('./payees')(router);
 
 router.use(errorHandler);

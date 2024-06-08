@@ -217,6 +217,26 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.runBankSync(bankSyncArgs);
   }
 
+  async function getRules() {
+    return actualApi.getRules();
+  }
+
+  async function getPayeeRules(payeeId) {
+    return actualApi.getPayeeRules(payeeId);
+  }
+
+  async function createRule(rule) {
+    return actualApi.createRule(rule);
+  }
+
+  async function updateRule(rule) {
+    return actualApi.updateRule(rule);
+  }
+
+  async function deleteRule(ruleId) {
+    return actualApi.deleteRule({ id: ruleId });
+  }
+
   async function shutdown() {
     actualApi.shutdown();
   }
@@ -274,6 +294,11 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     deletePayee: deletePayee,
     addCategoryTransfer: addCategoryTransfer,
     runBankSync: runBankSync,
+    getRules: getRules,
+    getPayeeRules: getPayeeRules,
+    createRule: createRule,
+    updateRule: updateRule,
+    deleteRule: deleteRule,
     shutdown: shutdown,
   };
 }

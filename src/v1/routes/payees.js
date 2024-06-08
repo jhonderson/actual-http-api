@@ -88,7 +88,7 @@ module.exports = (router) => {
    *               - payee:
    *                   name: 'Fidelity'
    *     responses:
-   *       '201':
+   *       '200':
    *         description: Payee id
    *         content:
    *           application/json:
@@ -128,6 +128,37 @@ module.exports = (router) => {
   /**
    * @swagger
    * /budgets/{budgetSyncId}/payees/{payeeId}:
+   *   get:
+   *     summary: Returns a payee
+   *     tags: [Payees]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/payeeId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: Payee
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   $ref: '#/components/schemas/Payee'
+   *               examples:
+   *                 - data:
+   *                     id: '9de084a4-dc96-4015-ac81-ba57ee340acd'
+   *                     name: 'Fidelity'
+   *                     category: null
+   *                     transfer_acct: '729cb492-4eab-468b-9522-75d455cded22'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
    *   patch:
    *     summary: Updates a payee
    *     tags: [Payees]
@@ -189,6 +220,19 @@ module.exports = (router) => {
    *       '500':
    *         $ref: '#/components/responses/500'
    */
+  router.get('/budgets/:budgetSyncId/payees/:payeeId', async (req, res, next) => {
+    try {
+      const allPayees = await res.locals.budget.getPayees() || [];
+      const queriedPayee = allPayees.find(payee => payee.id === req.params.payeeId);
+      if (!queriedPayee) {
+        throw new Error(`Payee with id '${req.params.payeeId}' not found`);
+      }
+      res.json({'data': queriedPayee});
+    } catch(err) {
+      next(err);
+    }
+  });
+
   router.patch('/budgets/:budgetSyncId/payees/:payeeId', async (req, res, next) => {
     try {
       await res.locals.budget.updatePayee(req.params.payeeId, req.body.payee);
@@ -202,6 +246,60 @@ module.exports = (router) => {
     try {
       await res.locals.budget.deletePayee(req.params.payeeId);
       res.json({'message': 'Payee deleted'});
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/payees/{payeeId}/rules:
+   *   get:
+   *     summary: Returns list of rules for a payee
+   *     tags: [Payees]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/payeeId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: The list of rules for a payee
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/Rule'
+   *               examples:
+   *                 - data:
+   *                   - id: '3ac44ad6-339a-459f-8eb6-fcff4cb87c34'
+   *                     stage: 'pre'
+   *                     conditionsOp: 'and'
+   *                     conditions:
+   *                       - op: 'is'
+   *                         field: 'payee'
+   *                         value: '6740d5c1-5a89-4fa0-a35c-910e6da86e8r'
+   *                         type: 'id'
+   *                     actions:
+   *                       - op: 'set'
+   *                         field: 'category'
+   *                         value: '9787f2b1-d145-4afc-95b5-8f39ac68f8h5'
+   *                         type: 'id'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.get('/budgets/:budgetSyncId/payees/:payeeId/rules', async (req, res, next) => {
+    try {
+      res.json({'data': await res.locals.budget.getPayeeRules(req.params.payeeId)});
     } catch(err) {
       next(err);
     }
