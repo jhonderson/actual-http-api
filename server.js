@@ -42,14 +42,25 @@ app.listen(port, () => {
  * the unhandled rejection errors and ignoring them if they come from @actual-app/api
  */
 function ignoreUnhandledRejectionsCausedByActualApiLibrary(reason, promise) {
-  if (reason
-    && ((reason.stack && reason.stack.indexOf('@actual-app/api') != -1)
-      || reason.type == 'APIError')) {
+  if (isErrorComingFromActualApi(reason) && !doesActualErrorRequiresRestartingTheHttpService(reason)) {
     console.log('Ignoring unhandledRejection caused by Actual api library');
     return;
   }
   console.log('unhandledRejection', reason);
   process.exit(1);
+}
+
+function isErrorComingFromActualApi(reason) {
+  return reason
+    && ((reason.stack && reason.stack.indexOf('@actual-app/api') != -1) || reason.type == 'APIError');
+}
+
+/**
+ * Forcing a restart if there is a problem opening a budget that was successfully
+ * opened before.
+ */
+function doesActualErrorRequiresRestartingTheHttpService(reason) {
+  return reason && reason.stack && reason.stack.indexOf('We had an unknown problem opening') != -1;
 }
 
 process.on('unhandledRejection', ignoreUnhandledRejectionsCausedByActualApiLibrary);
