@@ -207,6 +207,14 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     }
   }
 
+  async function holdBudgetForNextMonth(month, amount) {
+      return actualApi.holdBudgetForNextMonth(month, amount);
+  }
+
+  async function resetBudgetHold(month) {
+    return actualApi.resetBudgetHold(month);
+  }
+
   async function runBankSync(accountId) {
     let bankSyncArgs = undefined;
     if (accountId) {
@@ -293,6 +301,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updatePayee: updatePayee,
     deletePayee: deletePayee,
     addCategoryTransfer: addCategoryTransfer,
+    holdBudgetForNextMonth: holdBudgetForNextMonth,
+    resetBudgetHold: resetBudgetHold,
     runBankSync: runBankSync,
     getRules: getRules,
     getPayeeRules: getPayeeRules,

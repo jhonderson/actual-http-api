@@ -595,4 +595,86 @@ module.exports = (router) => {
       next(err);
     }
   });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/months/{month}/nextmonthbudgethold:
+   *   post:
+   *     summary: Put a budget amount on hold for next month
+   *     description: Put a budget amount on hold for next month
+   *     tags: [Budget Months]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             required:
+   *               - amount
+   *             type: object
+   *             properties:
+   *               amount:
+   *                 type: integer
+   *             examples:
+   *               - amount: 10000
+   *     responses:
+   *       '200':
+   *         description: Budget amount was put on hold for next month
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Budget amount 10000 was put on hold for next month
+   *       '400':
+   *         $ref: '#/components/responses/400'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   *   delete:
+   *     summary: Reset budget hold
+   *     tags: [Budget Months]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: Budget hold reset
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Budget hold reset
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.post('/budgets/:budgetSyncId/months/:month/nextmonthbudgethold', async (req, res, next) => {
+    try {
+      await res.locals.budget.holdBudgetForNextMonth(req.params.month, req.body.amount);
+      res.json({'message': `Budget amount ${req.body.amount} was put on hold for next month`});
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  router.delete('/budgets/:budgetSyncId/months/:month/nextmonthbudgethold', async (req, res, next) => {
+    try {
+      await res.locals.budget.resetBudgetHold(req.params.month);
+      res.json({'message': 'Budget hold reset'});
+    } catch(err) {
+      next(err);
+    }
+  });
 }
