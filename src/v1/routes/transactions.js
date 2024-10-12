@@ -145,10 +145,16 @@ module.exports = (router) => {
    *               - transaction
    *             type: object
    *             properties:
+   *               learnCategories:
+ *                   type: boolean
+   *               runTransfers:
+ *                   type: boolean
    *               transaction:
    *                 $ref: '#/components/schemas/Transaction'
    *             examples:
-   *               - transaction:
+   *               - learnCategories: false
+   *                 runTransfers: false
+   *                 transaction:
    *                   account: "729cb492-4eab-468b-9522-75d455cded22"
    *                   category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
    *                   amount: -7374
@@ -188,7 +194,10 @@ module.exports = (router) => {
     try {
       validateTransactionBody(req.body.transaction);
       await validateAccountExists(res, req.params.accountId);
-      res.json({'message': await res.locals.budget.addTransaction(req.params.accountId, req.body.transaction)}).status(201);
+      res.json({'message': await res.locals.budget.addTransaction(req.params.accountId, req.body.transaction, {
+        learnCategories: req.body.learnCategories || false,
+        runTransfers: req.body.runTransfers || false,
+      })}).status(201);
     } catch(err) {
       next(err);
     }
@@ -218,12 +227,18 @@ module.exports = (router) => {
    *               - transactions
    *             type: object
    *             properties:
+   *               learnCategories:
+ *                   type: boolean
+   *               runTransfers:
+ *                   type: boolean
    *               transactions:
    *                 type: array
    *                 items:
    *                   $ref: '#/components/schemas/Transaction'
    *             examples:
-   *               - transactions:
+   *               - learnCategories: false
+   *                 runTransfers: false
+   *                 transactions:
    *                 - account: "729cb492-4eab-468b-9522-75d455cded22"
    *                   category: "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
    *                   amount: -7374
@@ -250,7 +265,10 @@ module.exports = (router) => {
     try {
       validateTransactionsArray(req.body.transactions);
       await validateAccountExists(res, req.params.accountId);
-      res.json({'message': await res.locals.budget.addTransactions(req.params.accountId, req.body.transactions)}).status(201);
+      res.json({'message': await res.locals.budget.addTransactions(req.params.accountId, req.body.transactions, {
+          learnCategories: req.body.learnCategories || false,
+          runTransfers: req.body.runTransfers || false,
+        })}).status(201);
     } catch(err) {
       next(err);
     }

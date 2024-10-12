@@ -106,16 +106,16 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getTransactions(accountId, sinceDate, untilDate);
   }
 
-  async function addTransaction(accountId, transaction) {
-    const transactionIds = await addTransactions(accountId, [transaction]);
+  async function addTransaction(accountId, transaction, { learnCategories = false, runTransfers = false } = {}) {
+    const transactionIds = await addTransactions(accountId, [transaction], {learnCategories, runTransfers});
     if (transactionIds && Array.isArray(transactionIds) && transactionIds.length > 0) {
       return transactionIds[0];
     }
     return transactionIds;
   }
 
-  async function addTransactions(accountId, transactions) {
-    return actualApi.addTransactions(accountId, transactions);
+  async function addTransactions(accountId, transactions, { learnCategories = false, runTransfers = false } = {}) {
+    return actualApi.addTransactions(accountId, transactions, {learnCategories, runTransfers});
   }
 
   async function importTransactions(accountId, transactions) {
