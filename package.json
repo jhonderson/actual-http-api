@@ -1,6 +1,6 @@
 {
   "name": "actual-http-api",
-  "version": "0.18.0",
+  "version": "25.4.0",
   "description": "Basic Actual Budgeting API exposed through HTTP endpoints",
   "main": "server.js",
   "bin": "./server.js",
@@ -10,7 +10,7 @@
   "author": "jhonderson",
   "license": "MIT",
   "dependencies": {
-    "@actual-app/api": "^25.3.1",
+    "@actual-app/api": "^25.4.0",
     "express": "^4.21.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
