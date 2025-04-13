@@ -85,12 +85,12 @@
       "title": "Actual HTTP API",
       "tooltip": "Open API docs",
       "type": "link",
-      "url": "http://actualhttpapi:5007/api-docs/"
+      "url": "$instance/api-docs/"
     }
   ],
   "panels": [
     {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -98,192 +98,190 @@
         "y": 0
       },
       "id": 7,
-      "panels": [
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 2,
-            "w": 24,
-            "x": 0,
-            "y": 1
-          },
-          "id": 2,
-          "options": {
-            "afterRender": "",
-            "content": "<div class=\"alert alert-primary\" role=\"alert\">\n  You have selected: <b>{{name}}</b>\n</div>",
-            "contentPartials": [],
-            "defaultContent": "The query didn't return any results.",
-            "editor": {
-              "format": "auto",
-              "language": "html"
-            },
-            "editors": [
-              "helpers"
-            ],
-            "externalStyles": [],
-            "helpers": "import(\"https://esm.sh/bootstrap@5.0.2\");",
-            "renderMode": "everyRow",
-            "styles": "",
-            "wrap": true
-          },
-          "pluginVersion": "5.7.0",
-          "targets": [
-            {
-              "columns": [],
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "parse-json\n| project \"data\"",
-              "source": "url",
-              "type": "json",
-              "uql": "parse-json\r\n| project \"data\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
-              }
-            }
-          ],
-          "title": "",
-          "transformations": [
-            {
-              "id": "extractFields",
-              "options": {
-                "delimiter": ",",
-                "format": "json",
-                "source": "result"
-              }
-            },
-            {
-              "id": "filterFieldsByName",
-              "options": {
-                "byVariable": false,
-                "include": {
-                  "names": [
-                    "name"
-                  ]
-                }
-              }
-            }
-          ],
-          "transparent": true,
-          "type": "marcusolsson-dynamictext-panel"
-        },
-        {
-          "datasource": {
-            "type": "yesoreyeram-infinity-datasource",
-            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "custom": {
-                "align": "auto",
-                "cellOptions": {
-                  "type": "auto",
-                  "wrapText": false
-                },
-                "inspect": false
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 13,
-            "w": 24,
-            "x": 0,
-            "y": 3
-          },
-          "id": 4,
-          "options": {
-            "cellHeight": "sm",
-            "footer": {
-              "countRows": false,
-              "fields": "",
-              "reducer": [
-                "sum"
-              ],
-              "show": false
-            },
-            "showHeader": true
-          },
-          "pluginVersion": "11.6.0",
-          "targets": [
-            {
-              "columns": [],
-              "filters": [],
-              "format": "table",
-              "global_query_id": "",
-              "parser": "uql",
-              "refId": "A",
-              "root_selector": "parse-json\n| project \"data\"",
-              "source": "url",
-              "type": "json",
-              "uql": "parse-json\r\n| project \"data\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts",
-              "url_options": {
-                "data": "",
-                "method": "GET"
-              },
-              "datasource": {
-                "type": "yesoreyeram-infinity-datasource",
-                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
-              }
-            }
-          ],
-          "title": "Accounts List",
-          "transformations": [
-            {
-              "id": "filterFieldsByName",
-              "options": {
-                "include": {
-                  "names": [
-                    "id",
-                    "name",
-                    "offbudget"
-                  ]
-                }
-              }
-            }
-          ],
-          "type": "table"
-        }
-      ],
+      "panels": [],
       "title": "Accounts",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "afterRender": "",
+        "content": "<div class=\"alert alert-primary\" role=\"alert\">\n  You have selected: <b>{{name}}</b>\n</div>",
+        "contentPartials": [],
+        "defaultContent": "The query didn't return any results.",
+        "editor": {
+          "format": "auto",
+          "language": "html"
+        },
+        "editors": [
+          "helpers"
+        ],
+        "externalStyles": [],
+        "helpers": "import(\"https://esm.sh/bootstrap@5.0.2\");",
+        "renderMode": "everyRow",
+        "styles": "",
+        "wrap": true
+      },
+      "pluginVersion": "5.7.0",
+      "targets": [
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "parse-json\n| project \"data\"",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"",
+          "url": "$instance/v1/budgets/$budget/accounts/$account",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "delimiter": ",",
+            "format": "json",
+            "source": "result"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "byVariable": false,
+            "include": {
+              "names": [
+                "name"
+              ]
+            }
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "marcusolsson-dynamictext-panel"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto",
+              "wrapText": false
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "parser": "uql",
+          "refId": "A",
+          "root_selector": "parse-json\n| project \"data\"",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"",
+          "url": "$instance/v1/budgets/$budget/accounts",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Accounts List",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "id",
+                "name",
+                "offbudget"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "table"
     },
     {
       "collapsed": true,
@@ -291,7 +289,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 1
+        "y": 16
       },
       "id": 6,
       "panels": [
@@ -322,7 +320,7 @@
             "h": 16,
             "w": 12,
             "x": 0,
-            "y": 2
+            "y": 32
           },
           "id": 8,
           "options": {
@@ -369,7 +367,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categories",
+              "url": "$instance/v1/budgets/$budget/categories",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -391,7 +389,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url": "$instance/v1/budgets/$budget/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -584,7 +582,7 @@
             "h": 16,
             "w": 12,
             "x": 12,
-            "y": 2
+            "y": 32
           },
           "id": 5,
           "options": {
@@ -627,7 +625,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categories",
+              "url": "$instance/v1/budgets/$budget/categories",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -649,7 +647,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url": "$instance/v1/budgets/$budget/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -803,7 +801,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 2
+        "y": 17
       },
       "id": 11,
       "panels": [
@@ -860,7 +858,7 @@
             "h": 16,
             "w": 12,
             "x": 0,
-            "y": 3
+            "y": 33
           },
           "id": 9,
           "options": {
@@ -907,7 +905,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+              "url": "$instance/v1/budgets/$budget/categorygroups",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -929,7 +927,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url": "$instance/v1/budgets/$budget/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -1120,7 +1118,7 @@
             "h": 16,
             "w": 12,
             "x": 12,
-            "y": 3
+            "y": 33
           },
           "id": 10,
           "options": {
@@ -1163,7 +1161,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+              "url": "$instance/v1/budgets/$budget/categorygroups",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -1185,7 +1183,7 @@
               "source": "url",
               "type": "json",
               "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
-              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url": "$instance/v1/budgets/$budget/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
               "url_options": {
                 "data": "",
                 "method": "GET"
@@ -1341,7 +1339,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 18
       },
       "id": 12,
       "panels": [],
@@ -1410,7 +1408,7 @@
         "h": 16,
         "w": 12,
         "x": 0,
-        "y": 4
+        "y": 19
       },
       "id": 14,
       "options": {
@@ -1456,7 +1454,7 @@
           "source": "url",
           "type": "json",
           "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
-          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+          "url": "$instance/v1/budgets/$budget/categorygroups",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -1478,7 +1476,7 @@
           "source": "url",
           "type": "json",
           "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
-          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+          "url": "$instance/v1/budgets/$budget/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -1726,7 +1724,7 @@
         "h": 16,
         "w": 12,
         "x": 12,
-        "y": 4
+        "y": 19
       },
       "id": 16,
       "options": {
@@ -1771,7 +1769,7 @@
           "source": "url",
           "type": "json",
           "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
-          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+          "url": "$instance/v1/budgets/$budget/categorygroups",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -1793,7 +1791,7 @@
           "source": "url",
           "type": "json",
           "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
-          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+          "url": "$instance/v1/budgets/$budget/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
           "url_options": {
             "data": "",
             "method": "GET"
@@ -1973,6 +1971,257 @@
         }
       ],
       "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Outcome"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": []
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Income"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 17,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "hide": false,
+          "parser": "uql",
+          "refId": "Categorie",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
+          "url": "$instance/v1/budgets/$budget/categorygroups",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "dataframe",
+          "global_query_id": "",
+          "hide": false,
+          "parser": "uql",
+          "refId": "Transazioni",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\", \"notes\"\r\n",
+          "url": "$instance/v1/budgets/$budget/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "delimiter": ",",
+            "format": "json",
+            "keepTime": false,
+            "replace": false,
+            "source": "categories"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "name 1",
+            "renamePattern": "group_name"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "byVariable": false,
+            "include": {
+              "names": [
+                "Categorie id",
+                "group_name",
+                "Transazioni category",
+                "Transazioni amount",
+                "date",
+                "Transazioni notes",
+                "Categorie is_income"
+              ]
+            }
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "id 2",
+            "renamePattern": "category"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "is_income 1",
+            "renamePattern": "income"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "id 1",
+            "renamePattern": "group_id"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "category",
+            "mode": "inner"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "total",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "amount Transazioni"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "100"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "amount Transazioni": true,
+              "category": true,
+              "group_id": true,
+              "is_income Categorie": true
+            },
+            "includeByName": {},
+            "indexByName": {
+              "amount Transazioni": 6,
+              "category": 1,
+              "date Transazioni": 0,
+              "group_id": 2,
+              "group_name": 4,
+              "is_income Categorie": 5,
+              "notes Transazioni": 7,
+              "total": 8
+            },
+            "renameByName": {
+              "amount Transazioni": "",
+              "is_income Categorie": ""
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
   "schemaVersion": 41,
@@ -2000,7 +2249,7 @@
             "source": "url",
             "type": "json",
             "uql": "parse-json\r\n| project \"data\"\r\n| project \"id\"",
-            "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts",
+            "url": "$instance/v1/budgets/$budget/accounts",
             "url_options": {
               "data": "",
               "method": "GET"
@@ -2012,6 +2261,40 @@
         "refresh": 1,
         "regex": "",
         "type": "query"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "label": "Budget ID",
+        "name": "budget",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "label": "Instance Address",
+        "name": "instance",
+        "options": [
+          {
+            "selected": true,
+            "text": "",
+            "value": ""
+          }
+        ],
+        "query": "",
+        "type": "textbox"
       }
     ]
   },
@@ -2023,6 +2306,6 @@
   "timezone": "browser",
   "title": "Improved Actual Budget",
   "uid": "beim3ysg2yhogf",
-  "version": 75,
+  "version": 2,
   "weekStart": ""
 }
