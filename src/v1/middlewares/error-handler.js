@@ -24,7 +24,9 @@ const errorHandler = (err, req, res, next) => {
     || err.message.includes('required')
     || err.message.includes('Bad date format')
     || err.message.includes('does not exist on table')
-    || err.message.includes('convert to integer')) {
+    || err.message.includes('convert to integer')
+    || err.message.includes('must be')
+  ) {
     clientError(res, 400, err, err.message);
   } else {
     serverError(res, err, 'Unknown error while interacting with Actual Api. See server logs for more information');

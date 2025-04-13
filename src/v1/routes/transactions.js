@@ -1,4 +1,4 @@
-const { isEmpty } = require('../../utils/utils');
+const { isEmpty, paginate, validatePaginationParameters } = require('../../utils/utils');
 
 /**
  * @swagger
@@ -28,6 +28,20 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: false
  *       description: End date. Example 2023-08-31
+ *     page:
+ *       name: page
+ *       in: query
+ *       schema:
+ *         type: number
+ *       required: false
+ *       description: Page number. When limit is set, this parameter is required. Example 2
+ *     limit:
+ *       name: limit
+ *       in: query
+ *       schema:
+ *         type: number
+ *       required: false
+ *       description: Number of transactions to return. When page is set, this parameter is required. Example 50
  *   schemas:
  *     Transaction:
  *       required:
@@ -81,6 +95,8 @@ module.exports = (router) => {
    *       - $ref: '#/components/parameters/accountId'
    *       - $ref: '#/components/parameters/sinceDate'
    *       - $ref: '#/components/parameters/untilDate'
+   *       - $ref: '#/components/parameters/page'
+   *       - $ref: '#/components/parameters/limit'
    *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:
    *       '200':
@@ -183,26 +199,32 @@ module.exports = (router) => {
         throw new Error('since_date query parameter is required');
       }
       await validateAccountExists(res, req.params.accountId);
-      res.json({'data': await res.locals.budget.getTransactions(req.params.accountId, req.query.since_date,
-        req.query.until_date)});
-    } catch(err) {
+      let allTransactions = await res.locals.budget.getTransactions(req.params.accountId, req.query.since_date, req.query.until_date);
+      if (req.query.page || req.query.limit) {
+        validatePaginationParameters(req);
+        res.json({ 'data': paginate(allTransactions, parseInt(req.query.page), parseInt(req.query.limit)) });
+      } else {
+        res.json({ 'data': allTransactions });
+      }
+    }
+    catch (err) {
       next(err);
     }
   });
-  
+
   router.post('/budgets/:budgetSyncId/accounts/:accountId/transactions', async (req, res, next) => {
     try {
       validateTransactionBody(req.body.transaction);
       await validateAccountExists(res, req.params.accountId);
       res.json({'message': await res.locals.budget.addTransaction(req.params.accountId, req.body.transaction, {
-        learnCategories: req.body.learnCategories || false,
-        runTransfers: req.body.runTransfers || false,
+          learnCategories: req.body.learnCategories || false,
+          runTransfers: req.body.runTransfers || false,
       })}).status(201);
     } catch(err) {
       next(err);
     }
   });
-  
+
   /**
    * @swagger
    * /budgets/{budgetSyncId}/accounts/{accountId}/transactions/batch:
@@ -273,7 +295,7 @@ module.exports = (router) => {
       next(err);
     }
   });
-  
+
   /**
    * @swagger
    * /budgets/{budgetSyncId}/accounts/{accountId}/transactions/import:
@@ -361,7 +383,7 @@ module.exports = (router) => {
       next(err);
     }
   });
-  
+
   /**
    * @swagger
    * /budgets/{budgetSyncId}/transactions/{transactionId}:

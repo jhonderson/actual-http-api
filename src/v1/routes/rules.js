@@ -1,3 +1,5 @@
+const { validatePaginationParameters, paginate } = require('../../utils/utils');
+
 /**
  * @swagger
  * tags:
@@ -12,6 +14,20 @@
  *         type: string
  *       required: true
  *       description: Rule id
+ *     page:
+ *       name: page
+ *       in: query
+ *       schema:
+ *         type: number
+ *       required: false
+ *       description: Page number. When limit is set, this parameter is required. Example 2
+ *     limit:
+ *       name: limit
+ *       in: query
+ *       schema:
+ *         type: number
+ *       required: false
+ *       description: Number of rules to return. When page is set, this parameter is required. Example 50
  *   schemas:
  *     ConditionOrAction:
  *       required:
@@ -70,6 +86,8 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *       - $ref: '#/components/parameters/page'
+   *       - $ref: '#/components/parameters/limit'
    *     responses:
    *       '200':
    *         description: The list of rules for the specified budget
@@ -191,8 +209,14 @@ module.exports = (router) => {
    */
   router.get('/budgets/:budgetSyncId/rules', async (req, res, next) => {
     try {
-      res.json({'data': await res.locals.budget.getRules()});
-    } catch(err) {
+      let allRules = await res.locals.budget.getRules();
+      if (req.query.page || req.query.limit) {
+        validatePaginationParameters(req);
+        res.json({ 'data': paginate(allRules, parseInt(req.query.page), parseInt(req.query.limit)) });
+      } else {
+        res.json({ 'data': allRules });
+      }
+    } catch (err) {
       next(err);
     }
   });
