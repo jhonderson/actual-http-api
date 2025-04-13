@@ -1,0 +1,2028 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_YESOREYERAM-INFINITY-DATASOURCE",
+      "label": "yesoreyeram-infinity-datasource",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "yesoreyeram-infinity-datasource",
+      "pluginName": "Infinity"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "barchart",
+      "name": "Bar chart",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "11.6.0"
+    },
+    {
+      "type": "panel",
+      "id": "marcusolsson-dynamictext-panel",
+      "name": "Business Text",
+      "version": "5.7.0"
+    },
+    {
+      "type": "panel",
+      "id": "piechart",
+      "name": "Pie chart",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "yesoreyeram-infinity-datasource",
+      "name": "Infinity",
+      "version": "3.2.0"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Actual HTTP API",
+      "tooltip": "Open API docs",
+      "type": "link",
+      "url": "http://homeserver.home:5007/api-docs/"
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 7,
+      "panels": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 2,
+          "options": {
+            "afterRender": "",
+            "content": "<div class=\"alert alert-primary\" role=\"alert\">\n  You have selected: <b>{{name}}</b>\n</div>",
+            "contentPartials": [],
+            "defaultContent": "The query didn't return any results.",
+            "editor": {
+              "format": "auto",
+              "language": "html"
+            },
+            "editors": [
+              "helpers"
+            ],
+            "externalStyles": [],
+            "helpers": "import(\"https://esm.sh/bootstrap@5.0.2\");",
+            "renderMode": "everyRow",
+            "styles": "",
+            "wrap": true
+          },
+          "pluginVersion": "5.7.0",
+          "targets": [
+            {
+              "columns": [],
+              "filters": [],
+              "format": "table",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "parse-json\n| project \"data\"",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              }
+            }
+          ],
+          "title": "",
+          "transformations": [
+            {
+              "id": "extractFields",
+              "options": {
+                "delimiter": ",",
+                "format": "json",
+                "source": "result"
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "byVariable": false,
+                "include": {
+                  "names": [
+                    "name"
+                  ]
+                }
+              }
+            }
+          ],
+          "transparent": true,
+          "type": "marcusolsson-dynamictext-panel"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "align": "auto",
+                "cellOptions": {
+                  "type": "auto",
+                  "wrapText": false
+                },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 24,
+            "x": 0,
+            "y": 3
+          },
+          "id": 4,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": true
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "columns": [],
+              "filters": [],
+              "format": "table",
+              "global_query_id": "",
+              "parser": "uql",
+              "refId": "A",
+              "root_selector": "parse-json\n| project \"data\"",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              },
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              }
+            }
+          ],
+          "title": "Accounts List",
+          "transformations": [
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "id",
+                    "name",
+                    "offbudget"
+                  ]
+                }
+              }
+            }
+          ],
+          "type": "table"
+        }
+      ],
+      "title": "Accounts",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 6,
+      "panels": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "decimals": 2,
+              "mappings": [],
+              "unit": "currencyEUR"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 12,
+            "x": 0,
+            "y": 2
+          },
+          "id": 8,
+          "options": {
+            "displayLabels": [],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "percent",
+                "value"
+              ]
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "limit": 50,
+              "values": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "table",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Categorie",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categories",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            },
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "dataframe",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Transazioni",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "category",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "Categorie id"
+                  ],
+                  "reducer": "last"
+                }
+              }
+            },
+            {
+              "id": "filterByValue",
+              "options": {
+                "filters": [
+                  {
+                    "config": {
+                      "id": "regex",
+                      "options": {
+                        "value": "true"
+                      }
+                    },
+                    "fieldName": "Categorie is_income"
+                  }
+                ],
+                "match": "any",
+                "type": "exclude"
+              }
+            },
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "category",
+                "mode": "inner"
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "name Categorie",
+                    "amount Transazioni",
+                    "date Transazioni",
+                    "id Transazioni",
+                    "is_income Categorie"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "amount Transazioni": {
+                    "aggregations": [
+                      "sum"
+                    ],
+                    "operation": "aggregate"
+                  },
+                  "is_income Categorie": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "name Categorie": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  }
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total_100",
+                "mode": "unary",
+                "reduce": {
+                  "reducer": "sum"
+                },
+                "unary": {
+                  "fieldName": "amount Transazioni (sum)",
+                  "operator": "abs"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total",
+                "binary": {
+                  "left": {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "total_100"
+                    }
+                  },
+                  "operator": "/",
+                  "right": {
+                    "fixed": "100"
+                  }
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "name",
+                    "total"
+                  ]
+                }
+              }
+            }
+          ],
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "decimals": 2,
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 20
+                  },
+                  {
+                    "color": "orange",
+                    "value": 50
+                  },
+                  {
+                    "color": "red",
+                    "value": 75
+                  }
+                ]
+              },
+              "unit": "currencyEUR"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 12,
+            "x": 12,
+            "y": 2
+          },
+          "id": 5,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 30,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "table",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Categorie",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categories",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            },
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "dataframe",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Transazioni",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "category",
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [
+                    "Categorie id"
+                  ],
+                  "reducer": "last"
+                }
+              }
+            },
+            {
+              "id": "filterByValue",
+              "options": {
+                "filters": [
+                  {
+                    "config": {
+                      "id": "regex",
+                      "options": {
+                        "value": "true"
+                      }
+                    },
+                    "fieldName": "Categorie is_income"
+                  }
+                ],
+                "match": "any",
+                "type": "exclude"
+              }
+            },
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "category",
+                "mode": "inner"
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "name Categorie",
+                    "amount Transazioni",
+                    "date Transazioni",
+                    "id Transazioni",
+                    "is_income Categorie"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "amount Transazioni": {
+                    "aggregations": [
+                      "sum"
+                    ],
+                    "operation": "aggregate"
+                  },
+                  "is_income Categorie": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "name Categorie": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  }
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total_100",
+                "mode": "unary",
+                "reduce": {
+                  "reducer": "sum"
+                },
+                "unary": {
+                  "fieldName": "amount Transazioni (sum)",
+                  "operator": "abs"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total",
+                "binary": {
+                  "left": {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "total_100"
+                    }
+                  },
+                  "operator": "/",
+                  "right": {
+                    "fixed": "100"
+                  }
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "name",
+                    "total"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "total"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "barchart"
+        }
+      ],
+      "title": "Expenses by Category",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 2
+      },
+      "id": 11,
+      "panels": [
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "decimals": 2,
+              "mappings": [],
+              "unit": "currencyEUR"
+            },
+            "overrides": [
+              {
+                "__systemRef": "hideSeriesFrom",
+                "matcher": {
+                  "id": "byNames",
+                  "options": {
+                    "mode": "exclude",
+                    "names": [
+                      "total (sum)",
+                      "Investments and Savings"
+                    ],
+                    "prefix": "All except:",
+                    "readOnly": true
+                  }
+                },
+                "properties": [
+                  {
+                    "id": "custom.hideFrom",
+                    "value": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": true
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 12,
+            "x": 0,
+            "y": 3
+          },
+          "id": 9,
+          "options": {
+            "displayLabels": [],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "percent",
+                "value"
+              ]
+            },
+            "pieType": "pie",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/^total \\(sum\\)$/",
+              "limit": 50,
+              "values": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "table",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Categorie",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            },
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "dataframe",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Transazioni",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "",
+          "transformations": [
+            {
+              "id": "filterByValue",
+              "options": {
+                "filters": [
+                  {
+                    "config": {
+                      "id": "regex",
+                      "options": {
+                        "value": "true"
+                      }
+                    },
+                    "fieldName": "Categorie is_income"
+                  }
+                ],
+                "match": "any",
+                "type": "exclude"
+              }
+            },
+            {
+              "id": "extractFields",
+              "options": {
+                "delimiter": ",",
+                "format": "json",
+                "keepTime": false,
+                "replace": false,
+                "source": "categories"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "name 1",
+                "renamePattern": "group_name"
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "byVariable": false,
+                "include": {
+                  "names": [
+                    "Categorie id",
+                    "group_name",
+                    "Transazioni category",
+                    "Transazioni amount",
+                    "date"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "id 2",
+                "renamePattern": "category"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "id 1",
+                "renamePattern": "group_id"
+              }
+            },
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "category",
+                "mode": "inner"
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total",
+                "binary": {
+                  "left": {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "amount Transazioni"
+                    }
+                  },
+                  "operator": "/",
+                  "right": {
+                    "fixed": "-100"
+                  }
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "group_name",
+                    "total"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "group_name": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "total": {
+                    "aggregations": [
+                      "sum"
+                    ],
+                    "operation": "aggregate"
+                  }
+                }
+              }
+            }
+          ],
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "decimals": 2,
+              "mappings": [],
+              "thresholds": {
+                "mode": "percentage",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 50
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "currencyEUR"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 16,
+            "w": 12,
+            "x": 12,
+            "y": 3
+          },
+          "id": 10,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "11.6.0",
+          "targets": [
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "table",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Categorie",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            },
+            {
+              "columns": [],
+              "datasource": {
+                "type": "yesoreyeram-infinity-datasource",
+                "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+              },
+              "filters": [],
+              "format": "dataframe",
+              "global_query_id": "",
+              "hide": false,
+              "parser": "uql",
+              "refId": "Transazioni",
+              "root_selector": "",
+              "source": "url",
+              "type": "json",
+              "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
+              "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+              "url_options": {
+                "data": "",
+                "method": "GET"
+              }
+            }
+          ],
+          "title": "",
+          "transformations": [
+            {
+              "id": "filterByValue",
+              "options": {
+                "filters": [
+                  {
+                    "config": {
+                      "id": "regex",
+                      "options": {
+                        "value": "true"
+                      }
+                    },
+                    "fieldName": "Categorie is_income"
+                  }
+                ],
+                "match": "any",
+                "type": "exclude"
+              }
+            },
+            {
+              "id": "extractFields",
+              "options": {
+                "delimiter": ",",
+                "format": "json",
+                "keepTime": false,
+                "replace": false,
+                "source": "categories"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "name 1",
+                "renamePattern": "group_name"
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "byVariable": false,
+                "include": {
+                  "names": [
+                    "Categorie id",
+                    "group_name",
+                    "Transazioni category",
+                    "Transazioni amount",
+                    "date"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "id 2",
+                "renamePattern": "category"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "id 1",
+                "renamePattern": "group_id"
+              }
+            },
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "category",
+                "mode": "inner"
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "total",
+                "binary": {
+                  "left": {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "amount Transazioni"
+                    }
+                  },
+                  "operator": "/",
+                  "right": {
+                    "fixed": "-100"
+                  }
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                },
+                "replaceFields": false
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "group_name",
+                    "total"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "group_name": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  },
+                  "total": {
+                    "aggregations": [
+                      "sum"
+                    ],
+                    "operation": "aggregate"
+                  }
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "total (sum)"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "barchart"
+        }
+      ],
+      "title": "Expenses by Category Group",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "id": 12,
+      "panels": [],
+      "title": "Expenses vs Income",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "decimals": 2,
+          "mappings": [],
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Outcome"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": []
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Income"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 14,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "values": [
+            "percent",
+            "value"
+          ]
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "hide": false,
+          "parser": "uql",
+          "refId": "Categorie",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
+          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "dataframe",
+          "global_query_id": "",
+          "hide": false,
+          "parser": "uql",
+          "refId": "Transazioni",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
+          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "delimiter": ",",
+            "format": "json",
+            "keepTime": false,
+            "replace": false,
+            "source": "categories"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "name 1",
+            "renamePattern": "group_name"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "byVariable": false,
+            "include": {
+              "names": [
+                "Categorie id",
+                "group_name",
+                "Transazioni category",
+                "Transazioni amount",
+                "date",
+                "Categorie is_income"
+              ]
+            }
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "id 2",
+            "renamePattern": "category"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "id 1",
+            "renamePattern": "group_id"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "category",
+            "mode": "inner"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "total",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "amount Transazioni"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "-100"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total",
+            "mode": "unary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "unary": {
+              "fieldName": "total",
+              "operator": "abs"
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Total": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "group_name": {
+                "aggregations": []
+              },
+              "is_income Categorie": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "total": {
+                "aggregations": [
+                  "sum"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "is_income 2": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Total (sum)": "Total",
+              "is_income 1": "Is Expenses",
+              "total (sum)": "Total"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "Is Expenses"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "Total",
+                "handlerKey": "field.value"
+              },
+              {
+                "fieldName": "Is Expenses",
+                "handlerKey": "field.name"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "false": "Outcome",
+              "true": "Income"
+            }
+          }
+        }
+      ],
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Outcome"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": []
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Income"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 16,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 0,
+        "namePlacement": "auto",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": false,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "11.6.0",
+      "targets": [
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "table",
+          "global_query_id": "",
+          "hide": false,
+          "parser": "uql",
+          "refId": "Categorie",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"\r\n| project-away \"hidden\"\r\n| mv-expand \"categories\"",
+          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/categorygroups",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        },
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+          },
+          "filters": [],
+          "format": "dataframe",
+          "global_query_id": "",
+          "hide": false,
+          "parser": "uql",
+          "refId": "Transazioni",
+          "root_selector": "",
+          "source": "url",
+          "type": "json",
+          "uql": "parse-json\r\n| project \"data\"\r\n| project \"category\", \"amount\", \"date\"\r\n",
+          "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts/$account/transactions?since_date=${__from:date:YYYY-MM-DD}&until_date=${__to:date:YYYY-MM-DD}",
+          "url_options": {
+            "data": "",
+            "method": "GET"
+          }
+        }
+      ],
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "delimiter": ",",
+            "format": "json",
+            "keepTime": false,
+            "replace": false,
+            "source": "categories"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "name 1",
+            "renamePattern": "group_name"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "byVariable": false,
+            "include": {
+              "names": [
+                "Categorie id",
+                "group_name",
+                "Transazioni category",
+                "Transazioni amount",
+                "date",
+                "Categorie is_income"
+              ]
+            }
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "id 2",
+            "renamePattern": "category"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "id 1",
+            "renamePattern": "group_id"
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "category",
+            "mode": "inner"
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "total",
+            "binary": {
+              "left": {
+                "matcher": {
+                  "id": "byName",
+                  "options": "amount Transazioni"
+                }
+              },
+              "operator": "/",
+              "right": {
+                "fixed": "-100"
+              }
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": false
+          }
+        },
+        {
+          "id": "calculateField",
+          "options": {
+            "alias": "Total",
+            "mode": "unary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "unary": {
+              "fieldName": "total",
+              "operator": "abs"
+            }
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Total": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "group_name": {
+                "aggregations": []
+              },
+              "is_income Categorie": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "total": {
+                "aggregations": [
+                  "sum"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "is_income 2": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "Total (sum)": "Total",
+              "is_income 1": "Is Expenses",
+              "total (sum)": "Total"
+            }
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "string",
+                "targetField": "Is Expenses"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "Total",
+                "handlerKey": "field.value"
+              },
+              {
+                "fieldName": "Is Expenses",
+                "handlerKey": "field.name"
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "false": "Outcome",
+              "true": "Income"
+            }
+          }
+        }
+      ],
+      "type": "bargauge"
+    }
+  ],
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "${DS_YESOREYERAM-INFINITY-DATASOURCE}"
+        },
+        "definition": "",
+        "label": "Account ID",
+        "name": "account",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "filters": [],
+            "format": "table",
+            "parser": "uql",
+            "refId": "variable",
+            "root_selector": "",
+            "source": "url",
+            "type": "json",
+            "uql": "parse-json\r\n| project \"data\"\r\n| project \"id\"",
+            "url": "http://actualhttpapi:5007/v1/budgets/ac1be0a2-5b2f-41b5-9320-ee33375533f3/accounts",
+            "url_options": {
+              "data": "",
+              "method": "GET"
+            }
+          },
+          "query": "",
+          "queryType": "infinity"
+        },
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Improved Actual Budget",
+  "uid": "beim3ysg2yhogf",
+  "version": 75,
+  "weekStart": ""
+}
