@@ -7,7 +7,7 @@ const {
   ACTUAL_SERVER_URL,
   ACTUAL_SERVER_PASSWORD,
   ACTUAL_AUTH_METHOD,
-  API_PORT
+  PORT
 } = process.env;
 
 const { init, setToken } = require('@actual-app/api');
