@@ -1,4 +1,5 @@
 const express = require('express');
+const { init, setToken } = require('@actual-app/api');
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -10,16 +11,12 @@ const {
   PORT
 } = process.env;
 
-const { init, setToken } = require('@actual-app/api');
-
 async function getToken () {
   const opts = { method: 'POST', headers: {} };
 
   if (ACTUAL_AUTH_METHOD === 'header') {
-    // Header-based flow (Actual ≥ 24.6.0)
     opts.headers['X-Actual-Password'] = ACTUAL_SERVER_PASSWORD;
   } else {
-    // Classic JSON body flow
     opts.headers['content-type'] = 'application/json';
     opts.body = JSON.stringify({ password: ACTUAL_SERVER_PASSWORD });
   }
@@ -41,6 +38,8 @@ async function getToken () {
 
   const v1Routes = require('./src/v1/routes');
   app.use('/v1', v1Routes);
+
+  app.get('/health', (_req, res) => res.sendStatus(200));
 
   const swaggerUi = require('swagger-ui-express');
   const { openapiSpecification } = require('./src/config/swagger');
