@@ -16,7 +16,7 @@ const openapiSpecification = swaggerJsdoc({
           name: 'MIT',
           url: 'http://opensource.org/licenses/MIT',
         },
-        version: '25.5.0',
+        version: '25.6.1',
       },
       components: {
         securitySchemes: {
