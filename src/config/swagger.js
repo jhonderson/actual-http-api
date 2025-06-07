@@ -33,10 +33,16 @@ const openapiSpecification = swaggerJsdoc({
           url: "http://localhost:5007/v1"
         },
         {
-          url: "https://{host}:443/{basePath}",
+          url: "{protocol}://{host}:{port}/{basePath}",
           variables: {
+            protocol: {
+              default: "https",
+            },
             host: {
               default: "localhost",
+            },
+            port: {
+              default: "443",
             },
             basePath: {
               default: "v1"
