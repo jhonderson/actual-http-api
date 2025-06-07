@@ -1,4 +1,4 @@
-FROM node:18-alpine AS BUILD_IMAGE
+FROM node:22-alpine AS BUILD_IMAGE
 
 WORKDIR /usr/src/app
 
