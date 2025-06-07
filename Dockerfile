@@ -9,7 +9,7 @@ RUN npm ci --omit=dev
 
 COPY . .
 
-FROM node:18-alpine AS RUNNER_IMAGE
+FROM node:22-alpine AS RUNNER_IMAGE
 
 WORKDIR /usr/src/app
 
