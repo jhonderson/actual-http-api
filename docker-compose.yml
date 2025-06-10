@@ -1,14 +1,42 @@
-version: '3.3'
+version: "3.9"
+
 services:
-    actual-http-api:
-        container_name: actualhttpapi
-        volumes:
-            - './data:/data:rw'
-        ports:
-            - '5007:5007'
-        environment:
-            - 'ACTUAL_SERVER_URL=http://localhost:5006/'
-            - 'ACTUAL_SERVER_PASSWORD=my-actual-server-password'
-            - 'API_KEY=my-strong-api-key'
-        restart: on-failure
-        image: jhonderson/actual-http-api:latest
+  actual-http-api:
+    image: actual-http-api:latest
+    container_name: actualhttpapi
+    ports:
+      - ${PORT:-5007}:5007
+    depends_on:
+      actual-server:
+        condition: service_healthy
+    environment:
+      - ACTUAL_SERVER_URL=${ACTUAL_SERVER_URL}
+      - ACTUAL_SERVER_PASSWORD=${ACTUAL_SERVER_PASSWORD}
+      - ACTUAL_AUTH_METHOD=${ACTUAL_AUTH_METHOD:-password}
+      - API_KEY=${API_KEY}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5007/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  actual-server:
+    image: actualbudget/actual-server:latest
+    container_name: actualserver
+    ports:
+      - ${ACTUAL_PORT:-5006}:5006
+    volumes:
+      - ./data:/data
+    environment:
+      - ACTUAL_ALLOWED_LOGIN_METHODS=${ACTUAL_ALLOWED_LOGIN_METHODS}
+      - ACTUAL_LOGIN_METHOD=${ACTUAL_LOGIN_METHOD}
+      - ACTUAL_PASSWORD=${ACTUAL_SERVER_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
