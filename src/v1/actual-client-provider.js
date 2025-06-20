@@ -43,7 +43,7 @@ async function initializeActualClient() {
   });
   const token = await getToken();
   setToken(token);
-  setTimeout(shutdown, 1000 * 60 * 60);
+  setTimeout(invalidateActualClient, 1000 * 60 * 60);
   process.on('unhandledRejection', reason => {
     const stack = reason?.stack || '';
     const isActualError =
@@ -79,5 +79,4 @@ async function invalidateActualClient() {
 
 module.exports = {
   getActualClient,
-  invalidateActualClient,
 };
