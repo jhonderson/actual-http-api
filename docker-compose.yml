@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   actual-http-api:
-    image: actual-http-api:latest
+    image: jhonderson/actual-http-api:latest
     container_name: actualhttpapi
     ports:
       - ${PORT:-5007}:5007
