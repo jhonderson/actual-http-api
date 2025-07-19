@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const { init, setToken, shutdown } = require('@actual-app/api');
 const { createDirIfDoesNotExist } = require('../utils/utils');
+const actualApi = require('@actual-app/api');
 
 let isInitialized = false;
 
@@ -42,7 +43,7 @@ async function initializeActualClient() {
     serverURL: ACTUAL_SERVER_URL,
   });
   const token = await getToken();
-  setToken(token);
+  actualApi.setToken(token);
   setTimeout(invalidateActualClient, 1000 * 60 * 60);
   process.on('unhandledRejection', reason => {
     const stack = reason?.stack || '';
