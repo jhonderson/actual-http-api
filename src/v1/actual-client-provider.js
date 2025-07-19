@@ -1,7 +1,6 @@
 const fetch = require('node-fetch');
-const { init, setToken, shutdown } = require('@actual-app/api');
+const { init, setToken, shutdown, actualApi } = require('@actual-app/api');
 const { createDirIfDoesNotExist } = require('../utils/utils');
-const actualApi = require('@actual-app/api');
 
 let isInitialized = false;
 
