@@ -28,6 +28,9 @@ docker run -d --name actualhttpapi -v ./data:/data:rw -p 5007:5007 \
   --restart=on-failure jhonderson/actual-http-api:latest
 ```
 
+> [!IMPORTANT]
+> It's recommended to use a specific docker tag rather than `latest`. This is because the version of this docker image has to be the same version as the docker image of Actual budget, so if you use latest it may get out of sync. So, use a specific tag for both images, i.e `actualbudget/actual-server:25.8.0` and `jhonderson/actual-http-api:25.8.0`.
+
 Or run it using docker compose:
 ```bash
 docker-compose up -d
