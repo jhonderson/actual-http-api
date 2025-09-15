@@ -74,11 +74,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return accounts.find((account) => accountId == account.id);
   }
                                                                                                 
-  async function getAccountBalance(accountId) {                                               
-    return actualApi.runQuery(actualApi.q('transactions')                                     
-      .filter({ account: accountId })                                                         
-      .options({ splits: 'none' })                                                                      
-      .calculate({ $sum: '$amount' }));                                                       
+  async function getAccountBalance(accountId, cutoffDate) {                                               
+    return actualApi.getAccountBalance(accountId, cutoffDate);                                                       
   } 
 
   async function createAccount(account) {

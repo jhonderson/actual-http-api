@@ -1,5 +1,5 @@
 
-const { isEmpty } = require('../../utils/utils');
+const { isEmpty, formatDateToISOString } = require('../../utils/utils');
 
 /**
  * @swagger
@@ -15,6 +15,27 @@ const { isEmpty } = require('../../utils/utils');
  *         type: string
  *       required: true
  *       description: Account id
+ *     cutoffDate:
+ *       name: cutoff_date
+ *       in: query
+ *       schema:
+ *         type: string
+ *       required: false
+ *       description: Account balance cutoff date. Example 2023-08-01
+ *     sinceDate:
+ *       name: since_date
+ *       in: query
+ *       schema:
+ *         type: string
+ *       required: true
+ *       description: Starting date. Example 2023-08-01
+ *     untilDate:
+ *       name: until_date
+ *       in: query
+ *       schema:
+ *         type: string
+ *       required: false
+ *       description: End date. Example 2023-08-31
  *   schemas:
  *     Account:
  *       required:
@@ -133,14 +154,15 @@ module.exports = (router) => {
    * @swagger                                                                                                                                                                                                                               
    * /budgets/{budgetSyncId}/accounts/{accountId}/balance:                                                                                                                                                                                  
    *   get:                                                                                                                                                                                                                                 
-   *     summary: Returns account balance                                                                                                                                                                                                   
+   *     summary: Gets the balance for an account. If a cutoff is given, it gives the account balance as of that date. If no cutoff is given, it uses the current date as the cutoff.
    *     tags: [Accounts]                                                                                                                                                                                                                   
    *     security:                                                                                                                                                                                                                          
    *       - apiKey: []                                                                                                                                                                                                                     
    *     parameters:                                                                                                                                                                                                                        
-   *       - $ref: '#/components/parameters/budgetSyncId'                                                                                                                                                                                   
-   *       - $ref: '#/components/parameters/accountId'                                                                                                                                                                                      
-   *       - $ref: '#/components/parameters/budgetEncryptionPassword'                                                                                                                                                                       
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/cutoffDate'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
    *     responses:                                                                                                                                                                                                                         
    *       '200':                                                                                                                                                                                                                           
    *         description: Account balance                                                                                                                                                                                                   
@@ -160,19 +182,77 @@ module.exports = (router) => {
    *       '500':                                                                                                                                                                                                                           
    *         $ref: '#/components/responses/500'                                                                                                                                                                                             
    */                                                                                                                                                                                                                                       
-  router.get('/budgets/:budgetSyncId/accounts/:accountId/balance', async (req, res, next) => {                                                                                                                                              
-    try {                                                                                                                                                                                                                                   
-      const balance = await res.locals.budget.getAccountBalance(req.params.accountId);                                                                                                                                                      
-      if (balance) {           
+  router.get('/budgets/:budgetSyncId/accounts/:accountId/balance', async (req, res, next) => {
+    try {
+      const balance = await res.locals.budget.getAccountBalance(req.params.accountId, req.query.cutoff_date);                                                                                                                                                      
+      if (balance !== undefined) {           
         // Removing any additional field in the balance response                                                                                                                                                                                                             
-        res.json({ data: balance.data || 0 });                                                                                                                                                                                                                  
-      } else {                                                                                                                                                                                                                              
-        throw new Error('Account not found');                                                                                                                                                                                               
-      }                                                                                                                                                                                                                                     
-    } catch(err) {                                                                                                                                                                                                                          
-      next(err);                                                                                                                                                                                                                            
-    }                                                                                                                                                                                                                                       
-  });                                                                                                                                                                                                                                       
+        res.json({ data: balance || 0 });
+      } else {
+        throw new Error('Account not found');
+      }
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  /**                                                                                                                                                                                                                                       
+   * @swagger                                                                                                                                                                                                                               
+   * /budgets/{budgetSyncId}/accounts/{accountId}/balancehistory:                                                                                                                                                                                  
+   *   get:                                                                                                                                                                                                                                 
+   *     summary: Gets the balance history for an account, from start to end date, with daily granularity. Until date is optional, defaults to today.
+   *     tags: [Accounts]
+   *     security:                                                                                                                                                                                                                          
+   *       - apiKey: []                                                                                                                                                                                                                     
+   *     parameters:                                                                                                                                                                                                                        
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/accountId'
+   *       - $ref: '#/components/parameters/sinceDate'
+   *       - $ref: '#/components/parameters/untilDate'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:                                                                                                                                                                                                                         
+   *       '200':                                                                                                                                                                                                                           
+   *         description: Account balance                                                                                                                                                                                                   
+   *         content:                                                                                                                                                                                                                       
+   *           application/json:                                                                                                                                                                                                            
+   *             schema:                                                                                                                                                                                                                    
+   *               required:                                                                                                                                                                                                                
+   *                 - data                                                                                                                                                                                                                 
+   *               type: object                                                                                                                                                                                                             
+   *               properties:                                                                                                                                                                                                              
+   *                 data:                                                                                                                                                                                                                  
+   *                   $ref: '#/components/schemas/Amount'                                                                                                                                                                                  
+   *               examples:                                                                                                                                                                                                                
+   *                 - data: 2000                                                                                                                                                                                                           
+   *       '404':                                                                                                                                                                                                                           
+   *         $ref: '#/components/responses/404'                                                                                                                                                                                             
+   *       '500':                                                                                                                                                                                                                           
+   *         $ref: '#/components/responses/500'                                                                                                                                                                                             
+   */                                                                                                                                                                                                                                       
+  router.get('/budgets/:budgetSyncId/accounts/:accountId/balancehistory', async (req, res, next) => {
+    try {
+      const { since_date: sinceDate, until_date: untilDate } = req.query;
+      if (!sinceDate) {
+        throw new Error('since_date query parameter is required');
+      }
+      const start = new Date(sinceDate);
+      const end = untilDate ? new Date(untilDate) : new Date();
+      if (isNaN(start) || isNaN(end) || start > end) {
+        throw new Error('Invalid date range');
+      }
+      const dailyBalance = {};
+      let current = new Date(start);
+      while (current <= end) {
+        const currentDate = formatDateToISOString(current);
+        dailyBalance[currentDate] =
+          (await res.locals.budget.getAccountBalance(req.params.accountId, currentDate)) || 0;
+        current.setDate(current.getDate() + 1);
+      }
+      res.json({ data: dailyBalance });
+    } catch(err) {
+      next(err);
+    }
+  });
   
   /**
    * @swagger
