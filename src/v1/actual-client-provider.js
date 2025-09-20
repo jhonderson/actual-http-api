@@ -1,82 +1,59 @@
-const fetch = require('node-fetch');
-const { init, setToken, shutdown, actualApi } = require('@actual-app/api');
 const { createDirIfDoesNotExist } = require('../utils/utils');
 
-let isInitialized = false;
+let actualApi;
 
-async function getToken() {
+async function initializeActualApiClientThroughHttpHeaders() {
   const {
     ACTUAL_SERVER_URL,
     ACTUAL_SERVER_PASSWORD,
-    ACTUAL_AUTH_METHOD,
+    ACTUAL_DATA_DIR,
   } = process.env;
-
-  const opts = { method: 'POST', headers: {} };
-
-  if (ACTUAL_AUTH_METHOD === 'header') {
-    opts.headers['X-Actual-Password'] = ACTUAL_SERVER_PASSWORD;
-  } else {
-    opts.headers['Content-Type'] = 'application/json';
-    opts.body = JSON.stringify({ password: ACTUAL_SERVER_PASSWORD });
-  }
-
-  const res = await fetch(`${ACTUAL_SERVER_URL}/account/login`, opts);
+  const opts = { method: 'POST', headers: { 'X-Actual-Password': ACTUAL_SERVER_PASSWORD } };
+  const res = await fetch(`${ACTUAL_SERVER_URL}account/login`, opts);
   if (!res.ok) {
     throw new Error(`Actual login failed – ${res.status} ${res.statusText}`);
   }
-  return (await res.json()).data.token;
-}
-
-async function initializeActualClient() {
-  if (isInitialized) return;  // idempotent
-
-  const {
-    ACTUAL_DATA_DIR,
-    ACTUAL_SERVER_URL,
-  } = process.env;
-
+  const actualToken = (await res.json()).data.token;
+  actualApi = require('@actual-app/api');
   createDirIfDoesNotExist(ACTUAL_DATA_DIR);
-
-  await init({
-    dataDir: ACTUAL_DATA_DIR,
-    serverURL: ACTUAL_SERVER_URL,
+  await actualApi.init({
+      dataDir: ACTUAL_DATA_DIR,
+      serverURL: ACTUAL_SERVER_URL,
   });
-  const token = await getToken();
-  actualApi.setToken(token);
-  setTimeout(invalidateActualClient, 1000 * 60 * 60);
-  process.on('unhandledRejection', reason => {
-    const stack = reason?.stack || '';
-    const isActualError =
-      stack.includes('@actual-app/api') || reason.type === 'APIError';
-    const needsRestart = stack.includes('We had an unknown problem opening');
+  // This is not a legal way of accessing the nodejs api, but the only way to set the token for now
+  await actualApi.internal.send('subscribe-set-token', { token: actualToken });
+}
 
-    if (isActualError && !needsRestart) {
-      console.log('Ignoring Actual API unhandledRejection:', reason.message);
-    } else {
-      console.error('Unhandled Rejection:', reason);
-      process.exit(1);
-    }
+async function initializeActualApiClientThroughHttpPayload() {
+  actualApi = require('@actual-app/api');
+  createDirIfDoesNotExist(process.env.ACTUAL_DATA_DIR);
+  await actualApi.init({
+      dataDir: process.env.ACTUAL_DATA_DIR,
+      serverURL: process.env.ACTUAL_SERVER_URL,
+      password: process.env.ACTUAL_SERVER_PASSWORD,
   });
-
-  console.log('Actual API client initialized successfully');
-  isInitialized = true;
 }
 
-async function getActualClient() {
-  if (!isInitialized) {
-    await initializeActualClient();
+async function initializeActualApiClient() {
+  if (process.env.ACTUAL_AUTH_METHOD === 'header') {
+    await initializeActualApiClientThroughHttpHeaders();
+  } else {
+    await initializeActualApiClientThroughHttpPayload();
   }
-  return require('@actual-app/api');
+  console.log('Actual api client initialized successfully');
 }
 
-async function invalidateActualClient() {
-  if (isInitialized) {
-    await shutdown();
-    isInitialized = false;
-    console.log('Actual API client shut down successfully');
+async function invalidateActualApiClient() {
+  await actualApi.shutdown();
+  actualApi = null;
+  console.log('Actual api client was shut down successfully');
+}
+
+exports.getActualApiClient = async () => {
+  if (!actualApi) {
+    await initializeActualApiClient();
+    // Invalidating actual api to force closing the budget and downloading it again at least every hour
+    setTimeout(invalidateActualApiClient, 1000 * 60 * 60);
   }
+  return actualApi;
 }
-
-module.exports = {
-  getActualClient,
-};
