@@ -20,6 +20,7 @@ require('./transactions')(router);
 require('./categories')(router);
 require('./rules')(router);
 require('./payees')(router);
+require('./settings')(router);
 
 router.use(errorHandler);
 

@@ -1,6 +1,6 @@
 
 const { currentLocalDate, formatDateToISOString, listSubDirectories, getFileContent } = require('../utils/utils');
-const { getActualApiClient } = require('./actual-client-provider');
+const { getActualApiClient, downloadBudgetFile: downloadBudgetFileFromActualServer } = require('./actual-client-provider');
 var path = require('path');
 
 let syncIdToBudgetId = {};
@@ -242,6 +242,22 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteRule({ id: ruleId });
   }
 
+  async function getBudgets() {
+    return actualApi.getBudgets();
+  }
+
+  async function downloadBudgetFile(cloudFileId) {
+    const budgets = await actualApi.getBudgets();
+    const budgetMetadata = budgets.find(budget => budget.cloudFileId === cloudFileId && !!budget.name);
+    if (!budgetMetadata) {
+      throw new Error(`Budget not found: ${cloudFileId}`);
+    }
+    return {
+      fileName: budgetMetadata.name,
+      fileContentAsArrayBuffer: await downloadBudgetFileFromActualServer(cloudFileId),
+    };
+  }
+
   async function shutdown() {
     actualApi.shutdown();
   }
@@ -306,6 +322,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     createRule: createRule,
     updateRule: updateRule,
     deleteRule: deleteRule,
+    getBudgets: getBudgets,
+    downloadBudgetFile: downloadBudgetFile,
     shutdown: shutdown,
   };
 }
