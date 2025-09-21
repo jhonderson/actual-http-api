@@ -1,6 +1,3 @@
-const { currentLocalDate, formatDateToISOString } = require('../../utils/utils');
-const zlib = require('zlib');
-
 /**
  * @swagger
  * tags:
@@ -107,39 +104,6 @@ module.exports = (router) => {
   router.get('/budgets/:budgetSyncId/budgets', async (req, res, next) => {
     try {
       res.json({ 'data': await res.locals.budget.getBudgets() });
-    } catch (err) {
-      next(err);
-    }
-  });
-
-  /**
-   * @swagger
-   * /budgets/{budgetSyncId}/export/{cloudFileId}:
-   *   get:
-   *     summary: (🚧 UNSTABLE) Exports the budget data as a zip file containing db.sqlite and metadata.json files. This operation is currently only supported for actual servers using password authentication method. Not suported yet for http header based authentication, nor openid authentication. Encrypted budgets are not supported yet neither.
-   *     tags: [Settings]
-   *     security:
-   *       - apiKey: []
-   *     parameters:
-   *       - $ref: '#/components/parameters/budgetSyncId'
-   *       - $ref: '#/components/parameters/cloudFileId'
-   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
-   *     responses:
-   *       '200':
-   *         description: The budget data as a zip file containing db.sqlite and metadata.json files
-   *       '404':
-   *         $ref: '#/components/responses/404'
-   *       '500':
-   *         $ref: '#/components/responses/500'
-   */
-  router.get('/budgets/:budgetSyncId/export/:cloudFileId', async (req, res, next) => {
-    const { fileName, fileContentAsArrayBuffer } = await res.locals.budget.downloadBudgetFile(req.params.cloudFileId);
-    try {
-      res.setHeader('Content-Type', 'application/zip');
-      res.setHeader('Content-Disposition', `attachment; filename=${formatDateToISOString(currentLocalDate())}-${fileName}.zip`);
-      const gzip = zlib.createGzip();
-      gzip.pipe(res);
-      gzip.end(Buffer.from(fileContentAsArrayBuffer));
     } catch (err) {
       next(err);
     }

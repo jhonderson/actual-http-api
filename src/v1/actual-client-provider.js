@@ -19,37 +19,6 @@ async function invalidateActualApiClient() {
   console.log('Actual api client was shut down successfully');
 }
 
-async function getUserTokenThroughHttpPayload() {
-  const {
-    ACTUAL_SERVER_URL,
-    ACTUAL_SERVER_PASSWORD,
-  } = process.env;
-  const res = await fetch(`${ACTUAL_SERVER_URL}account/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      loginMethod: 'password',
-      password: ACTUAL_SERVER_PASSWORD
-    })
-  });
-  if (!res.ok) {
-    throw new Error(`Actual login failed – ${res.status} ${res.statusText}`);
-  }
-  return (await res.json()).data.token;
-}
-
-exports.downloadBudgetFile = async (cloudFileId) => {
-  const response = await fetch(`${process.env.ACTUAL_SERVER_URL}sync/download-user-file`, {
-      headers: {
-          "X-ACTUAL-TOKEN": await getUserTokenThroughHttpPayload(),
-          "X-ACTUAL-FILE-ID": cloudFileId
-      }
-  });
-  return await response.arrayBuffer();
-}
-
 exports.getActualApiClient = async () => {
   if (!actualApi) {
     await initializeActualApiClient();
