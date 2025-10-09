@@ -30,7 +30,7 @@ const { isEmpty, parseNumericBoolean } = require('../../utils/utils');
  *         id:
  *           type: string
  *         name:
- *            type: integer
+ *            type: string
  *         is_income:
  *            type: boolean
  *         hidden:
@@ -49,7 +49,7 @@ const { isEmpty, parseNumericBoolean } = require('../../utils/utils');
  *         id:
  *           type: string
  *         name:
- *            type: integer
+ *            type: string
  *         is_income:
  *            type: boolean
  *         hidden:
