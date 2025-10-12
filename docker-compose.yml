@@ -1,14 +1,16 @@
-version: '3.3'
+version: "3.9"
+
 services:
     actual-http-api:
         container_name: actualhttpapi
         volumes:
             - './data:/data:rw'
         ports:
-            - '5007:5007'
+            - ${PORT:-5007}:5007
         environment:
-            - 'ACTUAL_SERVER_URL=http://localhost:5006/'
-            - 'ACTUAL_SERVER_PASSWORD=my-actual-server-password'
-            - 'API_KEY=my-strong-api-key'
+            ACTUAL_SERVER_URL: "${ACTUAL_SERVER_URL:-http://localhost:5006/}"
+            ACTUAL_SERVER_PASSWORD: "${ACTUAL_SERVER_PASSWORD:-myactualserverpassword}"
+            API_KEY: "${API_KEY:-mystrongapikey}"
+            ACTUAL_AUTH_METHOD: "${ACTUAL_AUTH_METHOD:-password}"
         restart: on-failure
         image: jhonderson/actual-http-api:latest

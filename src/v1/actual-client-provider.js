@@ -2,7 +2,29 @@ const { createDirIfDoesNotExist } = require('../utils/utils');
 
 let actualApi;
 
-async function initializeActualApiClient() {
+async function initializeActualApiClientThroughHttpHeaders() {
+  const {
+    ACTUAL_SERVER_URL,
+    ACTUAL_SERVER_PASSWORD,
+    ACTUAL_DATA_DIR,
+  } = process.env;
+  const opts = { method: 'POST', headers: { 'X-Actual-Password': ACTUAL_SERVER_PASSWORD } };
+  const res = await fetch(`${ACTUAL_SERVER_URL}account/login`, opts);
+  if (!res.ok) {
+    throw new Error(`Actual login failed – ${res.status} ${res.statusText}`);
+  }
+  const actualToken = (await res.json()).data.token;
+  actualApi = require('@actual-app/api');
+  createDirIfDoesNotExist(ACTUAL_DATA_DIR);
+  await actualApi.init({
+      dataDir: ACTUAL_DATA_DIR,
+      serverURL: ACTUAL_SERVER_URL,
+  });
+  // This is not a legal way of accessing the nodejs api, but the only way to set the token for now
+  await actualApi.internal.send('subscribe-set-token', { token: actualToken });
+}
+
+async function initializeActualApiClientThroughHttpPayload() {
   actualApi = require('@actual-app/api');
   createDirIfDoesNotExist(process.env.ACTUAL_DATA_DIR);
   await actualApi.init({
@@ -10,6 +32,14 @@ async function initializeActualApiClient() {
       serverURL: process.env.ACTUAL_SERVER_URL,
       password: process.env.ACTUAL_SERVER_PASSWORD,
   });
+}
+
+async function initializeActualApiClient() {
+  if (process.env.ACTUAL_AUTH_METHOD === 'header') {
+    await initializeActualApiClientThroughHttpHeaders();
+  } else {
+    await initializeActualApiClientThroughHttpPayload();
+  }
   console.log('Actual api client initialized successfully');
 }
 
