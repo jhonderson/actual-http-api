@@ -1,5 +1,7 @@
 const express = require('express');
 
+const yaml = require('js-yaml');
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -28,6 +30,9 @@ app.get('/api-docs', swaggerUi.setup(null, {
   }
 }));
 app.get('/api-docs/swagger.json', (req, res) => res.json(openapiSpecification));
+app.get('/api-docs/swagger.yaml', (req, res) => {
+  res.type('yaml').send(yaml.dump(openapiSpecification));
+});
 
 const port = process.env.PORT || 5007;
 
