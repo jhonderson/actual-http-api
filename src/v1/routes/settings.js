@@ -1,4 +1,5 @@
 const zlib = require('zlib');
+const querystring = require('querystring');
 
 /**
  * @swagger
@@ -126,7 +127,7 @@ module.exports = (router) => {
     try {
       const { fileName, fileStream } = await res.locals.budget.exportData(req.params.budgetSyncId);
       res.setHeader('Content-Type', 'application/zip');
-      res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+      res.setHeader('Content-Disposition', `attachment; filename=${encodeURIComponent(fileName)}`);
       fileStream.pipe(res);
       fileStream.finalize();
       fileStream.on('error', err => {
