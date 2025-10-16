@@ -2,11 +2,15 @@ const { createDirIfDoesNotExist } = require('../utils/utils');
 
 let actualApi;
 
+function getActualDataDir() {
+  createDirIfDoesNotExist(process.env.ACTUAL_DATA_DIR);
+  return process.env.ACTUAL_DATA_DIR;
+}
+
 async function initializeActualApiClient() {
   actualApi = require('@actual-app/api');
-  createDirIfDoesNotExist(process.env.ACTUAL_DATA_DIR);
   await actualApi.init({
-      dataDir: process.env.ACTUAL_DATA_DIR,
+      dataDir: getActualDataDir(),
       serverURL: process.env.ACTUAL_SERVER_URL,
       password: process.env.ACTUAL_SERVER_PASSWORD,
   });
@@ -18,6 +22,8 @@ async function invalidateActualApiClient() {
   actualApi = null;
   console.log('Actual api client was shut down successfully');
 }
+
+exports.getActualDataDir = () => getActualDataDir();
 
 exports.getActualApiClient = async () => {
   if (!actualApi) {

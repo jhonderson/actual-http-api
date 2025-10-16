@@ -1,7 +1,10 @@
 
 const { currentLocalDate, formatDateToISOString, listSubDirectories, getFileContent } = require('../utils/utils');
-const { getActualApiClient } = require('./actual-client-provider');
-var path = require('path');
+const { getActualApiClient, getActualDataDir } = require('./actual-client-provider');
+
+const archiver = require('archiver');
+const fs = require('fs');
+const path = require('path');
 
 let syncIdToBudgetId = {};
 
@@ -253,10 +256,11 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
   function refreshSincIdToBudgetIdMap() {
     // Unfortunately Actual Node.js api doesn't provide functionality to get the
     // budget id associated to the sync id, this is a hack to do that
+    const actualDataDir = getActualDataDir();
     try {
-      const directories = listSubDirectories(process.env.ACTUAL_DATA_DIR);
+      const directories = listSubDirectories(actualDataDir);
       directories.forEach(subDir => {
-        const metadata = JSON.parse(getFileContent(path.join(process.env.ACTUAL_DATA_DIR, subDir, 'metadata.json')));
+        const metadata = JSON.parse(getFileContent(path.join(actualDataDir, subDir, 'metadata.json')));
         syncIdToBudgetId[metadata.groupId] = metadata.id;
       });
     } catch(err) {
@@ -264,6 +268,27 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
       // everytime the api is called
       console.error('Error creating map from sync id to budget id', err);
     }
+  }
+
+  async function exportData(budgetSyncId) {
+    const dataDir = getActualDataDir();
+    // Get the budget name safely
+    const budget = (await getBudgets() || [])
+      .find(b => b.groupId === budgetSyncId && !!b.id);
+    if (!budget) {
+      throw new Error(`Budget not found for budget sync id ${budgetSyncId}`);
+    }
+    // Create the archive
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    // Add files to the archive
+    for (const file of ['db.sqlite', 'metadata.json']) {
+      archive.file(path.join(dataDir, budget.id, file), { name: file });
+    }
+    // Return archive stream and filename
+    return {
+      fileName: `${new Date().toISOString().split('T')[0]}-${budget.name}.zip`,
+      fileStream: archive
+    };
   }
 
   return {
@@ -311,6 +336,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updateRule: updateRule,
     deleteRule: deleteRule,
     getBudgets: getBudgets,
+    exportData: exportData,
     shutdown: shutdown,
   };
 }

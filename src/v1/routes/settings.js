@@ -1,17 +1,11 @@
+const zlib = require('zlib');
+
 /**
  * @swagger
  * tags:
  *   - name: Settings
  *     description: Endpoints for settings-related operations
  * components:
- *   parameters:
- *     cloudFileId:
- *       name: cloudFileId
- *       in: path
- *       schema:
- *         type: string
- *       required: true
- *       description: Cloud file id
  *   schemas:
  *     Budget:
  *       required:
@@ -104,6 +98,40 @@ module.exports = (router) => {
   router.get('/budgets/:budgetSyncId/budgets', async (req, res, next) => {
     try {
       res.json({ 'data': await res.locals.budget.getBudgets() });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/export:
+   *   get:
+   *     summary: Exports the budget data as a zip file containing db.sqlite and metadata.json files.
+   *     tags: [Settings]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: The budget data as a zip file containing db.sqlite and metadata.json files
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.get('/budgets/:budgetSyncId/export', async (req, res, next) => {
+    try {
+      const { fileName, fileStream } = await res.locals.budget.exportData(req.params.budgetSyncId);
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+      fileStream.pipe(res);
+      fileStream.finalize();
+      fileStream.on('error', err => {
+        if (!res.headersSent) res.status(500).send('Failed to generate zip');
+      });
     } catch (err) {
       next(err);
     }
