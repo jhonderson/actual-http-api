@@ -1,18 +1,19 @@
+const { config } = require('../config/config');
 const { createDirIfDoesNotExist } = require('../utils/utils');
 
 let actualApi;
 
 function getActualDataDir() {
-  createDirIfDoesNotExist(process.env.ACTUAL_DATA_DIR);
-  return process.env.ACTUAL_DATA_DIR;
+  createDirIfDoesNotExist(config.actual.dataDir);
+  return config.actual.dataDir;
 }
 
 async function initializeActualApiClient() {
   actualApi = require('@actual-app/api');
   await actualApi.init({
       dataDir: getActualDataDir(),
-      serverURL: process.env.ACTUAL_SERVER_URL,
-      password: process.env.ACTUAL_SERVER_PASSWORD,
+      serverURL: config.actual.serverUrl,
+      password: config.actual.serverPassword,
   });
   console.log('Actual api client initialized successfully');
 }

@@ -1,10 +1,7 @@
+const { config } = require('./src/config/config');
 const express = require('express');
 
 const yaml = require('js-yaml');
-
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
 
 const v1Routes = require("./src/v1/routes");
 
@@ -34,10 +31,8 @@ app.get('/api-docs/swagger.yaml', (req, res) => {
   res.type('yaml').send(yaml.dump(openapiSpecification));
 });
 
-const port = process.env.PORT || 5007;
-
-app.listen(port, () => {
-    console.log("Actual HTTP Server Listening on PORT: ", port);
+app.listen(config.port, () => {
+    console.log("Actual HTTP Server Listening on PORT: ", config.port);
   });
 
 /**

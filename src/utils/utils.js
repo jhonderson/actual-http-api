@@ -14,16 +14,6 @@ exports.formatDateToISOString = (date) => {
   return date.toISOString().split('T')[0];
 }
 
-exports.validateMandatoryEnvironmentVariables = (mandatoryEnvVars) => {
-  for (const mandatoryEnvVar of mandatoryEnvVars) {
-    console.log((mandatoryEnvVar in process.env));
-    console.log((process.env[mandatoryEnvVar]));
-    if (!(mandatoryEnvVar in process.env)) {
-      throw Error(`${mandatoryEnvVar} environment variable is mandatory`);
-    }
-  }
-}
-
 exports.isEmpty = (obj) => {
   if (!obj) {
     return true;
