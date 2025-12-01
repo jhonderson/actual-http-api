@@ -130,6 +130,14 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteTransaction(transactionId);
   }
 
+  async function deleteTransactions(transactionIds = []) {
+    return actualApi.batchBudgetUpdates(async () => {
+      transactionIds.forEach(async (transactionId) => {
+        await actualApi.deleteTransaction(transactionId);
+      });
+    });
+  }
+
   async function getCategories() {
     return actualApi.getCategories();
   }
@@ -312,6 +320,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     addTransactions: addTransactions,
     updateTransaction: updateTransaction,
     deleteTransaction: deleteTransaction,
+    deleteTransactions: deleteTransactions,
     importTransactions: importTransactions,
     getCategories: getCategories,
     getCategory: getCategory,

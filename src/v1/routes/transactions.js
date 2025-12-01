@@ -162,9 +162,9 @@ module.exports = (router) => {
    *             type: object
    *             properties:
    *               learnCategories:
- *                   type: boolean
+   *                 type: boolean
    *               runTransfers:
- *                   type: boolean
+   *                 type: boolean
    *               transaction:
    *                 $ref: '#/components/schemas/Transaction'
    *             examples:
@@ -250,9 +250,9 @@ module.exports = (router) => {
    *             type: object
    *             properties:
    *               learnCategories:
- *                   type: boolean
+   *                 type: boolean
    *               runTransfers:
- *                   type: boolean
+   *                 type: boolean
    *               transactions:
    *                 type: array
    *                 items:
@@ -379,6 +379,58 @@ module.exports = (router) => {
       validateTransactionsArray(req.body.transactions);
       await validateAccountExists(res, req.params.accountId);
       res.json({'data': await res.locals.budget.importTransactions(req.params.accountId, req.body.transactions)}).status(201);
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/transactions/batch:
+   *   delete:
+   *     summary: Deletes a set of transactions using the transaction ids
+   *     tags: [Transactions]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             required:
+   *               - transactionIds
+   *             type: object
+   *             properties:
+   *               transactionIds:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                   description: Transaction id. Example "729cb492-4eab-468b-9522-75d455cded22"
+   *             examples:
+   *               - transactionIds:
+   *                 - "729cb492-4eab-468b-9522-75d455cded22"
+   *                 - "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
+   *     responses:
+   *       '200':
+   *         description: Transactions deleted
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Transactions deleted
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.delete('/budgets/:budgetSyncId/transactions/batch', async (req, res, next) => {
+    try {
+      await res.locals.budget.deleteTransactions(req.body.transactionIds || []);
+      res.json({'message': 'Transactions deleted'});
     } catch(err) {
       next(err);
     }
