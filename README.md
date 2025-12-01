@@ -39,10 +39,3 @@ docker-compose up -d
 ## Documentation
 
 Once the service is up, see the documentation in http://localhost:5007/api-docs/
-
-## Improvements
-
-This projects is missing:
-- Unit tests
-- End to end tests
-- Analysis about what happens when concurrent calls are made to the http api.
