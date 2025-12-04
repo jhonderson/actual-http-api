@@ -1,6 +1,7 @@
 // Ensure required secrets exist before importing modules that load config at module initialization
 process.env.API_KEY = process.env.API_KEY || 'test-api-key';
 process.env.ACTUAL_SERVER_PASSWORD = process.env.ACTUAL_SERVER_PASSWORD || 'test-password';
+jest.mock('../../../src/v1/actual-client-provider');
 
 describe('Settings Routes', () => {
   let mockRouter;
@@ -56,6 +57,58 @@ describe('Settings Routes', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     jest.clearAllTimers();
+  });
+
+  describe('GET /budgets', () => {
+    let getActualApiClient;
+
+    beforeEach(() => {
+      ({
+        getActualApiClient,
+      } = require('../../../src/v1/actual-client-provider'));
+      getActualApiClient.mockReset();
+    });
+
+    it('should register the routes', () => {
+      const settingsModule = require('../../../src/v1/routes/settings');
+      settingsModule(mockRouter);
+
+      expect(mockRouter.get).toHaveBeenCalledWith('/budgets', expect.any(Function));
+      expect(mockRouter.get).toHaveBeenCalledWith(
+        '/budgets/:budgetSyncId/budgets',
+        expect.any(Function),
+      );
+    });
+
+    it('should use server instance', async () => {
+      const settingsModule = require('../../../src/v1/routes/settings');
+      settingsModule(mockRouter);
+
+      const handler = handlers['GET /budgets'];
+      const getBudgets = jest.fn().mockResolvedValue([{ id: 'server-budget' }]);
+      getActualApiClient.mockResolvedValue({ getBudgets });
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(getBudgets).toHaveBeenCalled();
+      expect(mockRes.json).toHaveBeenCalledWith({
+        data: [{ id: 'server-budget' }],
+      });
+    });
+
+    it('should handle errors from getSettings', async () => {
+      const settingsModule = require('../../../src/v1/routes/settings');
+      settingsModule(mockRouter);
+
+      const handler = handlers['GET /budgets'];
+      const error = new Error('boom');
+      const getBudgets = jest.fn().mockRejectedValue(error);
+      getActualApiClient.mockResolvedValue({ getBudgets });
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
   });
 
   describe('GET /budgets/:budgetSyncId/budgets', () => {

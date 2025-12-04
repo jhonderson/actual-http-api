@@ -1,5 +1,6 @@
 const zlib = require('zlib');
 const querystring = require('querystring');
+const { getActualApiClient } = require('../actual-client-provider');
 
 /**
  * @swagger
@@ -52,6 +53,56 @@ const querystring = require('querystring');
  */
 
 module.exports = (router) => {
+  /**
+   * @swagger
+   * /budgets:
+   *   get:
+   *     summary: Returns a list of all budget files either locally cached or on the remote server. Remote files have a state field and local files have an id field.
+   *     tags: [Settings]
+   *     security:
+   *       - apiKey: []
+   *     responses:
+   *       '200':
+   *         description: The list of budgets
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/Budget'
+   *               examples:
+   *                 - data:
+   *                   - id: 'My-Finances-a12381e'
+   *                     cloudFileId: 'f06d14a2-13f9-44d2-9d4a-20696edfcf7y'
+   *                     groupId: '9676303d-3646-4f91-a735-bd6bb4e8631a'
+   *                     name: 'My Finances'
+   *                   - cloudFileId: 'f06d14a2-13f9-44d2-9d4a-20696edfcf7y'
+   *                     groupId: '9676303d-3646-4f91-a735-bd6bb4e8631a'
+   *                     name: 'My Finances'
+   *                     hasKey: false
+   *                     owner: 'eab15b69-1874-48e4-b187-b449035294fc'
+   *                     usersWithAccess:
+   *                     - userId: 'poe15b69-1874-48e4-b187-b449035294fc'
+   *                       owner: true
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.get('/budgets', async (req, res, next) => {
+    try {
+      const apiClient = await getActualApiClient();
+      res.json({ data: await apiClient.getBudgets() });
+    } catch (err) {
+      next(err);
+    }
+  });
+
   /**
    * @swagger
    * /budgets/{budgetSyncId}/budgets:
