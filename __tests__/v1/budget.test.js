@@ -98,6 +98,12 @@ describe('Budget Module', () => {
       createRule: jest.fn().mockResolvedValue({ id: 'rule2' }),
       updateRule: jest.fn().mockResolvedValue({ id: 'rule1', description: 'Updated' }),
       deleteRule: jest.fn().mockResolvedValue(undefined),
+      getSchedules: jest.fn().mockResolvedValue([
+        { id: 'schedule1', name: 'Monthly Rent', amount: -150000 }
+      ]),
+      createSchedule: jest.fn().mockResolvedValue('schedule2'),
+      updateSchedule: jest.fn().mockResolvedValue({ id: 'schedule1', name: 'Updated Rent' }),
+      deleteSchedule: jest.fn().mockResolvedValue(undefined),
       getBudgets: jest.fn().mockResolvedValue([
         { id: 'budget1', groupId: 'sync1', name: 'Personal Budget' }
       ]),
@@ -588,6 +594,56 @@ describe('Budget Module', () => {
     it('should delete a rule', async () => {
       await budget.deleteRule('rule1');
       expect(mockActualApi.deleteRule).toHaveBeenCalledWith({ id: 'rule1' });
+    });
+  });
+
+  describe('Schedules Management', () => {
+    let budget;
+
+    beforeEach(async () => {
+      budget = await Budget('sync1', undefined);
+    });
+
+    it('should get all schedules', async () => {
+      const schedules = await budget.getSchedules();
+      expect(mockActualApi.getSchedules).toHaveBeenCalled();
+      expect(schedules).toHaveLength(1);
+      expect(schedules[0].id).toBe('schedule1');
+    });
+
+    it('should get a specific schedule', async () => {
+      const schedule = await budget.getSchedule('schedule1');
+      expect(schedule.id).toBe('schedule1');
+      expect(schedule.name).toBe('Monthly Rent');
+    });
+
+    it('should return undefined for non-existent schedule', async () => {
+      const schedule = await budget.getSchedule('nonexistent');
+      expect(schedule).toBeUndefined();
+    });
+
+    it('should create a new schedule', async () => {
+      const newSchedule = {
+        name: 'Weekly Groceries',
+        amount: -50000,
+        date: { frequency: 'weekly', start: '2024-01-01', endMode: 'never' }
+      };
+      const result = await budget.createSchedule(newSchedule);
+      expect(mockActualApi.createSchedule).toHaveBeenCalledWith(newSchedule);
+      expect(result).toBe('schedule2');
+    });
+
+    it('should update a schedule', async () => {
+      const updates = { name: 'Updated Monthly Rent', amount: -160000 };
+      const result = await budget.updateSchedule('schedule1', updates);
+      expect(mockActualApi.updateSchedule).toHaveBeenCalledWith('schedule1', updates);
+      expect(result.id).toBe('schedule1');
+      expect(result.name).toBe('Updated Rent');
+    });
+
+    it('should delete a schedule', async () => {
+      await budget.deleteSchedule('schedule1');
+      expect(mockActualApi.deleteSchedule).toHaveBeenCalledWith('schedule1');
     });
   });
 
