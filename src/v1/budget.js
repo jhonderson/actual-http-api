@@ -253,6 +253,27 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteRule({ id: ruleId });
   }
 
+  async function getSchedules() {
+    return actualApi.getSchedules();
+  }
+
+  async function getSchedule(scheduleId) {
+    const schedules = await getSchedules();
+    return schedules.find((schedule) => scheduleId == schedule.id);
+  }
+
+  async function createSchedule(schedule) {
+    return actualApi.createSchedule(schedule);
+  }
+
+  async function updateSchedule(scheduleId, schedule) {
+    return actualApi.updateSchedule(scheduleId, schedule);
+  }
+
+  async function deleteSchedule(scheduleId) {
+    return actualApi.deleteSchedule(scheduleId);
+  }
+
   async function getBudgets() {
     return actualApi.getBudgets();
   }
@@ -344,6 +365,11 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     createRule: createRule,
     updateRule: updateRule,
     deleteRule: deleteRule,
+    getSchedules: getSchedules,
+    getSchedule: getSchedule,
+    createSchedule: createSchedule,
+    updateSchedule: updateSchedule,
+    deleteSchedule: deleteSchedule,
     getBudgets: getBudgets,
     exportData: exportData,
     shutdown: shutdown,
