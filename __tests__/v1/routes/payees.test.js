@@ -333,4 +333,64 @@ describe('Payees Routes', () => {
       });
     });
   });
+
+  describe('POST /budgets/:budgetSyncId/payees/merge', () => {
+    it('should register the route', () => {
+      const payeesModule = require('../../../src/v1/routes/payees');
+      payeesModule(mockRouter);
+
+      expect(mockRouter.post).toHaveBeenCalledWith(
+        '/budgets/:budgetSyncId/payees/merge',
+        expect.any(Function)
+      );
+    });
+
+    it('should merge payees', async () => {
+      const payeesModule = require('../../../src/v1/routes/payees');
+      payeesModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/payees/merge'];
+      mockReq.body = {
+        targetId: 'payee1',
+        mergeIds: ['payee2'],
+      };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.mergePayees).toHaveBeenCalledWith('payee1', ['payee2']);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'Payees merged',
+      });
+    });
+
+    it('should merge multiple payees', async () => {
+      const payeesModule = require('../../../src/v1/routes/payees');
+      payeesModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/payees/merge'];
+      mockReq.body = {
+        targetId: 'payee1',
+        mergeIds: ['payee2', 'payee3', 'payee4'],
+      };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.mergePayees).toHaveBeenCalledWith('payee1', ['payee2', 'payee3', 'payee4']);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'Payees merged',
+      });
+    });
+
+    it('should reject with missing parameters', async () => {
+      const payeesModule = require('../../../src/v1/routes/payees');
+      payeesModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/payees/merge'];
+      mockReq.body = { targetId: 'payee1' }; // missing mergeIds
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
 });
