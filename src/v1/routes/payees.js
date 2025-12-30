@@ -304,4 +304,65 @@ module.exports = (router) => {
       next(err);
     }
   });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/payees/merge:
+   *   post:
+   *     summary: Merges payees
+   *     tags: [Payees]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             required:
+   *               - targetId
+   *               - mergeIds
+   *             type: object
+   *             properties:
+   *               targetId:
+   *                 type: string
+   *                 description: The id of the payee to retain
+   *               mergeIds:
+   *                 type: array
+   *                 items:
+   *                   type: string
+   *                 description: The ids of the payees to merge into the target
+   *             examples:
+   *               - targetId: 'f733399d-4ccb-4758-b208-7422b27f650a'
+   *                 mergeIds: ['9de084a4-dc96-4015-ac81-ba57ee340acd']
+   *     responses:
+   *       '200':
+   *         description: Payees merged
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Payees merged
+   *       '400':
+   *         $ref: '#/components/responses/400'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.post('/budgets/:budgetSyncId/payees/merge', async (req, res, next) => {
+    try {
+      const { targetId, mergeIds } = req.body;
+      if (!targetId || !mergeIds || !Array.isArray(mergeIds)) {
+        throw new Error('targetId and mergeIds (array) are required');
+      }
+      await res.locals.budget.mergePayees(targetId, mergeIds);
+      res.json({'message': 'Payees merged'});
+    } catch(err) {
+      next(err);
+    }
+  });
 }
