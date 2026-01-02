@@ -452,6 +452,12 @@ describe('Budget Module', () => {
       await budget.deletePayee('payee1');
       expect(mockActualApi.deletePayee).toHaveBeenCalledWith('payee1');
     });
+
+    it('should merge payees', async () => {
+      mockActualApi.mergePayees = jest.fn().mockResolvedValue(undefined);
+      await budget.mergePayees('payee1', ['payee2']);
+      expect(mockActualApi.mergePayees).toHaveBeenCalledWith('payee1', ['payee2']);
+    });
   });
 
   describe('Category Transfers', () => {
