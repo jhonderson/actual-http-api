@@ -191,6 +191,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deletePayee(payeeId);
   }
 
+  async function mergePayees(targetId, mergeIds) {
+    return actualApi.mergePayees(targetId, mergeIds);
+  }
+
   async function addCategoryTransfer(month, {fromCategoryId, toCategoryId, amount}) {
     if (!(fromCategoryId || toCategoryId)) {
       throw new Error('At least one category id is required, either fromCategoryId or toCategoryId');
@@ -356,6 +360,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     createPayee: createPayee,
     updatePayee: updatePayee,
     deletePayee: deletePayee,
+    mergePayees: mergePayees,
     addCategoryTransfer: addCategoryTransfer,
     holdBudgetForNextMonth: holdBudgetForNextMonth,
     resetBudgetHold: resetBudgetHold,
