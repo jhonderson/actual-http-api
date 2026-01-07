@@ -14,6 +14,22 @@ jest.mock('archiver');
 jest.mock('fs');
 jest.mock('path');
 
+const mockAqlQuery = jest.fn();
+const mockQ = jest.fn((table) => {
+  const builder = {
+    table,
+    select: jest.fn(function select() { return this; }),
+    filter: jest.fn(function filter() { return this; }),
+  };
+  return builder;
+});
+
+jest.mock('@actual-app/api', () => ({
+  runQuery: mockAqlQuery,
+  aqlQuery: mockAqlQuery,
+  q: mockQ,
+}));
+
 const { Budget } = require('../../src/v1/budget');
 const { getActualApiClient, getActualDataDir } = require('../../src/v1/actual-client-provider');
 const { 
@@ -348,6 +364,96 @@ describe('Budget Module', () => {
     it('should handle empty transaction array for deletion', async () => {
       await budget.deleteTransactions([]);
       expect(mockActualApi.batchBudgetUpdates).toHaveBeenCalled();
+    });
+  });
+
+  describe('Accounts With Balances', () => {
+    let budget;
+
+    beforeEach(async () => {
+      budget = await Budget('sync1', undefined);
+      mockAqlQuery.mockReset();
+    });
+
+    it('should aggregate cleared and uncleared balances per account', async () => {
+      // accounts, acc1 cleared, acc1 uncleared, acc2 cleared, acc2 uncleared
+      mockAqlQuery
+        .mockResolvedValueOnce({
+          data: [
+            { id: 'acc1', name: 'Checking', offbudget: false },
+            { id: 'acc2', name: 'Savings', offbudget: false },
+          ],
+        })
+        .mockResolvedValueOnce({
+          data: [
+            { amount: 1000 },
+            { amount: 0, subtransactions: [{ amount: 200 }] },
+            { amount: 500, tombstone: true },
+          ],
+        })
+        .mockResolvedValueOnce({ data: [{ amount: -100 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 50 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 25 }] });
+
+      const accounts = await budget.getAccountsWithBalances();
+      expect(accounts).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: 'acc1',
+            clearedBalance: 1200, // 1000 + 200 (subtransactions), tombstone ignored
+            unclearedBalance: -100,
+            workingBalance: 1100,
+          }),
+          expect.objectContaining({
+            id: 'acc2',
+            clearedBalance: 50,
+            unclearedBalance: 25,
+            workingBalance: 75,
+          }),
+        ])
+      );
+    });
+
+    it('should propagate errors from AQL queries', async () => {
+      const error = new Error('AQL failure');
+      mockAqlQuery.mockRejectedValueOnce(error);
+      await expect(budget.getAccountsWithBalances()).rejects.toThrow('AQL failure');
+    });
+
+    it('should exclude offbudget accounts when flag is true', async () => {
+      mockAqlQuery
+        .mockResolvedValueOnce({
+          data: [
+            { id: 'acc1', name: 'Checking', offbudget: false },
+            { id: 'acc2', name: 'Savings', offbudget: false },
+            { id: 'acc3', name: 'Off Budget', offbudget: true },
+          ],
+        })
+        .mockResolvedValueOnce({ data: [{ amount: 10 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 0 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 20 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 0 }] });
+
+      const accounts = await budget.getAccountsWithBalances({ excludeOffbudget: true });
+      expect(accounts.find((a) => a.id === 'acc3')).toBeUndefined();
+    });
+
+    it('should exclude closed accounts when flag is true', async () => {
+      mockAqlQuery
+        .mockResolvedValueOnce({
+          data: [
+            { id: 'acc1', name: 'Checking', closed: false },
+            { id: 'acc2', name: 'Savings', closed: false },
+            { id: 'acc3', name: 'Closed Account', closed: true },
+          ],
+        })
+        .mockResolvedValueOnce({ data: [{ amount: 10 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 0 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 20 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 0 }] });
+
+      const accounts = await budget.getAccountsWithBalances({ excludeClosed: true });
+      expect(accounts.find((a) => a.id === 'acc3')).toBeUndefined();
     });
   });
 

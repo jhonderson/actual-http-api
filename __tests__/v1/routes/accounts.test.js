@@ -2,6 +2,7 @@
 process.env.API_KEY = process.env.API_KEY || 'test-api-key';
 process.env.ACTUAL_SERVER_PASSWORD = process.env.ACTUAL_SERVER_PASSWORD || 'test-password';
 
+
 describe('Accounts Routes', () => {
   let mockRouter;
   let mockBudget;
@@ -75,6 +76,26 @@ describe('Accounts Routes', () => {
       closeAccount: jest.fn().mockResolvedValue(undefined),
       reopenAccount: jest.fn().mockResolvedValue(undefined),
       runBankSync: jest.fn().mockResolvedValue(undefined),
+      getAccountsWithBalances: jest.fn().mockResolvedValue([
+        {
+          id: 'acc1',
+          name: 'Checking',
+          offbudget: false,
+          closed: false,
+          clearedBalance: 1200,
+          unclearedBalance: -100,
+          workingBalance: 1100,
+        },
+        {
+          id: 'acc2',
+          name: 'Savings',
+          offbudget: false,
+          closed: false,
+          clearedBalance: 50,
+          unclearedBalance: 25,
+          workingBalance: 75,
+        },
+      ]),
     };
 
     // Create mock request/response objects
@@ -137,6 +158,79 @@ describe('Accounts Routes', () => {
       const error = new Error('Failed to fetch accounts');
       mockBudget.getAccounts.mockRejectedValueOnce(error);
 
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('GET /budgets/:budgetSyncId/accounts/withbalances', () => {
+    it('should register the route', () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      expect(mockRouter.get).toHaveBeenCalledWith(
+        '/budgets/:budgetSyncId/accounts/withbalances',
+        expect.any(Function)
+      );
+    });
+
+    it('should return accounts with aggregated balances', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts/withbalances'];
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccountsWithBalances).toHaveBeenCalled();
+      expect(mockRes.json).toHaveBeenCalledWith({
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            id: 'acc1',
+            clearedBalance: 1200,
+            unclearedBalance: -100,
+            workingBalance: 1100,
+          }),
+          expect.objectContaining({
+            id: 'acc2',
+            clearedBalance: 50,
+            unclearedBalance: 25,
+            workingBalance: 75,
+          }),
+        ]),
+      });
+    });
+
+    it('should pass exclude_offbudget flag', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      mockReq.query.exclude_offbudget = 'true';
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts/withbalances'];
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccountsWithBalances).toHaveBeenCalledWith({ excludeOffbudget: true, excludeClosed: false });
+    });
+
+    it('should pass exclude_closed flag', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      mockReq.query.exclude_closed = 'true';
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts/withbalances'];
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccountsWithBalances).toHaveBeenCalledWith({ excludeOffbudget: false, excludeClosed: true });
+    });
+
+    it('should handle errors from getAccountsWithBalances', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const error = new Error('Failed to fetch accounts with balances');
+      mockBudget.getAccountsWithBalances.mockRejectedValueOnce(error);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts/withbalances'];
       await handler(mockReq, mockRes, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(error);
