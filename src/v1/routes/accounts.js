@@ -55,6 +55,17 @@ const { isEmpty, formatDateToISOString } = require('../../utils/utils');
  *           type: boolean
  *     Amount:
  *       type: integer
+ *     AccountWithBalances:
+ *       allOf:
+ *         - $ref: '#/components/schemas/Account'
+ *         - type: object
+ *           properties:
+ *             clearedBalance:
+ *               $ref: '#/components/schemas/Amount'
+ *             unclearedBalance:
+ *               $ref: '#/components/schemas/Amount'
+ *             workingBalance:
+ *               $ref: '#/components/schemas/Amount'
  */
 
 module.exports = (router) => {
@@ -69,6 +80,12 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *       - name: exclude_offbudget
+   *         in: query
+   *         schema:
+   *           type: boolean
+   *         required: false
+   *         description: When true, off-budget accounts are excluded
    *     responses:
    *       '200':
    *         description: The list of accounts for the specified budget
@@ -97,6 +114,52 @@ module.exports = (router) => {
   router.get('/budgets/:budgetSyncId/accounts', async (req, res, next) => {
     try {
       res.json({'data': await res.locals.budget.getAccounts()});
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/accounts/withbalances:
+   *   get:
+   *     summary: Returns list of accounts with balances aggregated from transactions
+   *     tags: [Accounts]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: The list of accounts for the specified budget including balances
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/AccountWithBalances'
+   *               examples:
+   *                 - data:
+   *                   - id: '671b669d-b616-4bf1-8a04-c82d73f87d5b'
+   *                     name: 'Checking'
+   *                     offbudget: false
+   *                     closed: false
+   *                     clearedBalance: 12000
+   *                     unclearedBalance: -500
+   *                     workingBalance: 11500
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.get('/budgets/:budgetSyncId/accounts/withbalances', async (req, res, next) => {
+    try {
+        const excludeOffbudget = req.query.exclude_offbudget === 'true' || req.query.exclude_offbudget === '1';
+        res.json({ data: await res.locals.budget.getAccountsWithBalances({ excludeOffbudget }) });
     } catch(err) {
       next(err);
     }
@@ -571,6 +634,7 @@ module.exports = (router) => {
       next(err);
     }
   });
+
 
   async function validateAccountExists(res, accountId) {
     const account = await res.locals.budget.getAccount(accountId);

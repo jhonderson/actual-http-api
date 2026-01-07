@@ -1,6 +1,7 @@
 
 const { currentLocalDate, formatDateToISOString, listSubDirectories, getFileContent } = require('../utils/utils');
 const { getActualApiClient, getActualDataDir } = require('./actual-client-provider');
+const { runQuery: aqlQuery, aqlQuery: directAqlQuery, q } = require('@actual-app/api');
 
 const archiver = require('archiver');
 const fs = require('fs');
@@ -70,6 +71,33 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
 
   async function getAccounts() {
     return actualApi.getAccounts();
+  }
+
+  async function getAccountsWithBalances({ excludeOffbudget = false } = {}) {
+    const accountQuery = excludeOffbudget
+      ? q('accounts').select(['id', 'name', 'offbudget']).filter({ offbudget: false })
+      : q('accounts').select(['id', 'name', 'offbudget']);
+
+    const data = await runAqlQuery(accountQuery);
+    const accounts = (data?.data || []).filter((account) =>
+      excludeOffbudget ? !account.offbudget : true
+    );
+    await Promise.all(
+      accounts.map(async (account) => {
+        const [cleared, uncleared] = await Promise.all([
+          runAqlQuery(q('transactions').select('*').filter({ account: account.id, cleared: true })),
+          runAqlQuery(q('transactions').select('*').filter({ account: account.id, cleared: false })),
+        ]);
+
+        const clearedBalance = sumTransactions(cleared?.data);
+        const unclearedBalance = sumTransactions(uncleared?.data);
+
+        account.clearedBalance = clearedBalance;
+        account.unclearedBalance = unclearedBalance;
+        account.workingBalance = clearedBalance + unclearedBalance;
+      })
+    );
+    return accounts;
   }
 
   async function getAccount(accountId) {
@@ -324,6 +352,30 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     };
   }
 
+  function runAqlQuery(query) {
+    const queryExecutor = aqlQuery || directAqlQuery;
+    if (!queryExecutor) {
+      throw new Error('AQL query function not available');
+    }
+    return queryExecutor(query);
+  }
+
+  function sumTransactions(transactions = []) {
+    return (transactions || []).reduce((total, transaction = {}) => {
+      if (transaction.tombstone) {
+        return total;
+      }
+      if (Array.isArray(transaction.subtransactions) && transaction.subtransactions.length > 0) {
+        const subTotal = transaction.subtransactions.reduce(
+          (acc, subTransaction = {}) => acc + (subTransaction.amount || 0),
+          0
+        );
+        return total + subTotal;
+      }
+      return total + (transaction.amount || 0);
+    }, 0);
+  }
+
   return {
     getMonths: getMonths,
     getMonth: getMonth,
@@ -333,6 +385,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     getMonthCategoryGroups: getMonthCategoryGroups,
     getMonthCategoryGroup: getMonthCategoryGroup,
     getAccounts: getAccounts,
+    getAccountsWithBalances: getAccountsWithBalances,
     getAccount: getAccount,
     getAccountBalance: getAccountBalance,
     createAccount: createAccount,
