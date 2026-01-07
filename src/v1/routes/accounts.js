@@ -130,6 +130,16 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *       - in: query
+   *         name: exclude_offbudget
+   *         schema:
+   *           type: boolean
+   *         description: Exclude off-budget accounts from response
+   *       - in: query
+   *         name: exclude_closed
+   *         schema:
+   *           type: boolean
+   *         description: Exclude closed accounts from response
    *     responses:
    *       '200':
    *         description: The list of accounts for the specified budget including balances
@@ -158,8 +168,9 @@ module.exports = (router) => {
    */
   router.get('/budgets/:budgetSyncId/accounts/withbalances', async (req, res, next) => {
     try {
-        const excludeOffbudget = req.query.exclude_offbudget === 'true' || req.query.exclude_offbudget === '1';
-        res.json({ data: await res.locals.budget.getAccountsWithBalances({ excludeOffbudget }) });
+      const excludeOffbudget = req.query.exclude_offbudget === 'true' || req.query.exclude_offbudget === '1';
+      const excludeClosed = req.query.exclude_closed === 'true' || req.query.exclude_closed === '1';
+      res.json({ data: await res.locals.budget.getAccountsWithBalances({ excludeOffbudget, excludeClosed }) });
     } catch(err) {
       next(err);
     }

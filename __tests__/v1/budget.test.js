@@ -437,6 +437,24 @@ describe('Budget Module', () => {
       const accounts = await budget.getAccountsWithBalances({ excludeOffbudget: true });
       expect(accounts.find((a) => a.id === 'acc3')).toBeUndefined();
     });
+
+    it('should exclude closed accounts when flag is true', async () => {
+      mockAqlQuery
+        .mockResolvedValueOnce({
+          data: [
+            { id: 'acc1', name: 'Checking', closed: false },
+            { id: 'acc2', name: 'Savings', closed: false },
+            { id: 'acc3', name: 'Closed Account', closed: true },
+          ],
+        })
+        .mockResolvedValueOnce({ data: [{ amount: 10 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 0 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 20 }] })
+        .mockResolvedValueOnce({ data: [{ amount: 0 }] });
+
+      const accounts = await budget.getAccountsWithBalances({ excludeClosed: true });
+      expect(accounts.find((a) => a.id === 'acc3')).toBeUndefined();
+    });
   });
 
   describe('Categories Management', () => {

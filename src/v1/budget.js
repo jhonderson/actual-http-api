@@ -73,15 +73,17 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getAccounts();
   }
 
-  async function getAccountsWithBalances({ excludeOffbudget = false } = {}) {
+  async function getAccountsWithBalances({ excludeOffbudget = false, excludeClosed = false } = {}) {
     const accountQuery = excludeOffbudget
-      ? q('accounts').select(['id', 'name', 'offbudget']).filter({ offbudget: false })
-      : q('accounts').select(['id', 'name', 'offbudget']);
+      ? q('accounts').select(['id', 'name', 'offbudget', 'closed']).filter({ offbudget: false })
+      : q('accounts').select(['id', 'name', 'offbudget', 'closed']);
 
     const data = await runAqlQuery(accountQuery);
-    const accounts = (data?.data || []).filter((account) =>
-      excludeOffbudget ? !account.offbudget : true
-    );
+    const accounts = (data?.data || []).filter((account) => {
+      if (excludeOffbudget && account.offbudget) return false;
+      if (excludeClosed && account.closed) return false;
+      return true;
+    });
     await Promise.all(
       accounts.map(async (account) => {
         const [cleared, uncleared] = await Promise.all([

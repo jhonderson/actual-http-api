@@ -209,7 +209,18 @@ describe('Accounts Routes', () => {
       const handler = handlers['GET /budgets/:budgetSyncId/accounts/withbalances'];
       await handler(mockReq, mockRes, mockNext);
 
-      expect(mockBudget.getAccountsWithBalances).toHaveBeenCalledWith({ excludeOffbudget: true });
+      expect(mockBudget.getAccountsWithBalances).toHaveBeenCalledWith({ excludeOffbudget: true, excludeClosed: false });
+    });
+
+    it('should pass exclude_closed flag', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      mockReq.query.exclude_closed = 'true';
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts/withbalances'];
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccountsWithBalances).toHaveBeenCalledWith({ excludeOffbudget: false, excludeClosed: true });
     });
 
     it('should handle errors from getAccountsWithBalances', async () => {
