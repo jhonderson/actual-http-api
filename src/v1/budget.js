@@ -320,7 +320,12 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     };
   }
 
+  async function runQuery(query) {
+    return actualApi.runQuery(query);
+  }
+
   return {
+    q: actualApi.q,
     getMonths: getMonths,
     getMonth: getMonth,
     getMonthCategories: getMonthCategories,
@@ -372,6 +377,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     deleteSchedule: deleteSchedule,
     getBudgets: getBudgets,
     exportData: exportData,
+    runQuery: runQuery,
     shutdown: shutdown,
   };
 }
