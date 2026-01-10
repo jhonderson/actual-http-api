@@ -22,6 +22,7 @@ require('./rules')(router);
 require('./payees')(router);
 require('./schedules')(router);
 require('./settings')(router);
+require('./run-query')(router);
 
 router.use(errorHandler);
 
