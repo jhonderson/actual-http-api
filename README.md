@@ -12,6 +12,10 @@ To host this server you can run it either with Node.js or Docker. You will need 
 - `ACTUAL_SERVER_URL`: Url of your Actual Budget server instance
 - `ACTUAL_SERVER_PASSWORD`: Password of your Actual Budget server
 - `API_KEY`: A string secret used to give access to clients of this API. Unlike typical Api Keys, this one is not used to identify the caller since the basic authorization method of this api doesn't allow multiple api keys, it's just one for every caller. You can generate one however you want, I use `apg -m 50 -n 1`
+- `SWAGGER_PROTOCOL` to override the default api-docs server protocol of `http`
+- `SWAGGER_HOST` to override the default api-docs server host of `localhost`
+- `SWAGGER_PORT` to override the default api-docs server port of `5007`
+- `SWAGGER_BASE_PATH` to override the default api-docs server base path of `v1`
 
 To start the server using the local code with Node.js, define your environment variables in the `.env` file and then run:
 ```bash
