@@ -30,22 +30,19 @@ const openapiSpecification = swaggerJsdoc({
       },
       servers: [
         {
-          url: "http://localhost:5007/v1"
-        },
-        {
           url: "{protocol}://{host}:{port}/{basePath}",
           variables: {
             protocol: {
-              default: "https",
+              default: process.env.SWAGGER_PROTOCOL || "http",
             },
             host: {
-              default: "localhost",
+              default: process.env.SWAGGER_HOST || "localhost",
             },
             port: {
-              default: "443",
+              default: process.env.SWAGGER_PORT || "5007",
             },
             basePath: {
-              default: "v1"
+              default: process.env.SWAGGER_BASE_PATH || "v1"
             }
           }
         }
