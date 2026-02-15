@@ -88,5 +88,3 @@ http://localhost:5007/api-docs/
 ```bash
 npm test
 ```
-
-If you'd like, I can also add a sample `.env.example` and a short docker-compose override for local dev. Want me to add that?
