@@ -88,3 +88,6 @@ http://localhost:5007/api-docs/
 ```bash
 npm test
 ```
+## Usage Examples
+
+See [examples/USAGE_EXAMPLES.md](examples/USAGE_EXAMPLES.md) for two ready-to-use samples: [examples/budget_backup.sh](examples/budget_backup.sh) (backup script) and [examples/fly.toml](examples/fly.toml) (Fly.io deployment).

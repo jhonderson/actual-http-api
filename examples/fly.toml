@@ -1,0 +1,48 @@
+app = "myuniqueactualapi"
+kill_signal = "SIGINT"
+kill_timeout = "5s"
+primary_region = "sea"
+
+[build]
+image = "jhonderson/actual-http-api:26.2.0"
+
+[env]
+ACTUAL_DATA_DIR = "/data"
+ACTUAL_SERVER_URL = "https://myactualserver.domain.com/"
+NODE_ENV = "production"
+PORT = "5007"
+
+[experimental]
+auto_rollback = true
+
+  [experimental.attached]
+  secrets = { }
+
+[[restart]]
+policy = "on-failure"
+processes = [ "app" ]
+retries = 10
+
+[[services]]
+internal_port = 5_007
+processes = [ "app" ]
+protocol = "tcp"
+
+  [services.concurrency]
+  hard_limit = 25
+  soft_limit = 20
+  type = "connections"
+
+  [[services.ports]]
+  force_https = true
+  handlers = [ "http" ]
+  port = 80
+
+  [[services.ports]]
+  handlers = [ "tls", "http" ]
+  port = 443
+
+  [[services.tcp_checks]]
+  grace_period = "1s"
+  interval = "15s"
+  timeout = "2s"
