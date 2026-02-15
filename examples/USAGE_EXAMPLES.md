@@ -4,7 +4,7 @@
 
 **Description:** A bash script to back up the Actual budget into a desired destination.
 
-**Location:** [examples/budget_backup.sh](examples/budget_backup.sh)
+**Location:** [budget_backup.sh](./budget_backup.sh)
 
 ## Fly deployment (fly.toml)
 
@@ -12,7 +12,7 @@
 
 **Required secrets:** `ACTUAL_SERVER_PASSWORD`, `API_KEY` (create these in the Fly console or via `fly secrets`).
 
-**Location:** [examples/fly.toml](examples/fly.toml)
+**Location:** [fly.toml](./fly.toml)
 
 ### Notes
 
