@@ -1,4 +1,5 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const { config } = require('./config');
 
 const openapiSpecification = swaggerJsdoc({
     definition: {
@@ -28,24 +29,45 @@ const openapiSpecification = swaggerJsdoc({
           },
         },
       },
-      servers: [
+      servers: config.swagger.customConfigProvided ? [
         {
           url: "{protocol}://{host}:{port}/{basePath}",
           variables: {
             protocol: {
-              default: process.env.SWAGGER_PROTOCOL || "http",
+              default: config.swagger.protocol,
             },
             host: {
-              default: process.env.SWAGGER_HOST || "localhost",
+              default: config.swagger.host,
             },
             port: {
-              default: process.env.SWAGGER_PORT || "5007",
+              default: config.swagger.port,
             },
             basePath: {
-              default: process.env.SWAGGER_BASE_PATH || "v1"
+              default: config.swagger.basePath,
             }
           }
-        }
+        },
+      ] : [
+        {
+          url: "http://localhost:5007/v1"
+        },
+        {
+          url: "{protocol}://{host}:{port}/{basePath}",
+          variables: {
+            protocol: {
+              default: "https",
+            },
+            host: {
+              default: "localhost",
+            },
+            port: {
+              default: "443",
+            },
+            basePath: {
+              default: "v1"
+            }
+          }
+        },
       ]
     },
     // This path needs to be relative to where node was started from

@@ -26,5 +26,12 @@ exports.config = {
     dataDir: process.env.ACTUAL_DATA_DIR,
     serverUrl: process.env.ACTUAL_SERVER_URL,
     serverPassword: loadMandatorySecret("ACTUAL_SERVER_PASSWORD"),
-  }
+  },
+  swagger: {
+    protocol: process.env.SWAGGER_PROTOCOL || "https",
+    host: process.env.SWAGGER_HOST || "localhost",
+    port: process.env.SWAGGER_PORT || "443",
+    basePath: process.env.SWAGGER_BASE_PATH || "v1",
+    customConfigProvided: !!(process.env.SWAGGER_PROTOCOL || process.env.SWAGGER_HOST || process.env.SWAGGER_PORT || process.env.SWAGGER_BASE_PATH),
+  },
 };
