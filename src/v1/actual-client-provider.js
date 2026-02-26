@@ -33,4 +33,9 @@ exports.getActualApiClient = async () => {
     setTimeout(invalidateActualApiClient, 1000 * 60 * 60);
   }
   return actualApi;
-}
+};
+
+exports.runAqlQuery = async (query) => {
+  const api = await exports.getActualApiClient();
+  return api.aqlQuery(query);
+};

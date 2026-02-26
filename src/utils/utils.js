@@ -41,6 +41,22 @@ exports.parseNumericBoolean = (numericBoolean) => {
   return numericBoolean === 0 ? false : (numericBoolean === 1 ? true : numericBoolean);
 }
 
+exports.parseBoolean = (value) => {
+  if (value === undefined || value === null || value === '') {
+    return false;
+  }
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    return value.toLowerCase() === 'true' || value === '1';
+  }
+  if (typeof value === 'number') {
+    return value === 1;
+  }
+  return false;
+}
+
 exports.paginate = (array, page, limit) => {
   const totalTransactions = array.length;
   // Ensure the limit number is greater than 0

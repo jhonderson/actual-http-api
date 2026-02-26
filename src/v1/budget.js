@@ -1,6 +1,6 @@
 
 const { currentLocalDate, formatDateToISOString, listSubDirectories, getFileContent } = require('../utils/utils');
-const { getActualApiClient, getActualDataDir } = require('./actual-client-provider');
+const { getActualApiClient, getActualDataDir, runAqlQuery } = require('./actual-client-provider');
 
 const archiver = require('archiver');
 const fs = require('fs');
@@ -68,8 +68,47 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return categoryGroups.find((categoryGroup) => categoryGroupId == categoryGroup.id);
   }
 
-  async function getAccounts() {
-    return actualApi.getAccounts();
+  async function getAccounts({ includeBalances = false, excludeOffbudget = false, excludeClosed = false } = {}) {
+    const filter = {};
+    if (excludeOffbudget) filter.offbudget = false;
+    if (excludeClosed) filter.closed = false;
+
+    const accounts = (await runAqlQuery(
+      actualApi.q('accounts')
+        .select(['id', 'name', 'offbudget', 'closed'])
+        .filter(filter)
+    ))?.data || [];
+
+    if(includeBalances) {
+      const balanceData = await runAqlQuery(
+        actualApi.q('transactions')
+          .groupBy(['account', 'cleared'])
+          .select([
+            'account',
+            'cleared',
+            { total: { $sum: '$amount' } }
+          ])
+      );
+
+      const clearedBalances = new Map();
+      const unclearedBalances = new Map();
+
+      (balanceData?.data || []).forEach(row => {
+        if (row.cleared) {
+          clearedBalances.set(row.account, row.total);
+        } else {
+          unclearedBalances.set(row.account, row.total);
+        }
+      });
+
+      accounts.forEach(account => {
+        account.clearedBalance = clearedBalances.get(account.id) || 0;
+        account.unclearedBalance = unclearedBalances.get(account.id) || 0;
+        account.workingBalance = account.clearedBalance + account.unclearedBalance;
+      });
+    }
+
+    return accounts;
   }
 
   async function getAccount(accountId) {

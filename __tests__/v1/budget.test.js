@@ -15,7 +15,7 @@ jest.mock('fs');
 jest.mock('path');
 
 const { Budget } = require('../../src/v1/budget');
-const { getActualApiClient, getActualDataDir } = require('../../src/v1/actual-client-provider');
+const { getActualApiClient, getActualDataDir, runAqlQuery } = require('../../src/v1/actual-client-provider');
 const { 
   currentLocalDate, 
   formatDateToISOString, 
@@ -107,7 +107,13 @@ describe('Budget Module', () => {
       getBudgets: jest.fn().mockResolvedValue([
         { id: 'budget1', groupId: 'sync1', name: 'Personal Budget' }
       ]),
-      shutdown: jest.fn()
+      shutdown: jest.fn(),
+      q: jest.fn(() => ({
+        select: jest.fn().mockReturnThis(),
+        filter: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis()
+      })),
+      aqlQuery: jest.fn()
     };
 
     mockArchive = {
@@ -116,6 +122,7 @@ describe('Budget Module', () => {
     };
 
     getActualApiClient.mockResolvedValue(mockActualApi);
+    runAqlQuery.mockResolvedValue({ data: [] });
     currentLocalDate.mockReturnValue(new Date('2024-01-15'));
     formatDateToISOString.mockReturnValue('2024-01-15');
     listSubDirectories.mockReturnValue(['budget1']);
@@ -223,12 +230,128 @@ describe('Budget Module', () => {
     });
 
     it('should get all accounts', async () => {
+      runAqlQuery.mockResolvedValueOnce({
+        data: [
+          { id: 'acc1', name: 'Checking', offbudget: false, closed: false },
+          { id: 'acc2', name: 'Savings', offbudget: false, closed: false }
+        ]
+      });
+
       const accounts = await budget.getAccounts();
-      expect(accounts).toHaveLength(1);
+      expect(accounts).toHaveLength(2);
       expect(accounts[0].id).toBe('acc1');
     });
 
+    it('should get accounts with balances when includeBalances is true', async () => {
+      runAqlQuery
+        .mockResolvedValueOnce({
+          data: [
+            { id: 'acc1', name: 'Checking', offbudget: false, closed: false },
+            { id: 'acc2', name: 'Savings', offbudget: false, closed: false }
+          ]
+        })
+        .mockResolvedValueOnce({
+          data: [
+            { account: 'acc1', cleared: true, total: 10000 },
+            { account: 'acc1', cleared: false, total: 500 },
+            { account: 'acc2', cleared: true, total: 25000 }
+          ]
+        });
+
+      const accounts = await budget.getAccounts({ includeBalances: true });
+      
+      expect(accounts).toHaveLength(2);
+      expect(accounts[0].clearedBalance).toBe(10000);
+      expect(accounts[0].unclearedBalance).toBe(500);
+      expect(accounts[0].workingBalance).toBe(10500);
+      expect(accounts[1].clearedBalance).toBe(25000);
+      expect(accounts[1].unclearedBalance).toBe(0);
+      expect(accounts[1].workingBalance).toBe(25000);
+    });
+
+    it('should exclude offbudget accounts when excludeOffbudget is true', async () => {
+      runAqlQuery.mockResolvedValueOnce({
+        data: [
+          { id: 'acc1', name: 'Checking', offbudget: false, closed: false }
+        ]
+      });
+
+      const accounts = await budget.getAccounts({ excludeOffbudget: true });
+      
+      expect(runAqlQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filter: expect.any(Function)
+        })
+      );
+      expect(accounts).toHaveLength(1);
+    });
+
+    it('should exclude closed accounts when excludeClosed is true', async () => {
+      runAqlQuery.mockResolvedValueOnce({
+        data: [
+          { id: 'acc1', name: 'Checking', offbudget: false, closed: false }
+        ]
+      });
+
+      const accounts = await budget.getAccounts({ excludeClosed: true });
+      
+      expect(runAqlQuery).toHaveBeenCalledWith(
+        expect.objectContaining({
+          filter: expect.any(Function)
+        })
+      );
+      expect(accounts).toHaveLength(1);
+    });
+
+    it('should handle accounts with zero balances', async () => {
+      runAqlQuery
+        .mockResolvedValueOnce({
+          data: [
+            { id: 'acc1', name: 'Empty Account', offbudget: false, closed: false }
+          ]
+        })
+        .mockResolvedValueOnce({
+          data: []
+        });
+
+      const accounts = await budget.getAccounts({ includeBalances: true });
+      
+      expect(accounts[0].clearedBalance).toBe(0);
+      expect(accounts[0].unclearedBalance).toBe(0);
+      expect(accounts[0].workingBalance).toBe(0);
+    });
+
+    it('should combine multiple filters', async () => {
+      runAqlQuery
+        .mockResolvedValueOnce({
+          data: [
+            { id: 'acc1', name: 'Checking', offbudget: false, closed: false }
+          ]
+        })
+        .mockResolvedValueOnce({
+          data: [
+            { account: 'acc1', cleared: true, total: 10000 }
+          ]
+        });
+
+      const accounts = await budget.getAccounts({ 
+        includeBalances: true, 
+        excludeOffbudget: true, 
+        excludeClosed: true 
+      });
+      
+      expect(accounts).toHaveLength(1);
+      expect(accounts[0].clearedBalance).toBe(10000);
+    });
+
     it('should get a specific account', async () => {
+      runAqlQuery.mockResolvedValueOnce({
+        data: [
+          { id: 'acc1', name: 'Checking', offbudget: false, closed: false },
+          { id: 'acc2', name: 'Savings', offbudget: false, closed: false }
+        ]
+      });
+
       const account = await budget.getAccount('acc1');
       expect(account.id).toBe('acc1');
     });
@@ -723,7 +846,7 @@ describe('Budget Module', () => {
 
     it('should propagate API errors', async () => {
       const error = new Error('API Error');
-      mockActualApi.getAccounts.mockRejectedValueOnce(error);
+      runAqlQuery.mockRejectedValueOnce(error);
       await expect(budget.getAccounts()).rejects.toThrow('API Error');
     });
 

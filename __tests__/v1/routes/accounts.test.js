@@ -141,6 +141,132 @@ describe('Accounts Routes', () => {
 
       expect(mockNext).toHaveBeenCalledWith(error);
     });
+
+    it('should pass includeBalances=true to getAccounts', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts'];
+      mockReq.query.include_balances = 'true';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccounts).toHaveBeenCalledWith({
+        includeBalances: true,
+        excludeOffbudget: false,
+        excludeClosed: false
+      });
+    });
+
+    it('should pass excludeOffbudget=true to getAccounts', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts'];
+      mockReq.query.exclude_offbudget = 'true';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccounts).toHaveBeenCalledWith({
+        includeBalances: false,
+        excludeOffbudget: true,
+        excludeClosed: false
+      });
+    });
+
+    it('should pass excludeClosed=true to getAccounts', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts'];
+      mockReq.query.exclude_closed = 'true';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccounts).toHaveBeenCalledWith({
+        includeBalances: false,
+        excludeOffbudget: false,
+        excludeClosed: true
+      });
+    });
+
+    it('should pass multiple query parameters to getAccounts', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts'];
+      mockReq.query.include_balances = 'true';
+      mockReq.query.exclude_offbudget = 'true';
+      mockReq.query.exclude_closed = 'true';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccounts).toHaveBeenCalledWith({
+        includeBalances: true,
+        excludeOffbudget: true,
+        excludeClosed: true
+      });
+    });
+
+    it('should handle query parameter values "1" as true', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts'];
+      mockReq.query.include_balances = '1';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccounts).toHaveBeenCalledWith({
+        includeBalances: true,
+        excludeOffbudget: false,
+        excludeClosed: false
+      });
+    });
+
+    it('should handle query parameter values "false" as false', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts'];
+      mockReq.query.include_balances = 'false';
+      mockReq.query.exclude_offbudget = 'false';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getAccounts).toHaveBeenCalledWith({
+        includeBalances: false,
+        excludeOffbudget: false,
+        excludeClosed: false
+      });
+    });
+
+    it('should return accounts with balance fields when includeBalances is true', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const accountsWithBalances = [
+        {
+          id: 'acc1',
+          name: 'Checking',
+          offbudget: false,
+          closed: false,
+          clearedBalance: 10000,
+          unclearedBalance: 500,
+          workingBalance: 10500
+        }
+      ];
+      mockBudget.getAccounts.mockResolvedValueOnce(accountsWithBalances);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts'];
+      mockReq.query.include_balances = 'true';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockRes.json).toHaveBeenCalledWith({
+        data: accountsWithBalances
+      });
+    });
   });
 
   describe('GET /budgets/:budgetSyncId/accounts/:accountId', () => {

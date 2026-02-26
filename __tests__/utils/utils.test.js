@@ -9,6 +9,7 @@ const {
   listSubDirectories,
   getFileContent,
   parseNumericBoolean,
+  parseBoolean,
   paginate,
   validatePaginationParameters,
 } = require('../../src/utils/utils');
@@ -150,6 +151,60 @@ describe('Utils', () => {
       expect(parseNumericBoolean(2)).toBe(2);
       expect(parseNumericBoolean('yes')).toBe('yes');
       expect(parseNumericBoolean(null)).toBe(null);
+    });
+  });
+
+  describe('parseBoolean', () => {
+    it('should convert string "true" to true', () => {
+      expect(parseBoolean('true')).toBe(true);
+    });
+
+    it('should convert string "TRUE" to true (case insensitive)', () => {
+      expect(parseBoolean('TRUE')).toBe(true);
+    });
+
+    it('should convert string "1" to true', () => {
+      expect(parseBoolean('1')).toBe(true);
+    });
+
+    it('should convert string "false" to false', () => {
+      expect(parseBoolean('false')).toBe(false);
+    });
+
+    it('should convert string "0" to false', () => {
+      expect(parseBoolean('0')).toBe(false);
+    });
+
+    it('should convert boolean true to true', () => {
+      expect(parseBoolean(true)).toBe(true);
+    });
+
+    it('should convert boolean false to false', () => {
+      expect(parseBoolean(false)).toBe(false);
+    });
+
+    it('should convert number 1 to true', () => {
+      expect(parseBoolean(1)).toBe(true);
+    });
+
+    it('should convert number 0 to false', () => {
+      expect(parseBoolean(0)).toBe(false);
+    });
+
+    it('should return false for null', () => {
+      expect(parseBoolean(null)).toBe(false);
+    });
+
+    it('should return false for undefined', () => {
+      expect(parseBoolean(undefined)).toBe(false);
+    });
+
+    it('should return false for empty string', () => {
+      expect(parseBoolean('')).toBe(false);
+    });
+
+    it('should return false for other numbers', () => {
+      expect(parseBoolean(2)).toBe(false);
     });
   });
 
