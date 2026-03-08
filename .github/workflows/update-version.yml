@@ -1,11 +1,13 @@
 name: Update Version
 
 on:
-  workflow_dispatch:          # you can also trigger manually if needed
+  workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - 'package.json'
-      - 'package-lock.json'  # trigger if Dependabot updates dependencies
+      - 'package-lock.json'
 
 permissions:
   contents: write
@@ -29,22 +31,41 @@ jobs:
       # 3. Install dependencies
       - run: npm ci
 
-      # 4. Get @actual-app/api version
-      - name: Get @actual-app/api version
-        id: get_version
+      # 4. Determine target version from dependency
+      - name: Get versions
+        id: versions
         run: |
-          ACTUAL_VERSION=$(node -p "require('./package.json').dependencies['@actual-app/api'].replace('^','')")
-          echo "ACTUAL_VERSION=$ACTUAL_VERSION" >> $GITHUB_ENV
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          TARGET_VERSION=$(node -p "require('./package.json').dependencies['@actual-app/api'].replace('^','')")
 
-      # 5. Update main package version
+          echo "Current version: $CURRENT_VERSION"
+          echo "Target version: $TARGET_VERSION"
+
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          echo "TARGET_VERSION=$TARGET_VERSION" >> $GITHUB_ENV
+
+          if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+            echo "SKIP=true" >> $GITHUB_ENV
+          else
+            echo "SKIP=false" >> $GITHUB_ENV
+          fi
+
+      # 5. Update package version if needed
       - name: Update main package version
-        run: npm version ${{ env.ACTUAL_VERSION }} --no-git-tag-version
+        if: env.SKIP != 'true'
+        run: npm version ${{ env.TARGET_VERSION }} --no-git-tag-version
 
-      # 6. Commit & push changes
+      # 6. Commit & push changes if needed
       - name: Commit changes
+        if: env.SKIP != 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add package.json
-          git commit -m "chore: bump version to ${{ env.ACTUAL_VERSION }}" || echo "No changes to commit"
+          git commit -m "chore: bump version to ${{ env.TARGET_VERSION }}"
           git push
+
+      # 7. Log skip
+      - name: Nothing to update
+        if: env.SKIP == 'true'
+        run: echo "Version already up to date. Nothing to do."
