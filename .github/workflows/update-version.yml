@@ -1,0 +1,50 @@
+name: Update Version
+
+on:
+  workflow_dispatch:          # you can also trigger manually if needed
+  push:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'  # trigger if Dependabot updates dependencies
+
+permissions:
+  contents: write
+
+jobs:
+  update-version:
+    if: github.actor != 'github-actions'
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repo
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      # 2. Set up Node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      # 3. Install dependencies
+      - run: npm ci
+
+      # 4. Get @actual-app/api version
+      - name: Get @actual-app/api version
+        id: get_version
+        run: |
+          ACTUAL_VERSION=$(node -p "require('./package.json').dependencies['@actual-app/api'].replace('^','')")
+          echo "ACTUAL_VERSION=$ACTUAL_VERSION" >> $GITHUB_ENV
+
+      # 5. Update main package version
+      - name: Update main package version
+        run: npm version ${{ env.ACTUAL_VERSION }} --no-git-tag-version
+
+      # 6. Commit & push changes
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add package.json
+          git commit -m "chore: bump version to ${{ env.ACTUAL_VERSION }}" || echo "No changes to commit"
+          git push
