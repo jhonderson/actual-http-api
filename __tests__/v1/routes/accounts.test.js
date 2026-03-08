@@ -38,6 +38,15 @@ describe('Accounts Routes', () => {
     };
 
     // Create a comprehensive mock budget object
+    // Provide a chainable Actual-QL builder mock for `q(...)` so route code can call .filter/.groupBy/.orderBy/.select/.calculate
+    const aqBuilder = {
+      filter() { return this; },
+      groupBy() { return this; },
+      orderBy() { return this; },
+      select() { return this; },
+      calculate() { return {}; },
+    };
+
     mockBudget = {
       getAccounts: jest.fn().mockResolvedValue([
         {
@@ -75,6 +84,9 @@ describe('Accounts Routes', () => {
       closeAccount: jest.fn().mockResolvedValue(undefined),
       reopenAccount: jest.fn().mockResolvedValue(undefined),
       runBankSync: jest.fn().mockResolvedValue(undefined),
+      // Actual-QL helpers used by the new balancehistory implementation
+      q: jest.fn().mockReturnValue(aqBuilder),
+      runQuery: jest.fn(),
     };
 
     // Create mock request/response objects
@@ -292,10 +304,14 @@ describe('Accounts Routes', () => {
       mockReq.params.accountId = 'acc1';
       mockReq.query.since_date = '2023-08-01';
       mockReq.query.until_date = '2023-08-03';
-      mockBudget.getAccountBalance
-        .mockResolvedValueOnce(1000)
-        .mockResolvedValueOnce(1100)
-        .mockResolvedValueOnce(1050);
+      // mock runQuery responses: first call -> startingBalance, second -> grouped per-day sums
+      mockBudget.runQuery
+        .mockResolvedValueOnce({ data: 0 })
+        .mockResolvedValueOnce({ data: [
+          { date: '2023-08-01', amount: 1000 },
+          { date: '2023-08-02', amount: 100 },
+          { date: '2023-08-03', amount: -50 },
+        ] });
 
       await handler(mockReq, mockRes, mockNext);
 

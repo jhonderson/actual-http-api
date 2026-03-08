@@ -240,14 +240,51 @@ module.exports = (router) => {
       if (isNaN(start) || isNaN(end) || start > end) {
         throw new Error('Invalid date range');
       }
-      const dailyBalance = {};
-      let current = new Date(start);
-      while (current <= end) {
-        const currentDate = formatDateToISOString(current);
-        dailyBalance[currentDate] =
-          (await res.locals.budget.getAccountBalance(req.params.accountId, currentDate)) || 0;
-        current.setDate(current.getDate() + 1);
+      // Delegate to helper that mirrors the compare script's Actual-QL method.
+      async function computeBalanceHistory(budget, accountId, start, end) {
+        const q = budget.q;
+        const startStr = formatDateToISOString(start);
+        const endStr = formatDateToISOString(end);
+
+        // compute day-before-start using simple date arithmetic and utility formatter
+        const DAY_MS = 24 * 60 * 60 * 1000;
+        const beforeStart = new Date(start.getTime() - DAY_MS);
+        const beforeStartStr = formatDateToISOString(beforeStart);
+
+        const startBalanceRes = await budget.runQuery(
+          q('transactions')
+            .filter({ account: accountId, is_parent: false, tombstone: false, date: { $lte: beforeStartStr } })
+            .calculate({ $sum: '$amount' })
+        );
+        const startingBalance = startBalanceRes && startBalanceRes.data ? startBalanceRes.data : 0;
+
+        const groupedRes = await budget.runQuery(
+          q('transactions')
+            .filter({ account: accountId, is_parent: false, tombstone: false, date: [{ $gte: startStr }, { $lte: endStr }] })
+            .groupBy('date')
+            .orderBy('date')
+            .select(['date', { amount: { $sum: '$amount' } }])
+        );
+
+        const groupedData = (groupedRes && groupedRes.data) || [];
+        const sumsByDate = {};
+        groupedData.forEach((row) => { sumsByDate[row.date] = row.amount || 0; });
+
+        const result = {};
+        let cumulative = startingBalance;
+        // iterate by day using utility formatter for date keys
+        let current = new Date(start.getTime());
+        const endDate = new Date(end.getTime());
+        while (current <= endDate) {
+          const d = formatDateToISOString(current);
+          cumulative = cumulative + (sumsByDate[d] || 0);
+          result[d] = cumulative;
+          current = new Date(current.getTime() + DAY_MS);
+        }
+        return result;
       }
+
+      const dailyBalance = await computeBalanceHistory(res.locals.budget, req.params.accountId, start, end);
       res.json({ data: dailyBalance });
     } catch(err) {
       next(err);
