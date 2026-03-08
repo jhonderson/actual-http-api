@@ -13,7 +13,7 @@
   "author": "jhonderson",
   "license": "MIT",
   "dependencies": {
-    "@actual-app/api": "^26.2.1",
+    "@actual-app/api": "^26.3.0",
     "archiver": "^7.0.1",
     "express": "^4.21.0",
     "js-yaml": "^4.1.0",
