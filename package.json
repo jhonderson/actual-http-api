@@ -1,6 +1,6 @@
 {
   "name": "actual-http-api",
-  "version": "26.2.1",
+  "version": "26.3.0",
   "description": "Basic Actual Budgeting API exposed through HTTP endpoints",
   "main": "server.js",
   "bin": "./server.js",
