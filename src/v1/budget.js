@@ -282,6 +282,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getBudgets();
   }
 
+  async function getServerVersion() {
+    return actualApi.getServerVersion();
+  }
+
   async function getTags() {
     return actualApi.getTags();
   }
@@ -309,8 +313,13 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     try {
       const directories = listSubDirectories(actualDataDir);
       directories.forEach(subDir => {
-        const metadata = JSON.parse(getFileContent(path.join(actualDataDir, subDir, 'metadata.json')));
-        syncIdToBudgetId[metadata.groupId] = metadata.id;
+        if (fs.existsSync(path.join(actualDataDir, subDir, 'metadata.json'))) {
+          const metadataRawContent = getFileContent(path.join(actualDataDir, subDir, 'metadata.json'));
+          if (!!metadataRawContent) {
+            const metadata = JSON.parse(metadataRawContent);
+            syncIdToBudgetId[metadata.groupId] = metadata.id;
+          }
+        }
       });
     } catch(err) {
       // The system will continue working normally,the only thing is that the budget will be downloaded
@@ -397,6 +406,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updateSchedule: updateSchedule,
     deleteSchedule: deleteSchedule,
     getBudgets: getBudgets,
+    getServerVersion: getServerVersion,
     getTags: getTags,
     createTag: createTag,
     updateTag: updateTag,
