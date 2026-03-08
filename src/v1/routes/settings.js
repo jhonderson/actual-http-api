@@ -137,7 +137,7 @@ module.exports = (router) => {
    */
   router.get('/actualhttpapiversion', async (req, res, next) => {
     try {
-      res.json({ data: pkg.version });
+      res.json({ data: { version: pkg.version } });
     } catch (err) {
       next(err);
     }
