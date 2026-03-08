@@ -1,5 +1,6 @@
 const swaggerJsdoc = require('swagger-jsdoc');
 const { config } = require('./config');
+const pkg = require('../../package.json');
 
 const openapiSpecification = swaggerJsdoc({
     definition: {
@@ -17,7 +18,7 @@ const openapiSpecification = swaggerJsdoc({
           name: 'MIT',
           url: 'http://opensource.org/licenses/MIT',
         },
-        version: '26.2.1',
+        version: pkg.version,
       },
       components: {
         securitySchemes: {
