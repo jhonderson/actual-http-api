@@ -107,6 +107,12 @@ describe('Budget Module', () => {
       getBudgets: jest.fn().mockResolvedValue([
         { id: 'budget1', groupId: 'sync1', name: 'Personal Budget' }
       ]),
+      getTags: jest.fn().mockResolvedValue([
+        { id: 'tag1', tag: 'important', color: '#ff0000', description: 'Important tag' }
+      ]),
+      createTag: jest.fn().mockResolvedValue({ id: 'tag2', tag: 'newtag' }),
+      updateTag: jest.fn().mockResolvedValue({ id: 'tag1', tag: 'updated' }),
+      deleteTag: jest.fn().mockResolvedValue(undefined),
       shutdown: jest.fn()
     };
 
@@ -698,6 +704,42 @@ describe('Budget Module', () => {
     it('should generate correct zip filename with date and budget name', async () => {
       const result = await budget.exportData('sync1');
       expect(result.fileName).toMatch(/\d{4}-\d{2}-\d{2}-Personal Budget\.zip/);
+    });
+  });
+
+  describe('Tags Management', () => {
+    let budget;
+
+    beforeEach(async () => {
+      budget = await Budget('sync1', undefined);
+    });
+
+    it('should get all tags', async () => {
+      const tags = await budget.getTags();
+      expect(tags).toHaveLength(1);
+      expect(tags[0].id).toBe('tag1');
+    });
+
+    it('should create a new tag', async () => {
+      const newTag = { tag: 'newtag' };
+      const result = await budget.createTag(newTag);
+
+      expect(mockActualApi.createTag).toHaveBeenCalledWith(newTag);
+      expect(result.id).toBe('tag2');
+    });
+
+    it('should update a tag', async () => {
+      const updates = { tag: 'updated' };
+      const result = await budget.updateTag('tag1', updates);
+
+      expect(mockActualApi.updateTag).toHaveBeenCalledWith('tag1', updates);
+      expect(result.id).toBe('tag1');
+    });
+
+    it('should delete a tag', async () => {
+      await budget.deleteTag('tag1');
+
+      expect(mockActualApi.deleteTag).toHaveBeenCalledWith('tag1');
     });
   });
 

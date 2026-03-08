@@ -282,6 +282,22 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getBudgets();
   }
 
+  async function getTags() {
+    return actualApi.getTags();
+  }
+
+  async function createTag(tag) {
+    return actualApi.createTag(tag);
+  }
+
+  async function updateTag(tagId, tag) {
+    return actualApi.updateTag(tagId, tag);
+  }
+
+  async function deleteTag(tagId) {
+    return actualApi.deleteTag(tagId);
+  }
+
   async function shutdown() {
     actualApi.shutdown();
   }
@@ -381,6 +397,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updateSchedule: updateSchedule,
     deleteSchedule: deleteSchedule,
     getBudgets: getBudgets,
+    getTags: getTags,
+    createTag: createTag,
+    updateTag: updateTag,
+    deleteTag: deleteTag,
     exportData: exportData,
     runQuery: runQuery,
     shutdown: shutdown,

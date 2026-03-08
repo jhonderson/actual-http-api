@@ -23,6 +23,7 @@ require('./payees')(router);
 require('./schedules')(router);
 require('./settings')(router);
 require('./run-query')(router);
+require('./tags')(router);
 
 router.use(errorHandler);
 
