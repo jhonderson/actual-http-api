@@ -4,8 +4,7 @@ on:
   push:
     branches: [ "main" ]
     tags: [ '*.*.*' ]
-  pull_request:
-    branches: [ "main" ]
+  # Removed pull_request trigger to avoid running CI on Dependabot PRs
 
 jobs:
   build:
@@ -21,6 +20,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Log into registry
+        if: ${{ github.event_name != 'pull_request' && secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
