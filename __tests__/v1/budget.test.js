@@ -113,7 +113,12 @@ describe('Budget Module', () => {
       createTag: jest.fn().mockResolvedValue({ id: 'tag2', tag: 'newtag' }),
       updateTag: jest.fn().mockResolvedValue({ id: 'tag1', tag: 'updated' }),
       deleteTag: jest.fn().mockResolvedValue(undefined),
-      shutdown: jest.fn()
+      shutdown: jest.fn(),
+      q: jest.fn(() => ({
+        filter: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis()
+      })),
+      runQuery: jest.fn(),
     };
 
     mockArchive = {
@@ -740,6 +745,57 @@ describe('Budget Module', () => {
       await budget.deleteTag('tag1');
 
       expect(mockActualApi.deleteTag).toHaveBeenCalledWith('tag1');
+    });
+  });
+
+  describe('Notes Management', () => {
+    let budget;
+
+    beforeEach(async () => {
+      budget = await Budget('sync1', undefined);
+    });
+
+    it('should get category notes', async () => {
+      mockActualApi.runQuery.mockResolvedValueOnce({
+        data: [{ note: 'Category note' }]
+      });
+
+      const result = await budget.getCategoryNotes('cat1');
+
+      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(result).toBe('Category note');
+    });
+
+    it('should get account notes', async () => {
+      mockActualApi.runQuery.mockResolvedValueOnce({
+        data: [{ note: 'Account note' }]
+      });
+
+      const result = await budget.getAccountNotes('acc1');
+
+      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(result).toBe('Account note');
+    });
+
+    it('should get budget month notes', async () => {
+      mockActualApi.runQuery.mockResolvedValueOnce({
+        data: [{ note: 'Month note' }]
+      });
+
+      const result = await budget.getBudgetMonthNotes('2024-01');
+
+      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(result).toBe('Month note');
+    });
+
+    it('should return undefined when note not found', async () => {
+      mockActualApi.runQuery.mockResolvedValueOnce({
+        data: []
+      });
+
+      const result = await budget.getCategoryNotes('cat1');
+
+      expect(result).toBeUndefined();
     });
   });
 

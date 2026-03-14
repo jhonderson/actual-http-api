@@ -302,6 +302,33 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteTag(tagId);
   }
 
+  async function getCategoryNotes(categoryId) {
+    return runQuery(
+          actualApi.q('notes')
+            .filter({ id: categoryId})
+            .select(['note'])
+        ).then(result => result?.data?.[0]?.note);
+  }
+
+  async function getAccountNotes(accountId) {
+    return runQuery(
+          actualApi.q('notes')
+            .filter({ id: `account-${accountId}`})
+            .select(['note'])
+        ).then(result => result?.data?.[0]?.note);
+  }
+
+  /**
+   * @param {*} month - The month for which to get the notes, in format YYYY-MM
+   */
+  async function getBudgetMonthNotes(month) {
+    return runQuery(
+          actualApi.q('notes')
+            .filter({ id: `budget-${month}`})
+            .select(['note'])
+        ).then(result => result?.data?.[0]?.note);
+  }
+
   async function shutdown() {
     actualApi.shutdown();
   }
@@ -411,6 +438,9 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     createTag: createTag,
     updateTag: updateTag,
     deleteTag: deleteTag,
+    getCategoryNotes: getCategoryNotes,
+    getAccountNotes: getAccountNotes,
+    getBudgetMonthNotes: getBudgetMonthNotes,
     exportData: exportData,
     runQuery: runQuery,
     shutdown: shutdown,
