@@ -88,6 +88,10 @@ http://localhost:5007/api-docs/
 ```bash
 npm test
 ```
+
 ## Usage Examples
 
-See [examples/USAGE_EXAMPLES.md](examples/USAGE_EXAMPLES.md) for two ready-to-use samples: [examples/budget_backup.sh](examples/budget_backup.sh) (backup script) and [examples/fly.toml](examples/fly.toml) (Fly.io deployment).
+See [USAGE_EXAMPLES.md](examples/USAGE_EXAMPLES.md) for ready-to-use use cases:
+- [budget_backup.sh](examples/budget_backup.sh): Backup your Actual Budget using a bash script
+- [fly.toml](examples/fly.toml): Configuration file to deploy actual-http-api to Fly
+- [update_account_balances.py](examples/update_account_balances.py): Script to update your investment account balances in Actual Budget (this script can only be used with actual-http-api version 26.4.0 and onwards)
