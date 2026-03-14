@@ -1,22 +1,20 @@
-name: Auto-merge Dependabot PRs
+name: Enable Dependabot Auto-Merge
 
 on:
-  pull_request_target:
-    types: [opened, reopened, synchronize, labeled]
+  pull_request:
+    types: [opened, synchronize]
 
 permissions:
-  contents: read
   pull-requests: write
+  contents: write
 
 jobs:
-  automerge:
-    if: github.actor == 'dependabot[bot]'
+  enable-automerge:
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
+
     steps:
-      - name: Auto-merge Dependabot PR when checks pass
-        uses: pascalgn/automerge-action@v0.14.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          merge_method: squash
-          # optional: require a label to be present before merging
-          # label: 'automerge'
+      - name: Enable auto-merge
+        run: gh pr merge --auto --squash "${{ github.event.pull_request.html_url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
