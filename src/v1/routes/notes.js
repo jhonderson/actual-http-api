@@ -66,7 +66,7 @@ module.exports = (router) => {
   router.get('/budgets/:budgetSyncId/notes/category/:categoryId', async (req, res, next) => {
     try {
       const notes = await res.locals.budget.getCategoryNotes(req.params.categoryId);
-      res.json({ data: notes });
+      res.json({ data: notes ?? "" });
     } catch (err) {
       next(err);
     }
@@ -107,7 +107,7 @@ module.exports = (router) => {
   router.get('/budgets/:budgetSyncId/notes/account/:accountId', async (req, res, next) => {
     try {
       const notes = await res.locals.budget.getAccountNotes(req.params.accountId);
-      res.json({ data: notes });
+      res.json({ data: notes ?? "" });
     } catch (err) {
       next(err);
     }
@@ -148,7 +148,7 @@ module.exports = (router) => {
   router.get('/budgets/:budgetSyncId/notes/budgetmonth/:budgetMonth', async (req, res, next) => {
     try {
       const notes = await res.locals.budget.getBudgetMonthNotes(req.params.budgetMonth);
-      res.json({ data: notes });
+      res.json({ data: notes ?? "" });
     } catch (err) {
       next(err);
     }
