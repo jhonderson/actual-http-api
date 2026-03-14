@@ -93,5 +93,5 @@ npm test
 
 See [USAGE_EXAMPLES.md](examples/USAGE_EXAMPLES.md) for ready-to-use use cases:
 - [budget_backup.sh](examples/budget_backup.sh): Backup your Actual Budget using a bash script
-- [fly.toml](examples/fly.toml): Configuration file to deploy actual-http-api to Fly
+- [fly.toml](examples/fly.toml): Configuration file to deploy actual-http-api to Fly.io
 - [update_account_balances.py](examples/update_account_balances.py): Script to update your investment account balances in Actual Budget (this script can only be used with actual-http-api version 26.4.0 and onwards)

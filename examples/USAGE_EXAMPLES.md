@@ -34,6 +34,9 @@ Schedule the script to run daily via cron (Linux/macOS) or Task Scheduler (Windo
 > [!NOTE]
 > This script can only be used with actual-http-api version 26.4.0 and onwards.
 
+> [!NOTE]
+> yfinance requires python 3.9+ to work properly. If you have python 3.8 or lower, try installing a lower version of yfinance: `pip install "yfinance<0.2.30"`.
+
 **Description:** Example python script to update your investment account balances in Actual Budget.
 
 **Location:** [update_account_balances.py](./update_account_balances.py)
