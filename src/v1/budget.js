@@ -254,7 +254,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
   }
 
   async function deleteRule(ruleId) {
-    return actualApi.deleteRule({ id: ruleId });
+    return actualApi.deleteRule(ruleId);
   }
 
   async function getSchedules() {
