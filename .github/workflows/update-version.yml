@@ -14,58 +14,51 @@ permissions:
 
 jobs:
   update-version:
-    if: github.actor != 'github-actions'
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout repo
       - uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          token: ${{ secrets.ACTIONS_PAT }}
+          fetch-depth: 0
 
-      # 2. Set up Node
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      # 3. Install dependencies
       - run: npm ci
 
-      # 4. Determine target version from dependency
       - name: Get versions
         id: versions
+        shell: bash
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           TARGET_VERSION=$(node -p "require('./package.json').dependencies['@actual-app/api'].replace('^','')")
 
-          echo "Current version: $CURRENT_VERSION"
-          echo "Target version: $TARGET_VERSION"
-
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-          echo "TARGET_VERSION=$TARGET_VERSION" >> $GITHUB_ENV
+          echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "target_version=$TARGET_VERSION" >> "$GITHUB_OUTPUT"
 
           if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
-            echo "SKIP=true" >> $GITHUB_ENV
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            echo "SKIP=false" >> $GITHUB_ENV
+            echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # 5. Update package version if needed
       - name: Update main package version
-        if: env.SKIP != 'true'
-        run: npm version ${{ env.TARGET_VERSION }} --no-git-tag-version
+        if: steps.versions.outputs.skip != 'true'
+        run: npm version "${{ steps.versions.outputs.target_version }}" --no-git-tag-version
 
-      # 6. Commit & push changes if needed
-      - name: Commit changes
-        if: env.SKIP != 'true'
+      - name: Commit and tag
+        if: steps.versions.outputs.skip != 'true'
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add package.json
-          git commit -m "chore: bump version to ${{ env.TARGET_VERSION }}"
-          git push
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ steps.versions.outputs.target_version }}"
+          git tag "v${{ steps.versions.outputs.target_version }}"
+          git push origin main --follow-tags
 
-      # 7. Log skip
       - name: Nothing to update
-        if: env.SKIP == 'true'
-        run: echo "Version already up to date. Nothing to do."
+        if: steps.versions.outputs.skip == 'true'
+        run: echo "Version already up to date"
