@@ -47,7 +47,9 @@ jobs:
 
       - name: Update main package version
         if: steps.versions.outputs.skip != 'true'
-        run: npm version "${{ steps.versions.outputs.target_version }}" --no-git-tag-version
+        run: |
+          npm version "${{ steps.versions.outputs.target_version }}" --no-git-tag-version
+          npm install --package-lock-only
 
       - name: Commit and tag
         if: steps.versions.outputs.skip != 'true'
