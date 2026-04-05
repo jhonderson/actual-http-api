@@ -361,12 +361,12 @@ module.exports = (router) => {
    *                            - '1fbd4467-004d-4163-8569-6f83f8db6eca'
    *               examples:
    *                 - data:
-   *                   added:
-   *                     - "1a152a80-af05-4efa-ba4a-95f814a9d1d1"
-   *                     - "f64fd861-ba21-481b-ac88-2c30c6660240"
-   *                   updated:
-   *                     - "1fbd4467-004d-4163-8569-6f83f8db6eca"
-   *                     - "34339ba3-7b38-4b3a-b90d-4a895781ea9e"
+   *                     added:
+   *                       - "1a152a80-af05-4efa-ba4a-95f814a9d1d1"
+   *                       - "f64fd861-ba21-481b-ac88-2c30c6660240"
+   *                     updated:
+   *                       - "1fbd4467-004d-4163-8569-6f83f8db6eca"
+   *                       - "34339ba3-7b38-4b3a-b90d-4a895781ea9e"
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
