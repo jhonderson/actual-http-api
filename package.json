@@ -1,6 +1,6 @@
 {
   "name": "actual-http-api",
-  "version": "26.3.0",
+  "version": "26.4.0",
   "description": "Basic Actual Budgeting API exposed through HTTP endpoints",
   "main": "server.js",
   "bin": "./server.js",
@@ -13,7 +13,7 @@
   "author": "jhonderson",
   "license": "MIT",
   "dependencies": {
-    "@actual-app/api": "^26.3.0",
+    "@actual-app/api": "^26.4.0",
     "archiver": "^7.0.1",
     "express": "^5.2.1",
     "js-yaml": "^4.1.0",
