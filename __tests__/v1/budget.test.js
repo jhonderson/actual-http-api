@@ -610,7 +610,7 @@ describe('Budget Module', () => {
 
     it('should delete a rule', async () => {
       await budget.deleteRule('rule1');
-      expect(mockActualApi.deleteRule).toHaveBeenCalledWith({ id: 'rule1' });
+      expect(mockActualApi.deleteRule).toHaveBeenCalledWith('rule1');
     });
   });
 
