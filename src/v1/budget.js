@@ -310,12 +310,20 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
         ).then(result => result?.data?.[0]?.note);
   }
 
+  async function setCategoryNotes(categoryId, note) {
+    return actualApi.internal.send('notes-save', { id: categoryId, note });
+  }
+
   async function getAccountNotes(accountId) {
     return runQuery(
           actualApi.q('notes')
             .filter({ id: `account-${accountId}`})
             .select(['note'])
         ).then(result => result?.data?.[0]?.note);
+  }
+
+  async function setAccountNotes(accountId, note) {
+    return actualApi.internal.send('notes-save', { id: `account-${accountId}`, note });
   }
 
   /**
@@ -327,6 +335,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
             .filter({ id: `budget-${month}`})
             .select(['note'])
         ).then(result => result?.data?.[0]?.note);
+  }
+
+  async function setBudgetMonthNotes(month, note) {
+    return actualApi.internal.send('notes-save', { id: `budget-${month}`, note });
   }
 
   async function shutdown() {
@@ -439,8 +451,11 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updateTag: updateTag,
     deleteTag: deleteTag,
     getCategoryNotes: getCategoryNotes,
+    setCategoryNotes: setCategoryNotes,
     getAccountNotes: getAccountNotes,
+    setAccountNotes: setAccountNotes,
     getBudgetMonthNotes: getBudgetMonthNotes,
+    setBudgetMonthNotes: setBudgetMonthNotes,
     exportData: exportData,
     runQuery: runQuery,
     shutdown: shutdown,
