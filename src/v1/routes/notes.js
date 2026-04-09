@@ -77,6 +77,7 @@ module.exports = (router) => {
    * /budgets/{budgetSyncId}/notes/category/{categoryId}:
    *   put:
    *     summary: Sets (creates or replaces) notes for a category
+   *     description: "⚠️ **Warning:** This endpoint interacts with the internals of Actual rather than the official API. It is not considered stable or secure for use and may change without notice."
    *     tags: [Notes]
    *     security:
    *       - apiKey: []
@@ -114,6 +115,7 @@ module.exports = (router) => {
    *         $ref: '#/components/responses/500'
    *   delete:
    *     summary: Deletes notes for a category
+   *     description: "⚠️ **Warning:** This endpoint interacts with the internals of Actual rather than the official API. It is not considered stable or secure for use and may change without notice."
    *     tags: [Notes]
    *     security:
    *       - apiKey: []
@@ -202,6 +204,7 @@ module.exports = (router) => {
    * /budgets/{budgetSyncId}/notes/account/{accountId}:
    *   put:
    *     summary: Sets (creates or replaces) notes for an account
+   *     description: "⚠️ **Warning:** This endpoint interacts with the internals of Actual rather than the official API. It is not considered stable or secure for use and may change without notice."
    *     tags: [Notes]
    *     security:
    *       - apiKey: []
@@ -239,6 +242,7 @@ module.exports = (router) => {
    *         $ref: '#/components/responses/500'
    *   delete:
    *     summary: Deletes notes for an account
+   *     description: "⚠️ **Warning:** This endpoint interacts with the internals of Actual rather than the official API. It is not considered stable or secure for use and may change without notice."
    *     tags: [Notes]
    *     security:
    *       - apiKey: []
@@ -327,6 +331,7 @@ module.exports = (router) => {
    * /budgets/{budgetSyncId}/notes/budgetmonth/{budgetMonth}:
    *   put:
    *     summary: Sets (creates or replaces) notes for a budget month
+   *     description: "⚠️ **Warning:** This endpoint interacts with the internals of Actual rather than the official API. It is not considered stable or secure for use and may change without notice."
    *     tags: [Notes]
    *     security:
    *       - apiKey: []
@@ -364,6 +369,7 @@ module.exports = (router) => {
    *         $ref: '#/components/responses/500'
    *   delete:
    *     summary: Deletes notes for a budget month
+   *     description: "⚠️ **Warning:** This endpoint interacts with the internals of Actual rather than the official API. It is not considered stable or secure for use and may change without notice."
    *     tags: [Notes]
    *     security:
    *       - apiKey: []
