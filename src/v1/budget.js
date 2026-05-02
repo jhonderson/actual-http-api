@@ -118,8 +118,16 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.addTransactions(accountId, transactions, {learnCategories, runTransfers});
   }
 
-  async function importTransactions(accountId, transactions) {
-    return actualApi.importTransactions(accountId, transactions);
+  async function importTransactions(accountId, transactions, {
+    defaultCleared = true,
+    dryRun = false,
+    reimportDeleted = false,
+  } = {}) {
+    return actualApi.importTransactions(accountId, transactions, {
+      defaultCleared,
+      dryRun,
+      reimportDeleted,
+    });
   }
 
   async function updateTransaction(transactionId, transaction) {

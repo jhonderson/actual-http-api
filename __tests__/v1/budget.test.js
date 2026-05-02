@@ -330,10 +330,27 @@ describe('Budget Module', () => {
       });
     });
 
-    it('should import transactions', async () => {
+    it('should import transactions with default options', async () => {
       const transactions = [{ amount: 100 }];
       await budget.importTransactions('acc1', transactions);
-      expect(mockActualApi.importTransactions).toHaveBeenCalledWith('acc1', transactions);
+      expect(mockActualApi.importTransactions).toHaveBeenCalledWith('acc1', transactions, {
+        defaultCleared: true,
+        dryRun: false,
+        reimportDeleted: false,
+      });
+    });
+
+    it('should import transactions with explicit options', async () => {
+      const transactions = [{ amount: 100 }];
+      const options = {
+        defaultCleared: false,
+        dryRun: true,
+        reimportDeleted: true,
+      };
+
+      await budget.importTransactions('acc1', transactions, options);
+
+      expect(mockActualApi.importTransactions).toHaveBeenCalledWith('acc1', transactions, options);
     });
 
     it('should update a transaction', async () => {
