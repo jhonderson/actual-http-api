@@ -430,7 +430,41 @@ describe('Transactions Routes', () => {
       await handler(mockReq, mockRes, mockNext);
 
       expect(mockBudget.getAccount).toHaveBeenCalledWith('acc1');
-      expect(mockBudget.importTransactions).toHaveBeenCalledWith('acc1', mockReq.body.transactions);
+      expect(mockBudget.importTransactions).toHaveBeenCalledWith('acc1', mockReq.body.transactions, {
+        defaultCleared: true,
+        dryRun: false,
+        reimportDeleted: false,
+      });
+      expect(mockRes.json).toHaveBeenCalled();
+    });
+
+    it('should import transactions with explicit options', async () => {
+      const transactionsModule = require('../../../src/v1/routes/transactions');
+      transactionsModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/accounts/:accountId/transactions/import'];
+      mockReq.params.accountId = 'acc1';
+      mockReq.body = {
+        transactions: [
+          {
+            date: '2023-08-01',
+            amount: -50,
+            imported_id: 'ext-1',
+            account: 'acc1',
+          },
+        ],
+        defaultCleared: false,
+        dryRun: true,
+        reimportDeleted: true,
+      };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.importTransactions).toHaveBeenCalledWith('acc1', mockReq.body.transactions, {
+        defaultCleared: false,
+        dryRun: true,
+        reimportDeleted: true,
+      });
       expect(mockRes.json).toHaveBeenCalled();
     });
 
