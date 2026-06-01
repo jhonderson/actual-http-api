@@ -16,7 +16,7 @@
     "@actual-app/api": "^26.5.2",
     "archiver": "^8.0.0",
     "express": "^5.2.1",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.2.0",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1"
   },
