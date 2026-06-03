@@ -2,7 +2,6 @@
 const { currentLocalDate, formatDateToISOString, listSubDirectories, getFileContent } = require('../utils/utils');
 const { getActualApiClient, getActualDataDir } = require('./actual-client-provider');
 
-const archiver = require('archiver');
 const fs = require('fs');
 const path = require('path');
 
@@ -383,7 +382,17 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     if (!budget) {
       throw new Error(`Budget not found for budget sync id ${budgetSyncId}`);
     }
-    // Create the archive
+    // Create the archive. Prefer CommonJS `require` (works in Jest tests);
+    // fall back to dynamic ESM import when `require` is unavailable.
+    let archiver;
+    try {
+      // This will load our Jest-shimmed module during tests (or the CJS variant if available).
+      // eslint-disable-next-line global-require
+      archiver = require('archiver');
+    } catch (err) {
+      const archiverModule = await import('archiver');
+      archiver = archiverModule && archiverModule.default ? archiverModule.default : archiverModule;
+    }
     const archive = archiver('zip', { zlib: { level: 9 } });
     // Add files to the archive
     for (const file of ['db.sqlite', 'metadata.json']) {
