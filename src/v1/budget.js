@@ -310,42 +310,30 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
   }
 
   async function getCategoryNotes(categoryId) {
-    return runQuery(
-          actualApi.q('notes')
-            .filter({ id: categoryId})
-            .select(['note'])
-        ).then(result => result?.data?.[0]?.note);
+    const result = await actualApi.getNote(categoryId);
+    return result?.note ?? null;
   }
 
   async function setCategoryNotes(categoryId, note) {
-    return actualApi.internal.send('notes-save', { id: categoryId, note });
+    return actualApi.updateNote(categoryId, note);
   }
 
   async function getAccountNotes(accountId) {
-    return runQuery(
-          actualApi.q('notes')
-            .filter({ id: `account-${accountId}`})
-            .select(['note'])
-        ).then(result => result?.data?.[0]?.note);
+    const result = await actualApi.getNote(`account-${accountId}`);
+    return result?.note ?? null;
   }
 
   async function setAccountNotes(accountId, note) {
-    return actualApi.internal.send('notes-save', { id: `account-${accountId}`, note });
+    return actualApi.updateNote(`account-${accountId}`, note);
   }
 
-  /**
-   * @param {*} month - The month for which to get the notes, in format YYYY-MM
-   */
   async function getBudgetMonthNotes(month) {
-    return runQuery(
-          actualApi.q('notes')
-            .filter({ id: `budget-${month}`})
-            .select(['note'])
-        ).then(result => result?.data?.[0]?.note);
+    const result = await actualApi.getNote(`budget-${month}`);
+    return result?.note ?? null;
   }
 
   async function setBudgetMonthNotes(month, note) {
-    return actualApi.internal.send('notes-save', { id: `budget-${month}`, note });
+    return actualApi.updateNote(`budget-${month}`, note);
   }
 
   async function shutdown() {
