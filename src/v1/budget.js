@@ -277,8 +277,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.createSchedule(schedule);
   }
 
-  async function updateSchedule(scheduleId, schedule) {
-    return actualApi.updateSchedule(scheduleId, schedule);
+  async function updateSchedule(scheduleId, schedule, resetNextDate) {
+    return actualApi.updateSchedule(scheduleId, schedule, resetNextDate);
   }
 
   async function deleteSchedule(scheduleId) {

@@ -696,9 +696,15 @@ describe('Budget Module', () => {
     it('should update a schedule', async () => {
       const updates = { name: 'Updated Monthly Rent', amount: -160000 };
       const result = await budget.updateSchedule('schedule1', updates);
-      expect(mockActualApi.updateSchedule).toHaveBeenCalledWith('schedule1', updates);
+      expect(mockActualApi.updateSchedule).toHaveBeenCalledWith('schedule1', updates, undefined);
       expect(result.id).toBe('schedule1');
       expect(result.name).toBe('Updated Rent');
+    });
+
+    it('should update a schedule with resetNextDate', async () => {
+      const updates = { name: 'Updated Monthly Rent', amount: -160000 };
+      await budget.updateSchedule('schedule1', updates, true);
+      expect(mockActualApi.updateSchedule).toHaveBeenCalledWith('schedule1', updates, true);
     });
 
     it('should delete a schedule', async () => {
