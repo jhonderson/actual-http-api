@@ -388,8 +388,19 @@ describe('Budget Module', () => {
 
     it('should get all categories', async () => {
       const categories = await budget.getCategories();
+      expect(mockActualApi.getCategories).toHaveBeenCalledWith({ hidden: undefined });
       expect(categories).toHaveLength(1);
       expect(categories[0].id).toBe('cat1');
+    });
+
+    it('should get hidden categories when hidden=true', async () => {
+      await budget.getCategories({ hidden: true });
+      expect(mockActualApi.getCategories).toHaveBeenCalledWith({ hidden: true });
+    });
+
+    it('should get visible categories when hidden=false', async () => {
+      await budget.getCategories({ hidden: false });
+      expect(mockActualApi.getCategories).toHaveBeenCalledWith({ hidden: false });
     });
 
     it('should get a specific category', async () => {
@@ -426,8 +437,14 @@ describe('Budget Module', () => {
 
     it('should get all category groups', async () => {
       const groups = await budget.getCategoryGroups();
+      expect(mockActualApi.getCategoryGroups).toHaveBeenCalledWith({ hidden: undefined });
       expect(groups).toHaveLength(1);
       expect(groups[0].id).toBe('cg1');
+    });
+
+    it('should get hidden category groups when hidden=true', async () => {
+      await budget.getCategoryGroups({ hidden: true });
+      expect(mockActualApi.getCategoryGroups).toHaveBeenCalledWith({ hidden: true });
     });
 
     it('should create a new category group', async () => {
