@@ -250,10 +250,25 @@ describe('Accounts Routes', () => {
 
       await handler(mockReq, mockRes, mockNext);
 
-      expect(mockBudget.getAccountBalance).toHaveBeenCalledWith('acc1', '2023-08-15');
+      expect(mockBudget.getAccountBalance).toHaveBeenCalledWith('acc1', new Date(2023, 7, 15));
       expect(mockRes.json).toHaveBeenCalledWith({
         data: 3500,
       });
+    });
+
+    it('should return 400 for invalid cutoff_date format', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/accounts/:accountId/balance'];
+      mockReq.params.accountId = 'acc1';
+      mockReq.query.cutoff_date = '15-08-2023';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining('Bad date format') })
+      );
     });
 
     it('should handle zero balance', async () => {
