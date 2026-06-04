@@ -406,7 +406,7 @@ describe('Accounts Routes', () => {
       );
     });
 
-    it('should create an account', async () => {
+    it('should create an account without initialBalance', async () => {
       const accountsModule = require('../../../src/v1/routes/accounts');
       accountsModule(mockRouter);
 
@@ -420,16 +420,51 @@ describe('Accounts Routes', () => {
 
       await handler(mockReq, mockRes, mockNext);
 
-      expect(mockBudget.createAccount).toHaveBeenCalledWith({
-        name: 'New Account',
-        offbudget: false,
-      });
+      expect(mockBudget.createAccount).toHaveBeenCalledWith(
+        { name: 'New Account', offbudget: false },
+        undefined
+      );
       expect(mockRes.json).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          id: 'new-acc',
-          name: 'New Account',
-        }),
+        data: expect.objectContaining({ id: 'new-acc', name: 'New Account' }),
       });
+    });
+
+    it('should create an account with initialBalance', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/accounts'];
+      mockReq.body = {
+        account: {
+          name: 'New Account',
+          offbudget: false,
+          initialBalance: 10000,
+        },
+      };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.createAccount).toHaveBeenCalledWith(
+        { name: 'New Account', offbudget: false },
+        10000
+      );
+    });
+
+    it('should return 400 for non-integer initialBalance', async () => {
+      const accountsModule = require('../../../src/v1/routes/accounts');
+      accountsModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/accounts'];
+      mockReq.body = {
+        account: { name: 'New Account', offbudget: false, initialBalance: 'abc' },
+      };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining('initialBalance must be an integer') })
+      );
+      expect(mockBudget.createAccount).not.toHaveBeenCalled();
     });
 
     it('should reject empty account info', async () => {

@@ -80,8 +80,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getAccountBalance(accountId, cutoffDate);                                                       
   } 
 
-  async function createAccount(account) {
-    return actualApi.createAccount(account);
+  async function createAccount(account, initialBalance) {
+    return actualApi.createAccount(account, initialBalance);
   }
 
   async function updateAccount(accountId, account) {
