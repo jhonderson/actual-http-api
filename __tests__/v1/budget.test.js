@@ -113,6 +113,8 @@ describe('Budget Module', () => {
       createTag: jest.fn().mockResolvedValue({ id: 'tag2', tag: 'newtag' }),
       updateTag: jest.fn().mockResolvedValue({ id: 'tag1', tag: 'updated' }),
       deleteTag: jest.fn().mockResolvedValue(undefined),
+      getNote: jest.fn().mockResolvedValue({ id: 'cat1', note: 'Category note' }),
+      updateNote: jest.fn().mockResolvedValue(undefined),
       shutdown: jest.fn(),
       q: jest.fn(() => ({
         filter: jest.fn().mockReturnThis(),
@@ -773,46 +775,38 @@ describe('Budget Module', () => {
     });
 
     it('should get category notes', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
-        data: [{ note: 'Category note' }]
-      });
+      mockActualApi.getNote.mockResolvedValueOnce({ id: 'cat1', note: 'Category note' });
 
       const result = await budget.getCategoryNotes('cat1');
 
-      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(mockActualApi.getNote).toHaveBeenCalledWith('cat1');
       expect(result).toBe('Category note');
     });
 
     it('should get account notes', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
-        data: [{ note: 'Account note' }]
-      });
+      mockActualApi.getNote.mockResolvedValueOnce({ id: 'account-acc1', note: 'Account note' });
 
       const result = await budget.getAccountNotes('acc1');
 
-      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(mockActualApi.getNote).toHaveBeenCalledWith('account-acc1');
       expect(result).toBe('Account note');
     });
 
     it('should get budget month notes', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
-        data: [{ note: 'Month note' }]
-      });
+      mockActualApi.getNote.mockResolvedValueOnce({ id: 'budget-2024-01', note: 'Month note' });
 
       const result = await budget.getBudgetMonthNotes('2024-01');
 
-      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(mockActualApi.getNote).toHaveBeenCalledWith('budget-2024-01');
       expect(result).toBe('Month note');
     });
 
-    it('should return undefined when note not found', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
-        data: []
-      });
+    it('should return null when note not found', async () => {
+      mockActualApi.getNote.mockResolvedValueOnce(null);
 
       const result = await budget.getCategoryNotes('cat1');
 
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 
