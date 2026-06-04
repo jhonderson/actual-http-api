@@ -136,7 +136,7 @@ describe('Budget Module', () => {
       name: 'Personal Budget'
     }));
     getActualDataDir.mockReturnValue('/data/actual');
-    archiver.mockReturnValue(mockArchive);
+    archiver.ZipArchive.mockImplementation(() => mockArchive);
     path.join.mockImplementation((...args) => args.join('/'));
   });
 
