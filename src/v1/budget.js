@@ -145,8 +145,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     });
   }
 
-  async function getCategories() {
-    return actualApi.getCategories();
+  async function getCategories({ hidden } = {}) {
+    return actualApi.getCategories({ hidden });
   }
 
   async function getCategory(categoryId) {
@@ -166,8 +166,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteCategory(categoryId, transferCategoryId);
   }
 
-  async function getCategoryGroups() {
-    return actualApi.getCategoryGroups();
+  async function getCategoryGroups({ hidden } = {}) {
+    return actualApi.getCategoryGroups({ hidden });
   }
 
   async function createCategoryGroup(categoryGroup) {
