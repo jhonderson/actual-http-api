@@ -316,17 +316,20 @@ module.exports = (router) => {
    *               account:
    *                 required:
    *                   - name
-   *                   - offbudget
    *                 type: object
    *                 properties:
    *                   name:
    *                      type: string
    *                   offbudget:
    *                      type: boolean
+   *                   initialBalance:
+   *                      type: integer
+   *                      description: Optional initial balance in integer format (e.g. 10000 = $100.00)
    *             examples:
    *               - account:
    *                   name: 'Checking'
    *                   offbudget: false
+   *                   initialBalance: 10000
    *     responses:
    *       '200':
    *         description: Account created
@@ -346,7 +349,11 @@ module.exports = (router) => {
   router.post('/budgets/:budgetSyncId/accounts', async (req, res, next) => {
     try {
       validateAccountBody(req.body.account);
-      res.json({'data': await res.locals.budget.createAccount(req.body.account)});
+      const { initialBalance, ...account } = req.body.account;
+      if (initialBalance !== undefined && !Number.isInteger(initialBalance)) {
+        throw new Error('initialBalance must be an integer (e.g. 10000 = $100.00)');
+      }
+      res.json({'data': await res.locals.budget.createAccount(account, initialBalance)});
     } catch(err) {
       next(err);
     }

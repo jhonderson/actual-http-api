@@ -253,7 +253,14 @@ describe('Budget Module', () => {
     it('should create a new account', async () => {
       const newAccount = { name: 'Savings', type: 'savings' };
       const result = await budget.createAccount(newAccount);
-      expect(mockActualApi.createAccount).toHaveBeenCalledWith(newAccount);
+      expect(mockActualApi.createAccount).toHaveBeenCalledWith(newAccount, undefined);
+      expect(result.id).toBe('acc2');
+    });
+
+    it('should create a new account with initial balance', async () => {
+      const newAccount = { name: 'Savings', type: 'savings' };
+      const result = await budget.createAccount(newAccount, 10000);
+      expect(mockActualApi.createAccount).toHaveBeenCalledWith(newAccount, 10000);
       expect(result.id).toBe('acc2');
     });
 
