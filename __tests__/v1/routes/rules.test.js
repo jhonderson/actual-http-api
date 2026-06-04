@@ -236,7 +236,7 @@ describe('Rules Routes', () => {
       );
     });
 
-    it('should update a rule', async () => {
+    it('should update a rule using the URL ruleId when body has no id', async () => {
       const rulesModule = require('../../../src/v1/routes/rules');
       rulesModule(mockRouter);
 
@@ -255,10 +255,41 @@ describe('Rules Routes', () => {
 
       await handler(mockReq, mockRes, mockNext);
 
-      expect(mockBudget.updateRule).toHaveBeenCalledWith(mockReq.body.rule);
+      expect(mockBudget.updateRule).toHaveBeenCalledWith({ name: 'Updated Rule', id: 'rule1' });
       expect(mockRes.json).toHaveBeenCalledWith({
         data: expect.objectContaining({ id: 'rule1' }),
       });
+    });
+
+    it('should update a rule when body id matches URL ruleId', async () => {
+      const rulesModule = require('../../../src/v1/routes/rules');
+      rulesModule(mockRouter);
+
+      const handler = handlers['PATCH /budgets/:budgetSyncId/rules/:ruleId'];
+      mockReq.params.ruleId = 'rule1';
+      mockReq.body = { rule: { id: 'rule1', name: 'Updated Rule' } };
+
+      mockBudget.updateRule.mockResolvedValueOnce({ id: 'rule1', name: 'Updated Rule' });
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.updateRule).toHaveBeenCalledWith({ id: 'rule1', name: 'Updated Rule' });
+    });
+
+    it('should return 400 when body id differs from URL ruleId', async () => {
+      const rulesModule = require('../../../src/v1/routes/rules');
+      rulesModule(mockRouter);
+
+      const handler = handlers['PATCH /budgets/:budgetSyncId/rules/:ruleId'];
+      mockReq.params.ruleId = 'rule1';
+      mockReq.body = { rule: { id: 'rule2', name: 'Updated Rule' } };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(
+        expect.objectContaining({ message: expect.stringContaining('must be the same as the rule id in the URL parameter') })
+      );
+      expect(mockBudget.updateRule).not.toHaveBeenCalled();
     });
 
     it('should reject for nonexistent rule', async () => {

@@ -379,7 +379,11 @@ module.exports = (router) => {
 
   router.patch('/budgets/:budgetSyncId/rules/:ruleId', async (req, res, next) => {
     try {
-      res.json({'data': await res.locals.budget.updateRule(req.body.rule)});
+      const bodyId = req.body.rule?.id;
+      if (bodyId && bodyId !== req.params.ruleId) {
+        throw new Error(`Rule id in request body must be the same as the rule id in the URL parameter`);
+      }
+      res.json({'data': await res.locals.budget.updateRule({ ...req.body.rule, id: req.params.ruleId })});
     } catch(err) {
       next(err);
     }
