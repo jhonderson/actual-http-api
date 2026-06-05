@@ -116,7 +116,45 @@ module.exports = (router) => {
       next(err);
     }
   });
-  
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/common-payees:
+   *   get:
+   *     summary: Returns common payees that appear frequently in transactions, including transfer payees
+   *     tags: [Payees]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: List of common payees
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/Payee'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.get('/budgets/:budgetSyncId/common-payees', async (req, res, next) => {
+    try {
+      res.json({'data': await res.locals.budget.getCommonPayees()});
+    } catch(err) {
+      next(err);
+    }
+  });
+
   router.post('/budgets/:budgetSyncId/payees', async (req, res, next) => {
     try {
       res.json({'data': await res.locals.budget.createPayee(req.body.payee)});

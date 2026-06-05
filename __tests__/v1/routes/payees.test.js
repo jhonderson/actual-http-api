@@ -40,6 +40,9 @@ describe('Payees Routes', () => {
           transfer_acct: null,
         },
       ]),
+      getCommonPayees: jest.fn().mockResolvedValue([
+        { id: 'transfer-payee1', name: 'Transfer: Checking', transfer_acct: 'acc1' },
+      ]),
       getPayee: jest.fn().mockResolvedValue({
         id: 'payee1',
         name: 'Grocery Store',
@@ -112,6 +115,36 @@ describe('Payees Routes', () => {
       const handler = handlers['GET /budgets/:budgetSyncId/payees'];
       const error = new Error('Failed to fetch payees');
       mockBudget.getPayees.mockRejectedValueOnce(error);
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe('GET /budgets/:budgetSyncId/common-payees', () => {
+    it('should return list of common payees', async () => {
+      const payeesModule = require('../../../src/v1/routes/payees');
+      payeesModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/common-payees'];
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getCommonPayees).toHaveBeenCalled();
+      expect(mockRes.json).toHaveBeenCalledWith({
+        data: expect.arrayContaining([
+          expect.objectContaining({ transfer_acct: 'acc1' }),
+        ]),
+      });
+    });
+
+    it('should handle errors from getCommonPayees', async () => {
+      const payeesModule = require('../../../src/v1/routes/payees');
+      payeesModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/common-payees'];
+      const error = new Error('Failed to fetch common payees');
+      mockBudget.getCommonPayees.mockRejectedValueOnce(error);
 
       await handler(mockReq, mockRes, mockNext);
 
