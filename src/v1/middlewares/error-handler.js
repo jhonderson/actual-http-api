@@ -17,6 +17,7 @@ const errorHandler = (err, req, res, next) => {
   } else if (err.message.includes('Could not get remote files')) {
     serverError(res, err, 'Error accessing Actual Server, check Actual Server password');
   } else if (err.message.includes('not found')
+    || err.message.includes('Not found')
     || err.message.includes('No budget')
     || err.message.includes('Cannot destructure property')) {
     clientError(res, 404, err, err.message);

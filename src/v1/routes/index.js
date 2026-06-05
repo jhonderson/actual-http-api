@@ -25,6 +25,7 @@ require('./settings')(router);
 require('./run-query')(router);
 require('./tags')(router);
 require('./notes')(router);
+require('./utils')(router);
 
 router.use(errorHandler);
 
