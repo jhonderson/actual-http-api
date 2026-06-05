@@ -463,6 +463,15 @@ describe('Budget Module', () => {
       expect(payees[0].id).toBe('payee1');
     });
 
+    it('should get common payees', async () => {
+      mockActualApi.getCommonPayees = jest.fn().mockResolvedValue([
+        { id: 'transfer-payee1', name: 'Transfer: Checking', transfer_acct: 'acc1' }
+      ]);
+      const payees = await budget.getCommonPayees();
+      expect(mockActualApi.getCommonPayees).toHaveBeenCalled();
+      expect(payees[0].transfer_acct).toBe('acc1');
+    });
+
     it('should create a new payee', async () => {
       const newPayee = { name: 'Walmart' };
       const result = await budget.createPayee(newPayee);

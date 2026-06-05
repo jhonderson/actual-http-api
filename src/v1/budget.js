@@ -186,6 +186,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getPayees();
   }
 
+  async function getCommonPayees() {
+    return actualApi.getCommonPayees();
+  }
+
   async function createPayee(payee) {
     return actualApi.createPayee(payee);
   }
@@ -443,6 +447,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updateCategoryGroup: updateCategoryGroup,
     deleteCategoryGroup: deleteCategoryGroup,
     getPayees: getPayees,
+    getCommonPayees: getCommonPayees,
     createPayee: createPayee,
     updatePayee: updatePayee,
     deletePayee: deletePayee,
