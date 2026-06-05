@@ -119,7 +119,7 @@ module.exports = (router) => {
 
   /**
    * @swagger
-   * /budgets/{budgetSyncId}/common-payees:
+   * /budgets/{budgetSyncId}/payees-common:
    *   get:
    *     summary: Returns common payees that appear frequently in transactions, including transfer payees
    *     tags: [Payees]
@@ -147,7 +147,7 @@ module.exports = (router) => {
    *       '500':
    *         $ref: '#/components/responses/500'
    */
-  router.get('/budgets/:budgetSyncId/common-payees', async (req, res, next) => {
+  router.get('/budgets/:budgetSyncId/payees-common', async (req, res, next) => {
     try {
       res.json({'data': await res.locals.budget.getCommonPayees()});
     } catch(err) {
