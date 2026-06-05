@@ -60,15 +60,12 @@ const { isEmpty } = require('../../utils/utils');
  *         - name
  *         - is_income
  *         - categories
- *         - budgeted
- *         - spent
- *         - balance
  *       type: object
  *       properties:
  *         id:
  *           type: string
  *         name:
- *            type: integer
+ *            type: string
  *         is_income:
  *            type: boolean
  *         hidden:
@@ -79,26 +76,28 @@ const { isEmpty } = require('../../utils/utils');
  *             $ref: '#/components/schemas/BudgetMonthCategory'
  *         budgeted:
  *           type: integer
+ *           description: Present for expense groups and income groups in tracking budgets
  *         spent:
  *           type: integer
+ *           description: Present for expense groups only
  *         balance:
  *           type: integer
+ *           description: Present for expense groups and income groups in tracking budgets
+ *         received:
+ *           type: integer
+ *           description: Present for income groups only
  *     BudgetMonthCategory:
  *       required:
  *         - id
  *         - name
  *         - is_income
  *         - group_id
- *         - budgeted
- *         - spent
- *         - balance
- *         - carryover
  *       type: object
  *       properties:
  *         id:
  *           type: string
  *         name:
- *            type: integer
+ *            type: string
  *         is_income:
  *            type: boolean
  *         hidden:
@@ -107,12 +106,19 @@ const { isEmpty } = require('../../utils/utils');
  *           type: string
  *         budgeted:
  *           type: integer
+ *           description: Present for expense categories and income categories in tracking budgets
  *         spent:
  *           type: integer
+ *           description: Present for expense categories only
  *         balance:
  *           type: integer
+ *           description: Present for expense categories and income categories in tracking budgets
  *         carryover:
  *           type: boolean
+ *           description: Present for expense categories and income categories in tracking budgets
+ *         received:
+ *           type: integer
+ *           description: Present for income categories only
  */
 
 module.exports = (router) => {
