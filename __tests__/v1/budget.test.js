@@ -119,6 +119,7 @@ describe('Budget Module', () => {
         select: jest.fn().mockReturnThis()
       })),
       runQuery: jest.fn(),
+      aqlQuery: jest.fn().mockResolvedValue({ data: [] }),
     };
 
     mockArchive = {
@@ -773,40 +774,40 @@ describe('Budget Module', () => {
     });
 
     it('should get category notes', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
+      mockActualApi.aqlQuery.mockResolvedValueOnce({
         data: [{ note: 'Category note' }]
       });
 
       const result = await budget.getCategoryNotes('cat1');
 
-      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(mockActualApi.aqlQuery).toHaveBeenCalled();
       expect(result).toBe('Category note');
     });
 
     it('should get account notes', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
+      mockActualApi.aqlQuery.mockResolvedValueOnce({
         data: [{ note: 'Account note' }]
       });
 
       const result = await budget.getAccountNotes('acc1');
 
-      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(mockActualApi.aqlQuery).toHaveBeenCalled();
       expect(result).toBe('Account note');
     });
 
     it('should get budget month notes', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
+      mockActualApi.aqlQuery.mockResolvedValueOnce({
         data: [{ note: 'Month note' }]
       });
 
       const result = await budget.getBudgetMonthNotes('2024-01');
 
-      expect(mockActualApi.runQuery).toHaveBeenCalled();
+      expect(mockActualApi.aqlQuery).toHaveBeenCalled();
       expect(result).toBe('Month note');
     });
 
     it('should return undefined when note not found', async () => {
-      mockActualApi.runQuery.mockResolvedValueOnce({
+      mockActualApi.aqlQuery.mockResolvedValueOnce({
         data: []
       });
 
