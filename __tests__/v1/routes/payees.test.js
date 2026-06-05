@@ -122,12 +122,12 @@ describe('Payees Routes', () => {
     });
   });
 
-  describe('GET /budgets/:budgetSyncId/common-payees', () => {
+  describe('GET /budgets/:budgetSyncId/payees-common', () => {
     it('should return list of common payees', async () => {
       const payeesModule = require('../../../src/v1/routes/payees');
       payeesModule(mockRouter);
 
-      const handler = handlers['GET /budgets/:budgetSyncId/common-payees'];
+      const handler = handlers['GET /budgets/:budgetSyncId/payees-common'];
       await handler(mockReq, mockRes, mockNext);
 
       expect(mockBudget.getCommonPayees).toHaveBeenCalled();
@@ -142,7 +142,7 @@ describe('Payees Routes', () => {
       const payeesModule = require('../../../src/v1/routes/payees');
       payeesModule(mockRouter);
 
-      const handler = handlers['GET /budgets/:budgetSyncId/common-payees'];
+      const handler = handlers['GET /budgets/:budgetSyncId/payees-common'];
       const error = new Error('Failed to fetch common payees');
       mockBudget.getCommonPayees.mockRejectedValueOnce(error);
 
