@@ -121,6 +121,7 @@ describe('Budget Module', () => {
         select: jest.fn().mockReturnThis()
       })),
       runQuery: jest.fn(),
+      aqlQuery: jest.fn().mockResolvedValue({ data: [] }),
     };
 
     mockArchive = {

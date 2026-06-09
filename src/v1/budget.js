@@ -390,7 +390,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
   }
 
   async function runQuery(query) {
-    return actualApi.runQuery(query);
+    return actualApi.aqlQuery(query);
   }
 
   return {
