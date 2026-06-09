@@ -21,7 +21,7 @@ const { isEmpty, formatDateToISOString } = require('../../utils/utils');
  *       schema:
  *         type: string
  *       required: false
- *       description: Account balance cutoff date. Example 2023-08-01
+ *       description: Account balance cutoff date in YYYY-MM-DD format. Example 2023-08-20
  *     sinceDate:
  *       name: since_date
  *       in: query
@@ -185,7 +185,15 @@ module.exports = (router) => {
    */                                                                                                                                                                                                                                       
   router.get('/budgets/:budgetSyncId/accounts/:accountId/balance', async (req, res, next) => {
     try {
-      const balance = await res.locals.budget.getAccountBalance(req.params.accountId, req.query.cutoff_date);                                                                                                                                                      
+      let cutoff;
+      if (req.query.cutoff_date) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(req.query.cutoff_date)) {
+          throw new Error(`Bad date format, use YYYY-MM-DD: ${req.query.cutoff_date}`);
+        }
+        const [year, month, day] = req.query.cutoff_date.split('-').map(Number);
+        cutoff = new Date(year, month - 1, day);
+      }
+      const balance = await res.locals.budget.getAccountBalance(req.params.accountId, cutoff);                                                                                                                                                      
       if (balance !== undefined) {           
         // Removing any additional field in the balance response                                                                                                                                                                                                             
         res.json({ data: balance || 0 });
@@ -316,17 +324,20 @@ module.exports = (router) => {
    *               account:
    *                 required:
    *                   - name
-   *                   - offbudget
    *                 type: object
    *                 properties:
    *                   name:
    *                      type: string
    *                   offbudget:
    *                      type: boolean
+   *                   initialBalance:
+   *                      type: integer
+   *                      description: Optional initial balance in integer format (e.g. 10000 = $100.00)
    *             examples:
    *               - account:
    *                   name: 'Checking'
    *                   offbudget: false
+   *                   initialBalance: 10000
    *     responses:
    *       '200':
    *         description: Account created
@@ -346,7 +357,11 @@ module.exports = (router) => {
   router.post('/budgets/:budgetSyncId/accounts', async (req, res, next) => {
     try {
       validateAccountBody(req.body.account);
-      res.json({'data': await res.locals.budget.createAccount(req.body.account)});
+      const { initialBalance, ...account } = req.body.account;
+      if (initialBalance !== undefined && !Number.isInteger(initialBalance)) {
+        throw new Error('initialBalance must be an integer (e.g. 10000 = $100.00)');
+      }
+      res.json({'data': await res.locals.budget.createAccount(account, initialBalance)});
     } catch(err) {
       next(err);
     }

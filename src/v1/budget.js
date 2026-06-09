@@ -80,8 +80,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getAccountBalance(accountId, cutoffDate);                                                       
   } 
 
-  async function createAccount(account) {
-    return actualApi.createAccount(account);
+  async function createAccount(account, initialBalance) {
+    return actualApi.createAccount(account, initialBalance);
   }
 
   async function updateAccount(accountId, account) {
@@ -139,14 +139,14 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
 
   async function deleteTransactions(transactionIds = []) {
     return actualApi.batchBudgetUpdates(async () => {
-      transactionIds.forEach(async (transactionId) => {
+      for (const transactionId of transactionIds) {
         await actualApi.deleteTransaction(transactionId);
-      });
+      }
     });
   }
 
-  async function getCategories() {
-    return actualApi.getCategories();
+  async function getCategories({ hidden } = {}) {
+    return actualApi.getCategories({ hidden });
   }
 
   async function getCategory(categoryId) {
@@ -166,8 +166,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteCategory(categoryId, transferCategoryId);
   }
 
-  async function getCategoryGroups() {
-    return actualApi.getCategoryGroups();
+  async function getCategoryGroups({ hidden } = {}) {
+    return actualApi.getCategoryGroups({ hidden });
   }
 
   async function createCategoryGroup(categoryGroup) {
@@ -277,8 +277,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.createSchedule(schedule);
   }
 
-  async function updateSchedule(scheduleId, schedule) {
-    return actualApi.updateSchedule(scheduleId, schedule);
+  async function updateSchedule(scheduleId, schedule, resetNextDate) {
+    return actualApi.updateSchedule(scheduleId, schedule, resetNextDate);
   }
 
   async function deleteSchedule(scheduleId) {
@@ -310,42 +310,30 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
   }
 
   async function getCategoryNotes(categoryId) {
-    return runQuery(
-          actualApi.q('notes')
-            .filter({ id: categoryId})
-            .select(['note'])
-        ).then(result => result?.data?.[0]?.note);
+    const result = await actualApi.getNote(categoryId);
+    return result?.note ?? null;
   }
 
   async function setCategoryNotes(categoryId, note) {
-    return actualApi.internal.send('notes-save', { id: categoryId, note });
+    return actualApi.updateNote(categoryId, note);
   }
 
   async function getAccountNotes(accountId) {
-    return runQuery(
-          actualApi.q('notes')
-            .filter({ id: `account-${accountId}`})
-            .select(['note'])
-        ).then(result => result?.data?.[0]?.note);
+    const result = await actualApi.getNote(`account-${accountId}`);
+    return result?.note ?? null;
   }
 
   async function setAccountNotes(accountId, note) {
-    return actualApi.internal.send('notes-save', { id: `account-${accountId}`, note });
+    return actualApi.updateNote(`account-${accountId}`, note);
   }
 
-  /**
-   * @param {*} month - The month for which to get the notes, in format YYYY-MM
-   */
   async function getBudgetMonthNotes(month) {
-    return runQuery(
-          actualApi.q('notes')
-            .filter({ id: `budget-${month}`})
-            .select(['note'])
-        ).then(result => result?.data?.[0]?.note);
+    const result = await actualApi.getNote(`budget-${month}`);
+    return result?.note ?? null;
   }
 
   async function setBudgetMonthNotes(month, note) {
-    return actualApi.internal.send('notes-save', { id: `budget-${month}`, note });
+    return actualApi.updateNote(`budget-${month}`, note);
   }
 
   async function shutdown() {
@@ -382,18 +370,14 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     if (!budget) {
       throw new Error(`Budget not found for budget sync id ${budgetSyncId}`);
     }
-    // Create the archive. Prefer CommonJS `require` (works in Jest tests);
-    // fall back to dynamic ESM import when `require` is unavailable.
-    let archiver;
+    let ZipArchive;
     try {
-      // This will load our Jest-shimmed module during tests (or the CJS variant if available).
       // eslint-disable-next-line global-require
-      archiver = require('archiver');
+      ({ ZipArchive } = require('archiver'));
     } catch (err) {
-      const archiverModule = await import('archiver');
-      archiver = archiverModule && archiverModule.default ? archiverModule.default : archiverModule;
+      ({ ZipArchive } = await import('archiver'));
     }
-    const archive = archiver('zip', { zlib: { level: 9 } });
+    const archive = new ZipArchive({ zlib: { level: 9 } });
     // Add files to the archive
     for (const file of ['db.sqlite', 'metadata.json']) {
       archive.file(path.join(dataDir, budget.id, file), { name: file });

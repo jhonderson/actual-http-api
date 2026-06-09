@@ -234,25 +234,46 @@ describe('Schedules Routes', () => {
       );
     });
 
-    it('should update a schedule', async () => {
+    it('should update a schedule without resetNextDate', async () => {
       const schedulesModule = require('../../../src/v1/routes/schedules');
       schedulesModule(mockRouter);
 
       const handler = handlers['PATCH /budgets/:budgetSyncId/schedules/:scheduleId'];
       mockReq.params.scheduleId = 'schedule1';
       mockReq.body = {
-        schedule: {
-          name: 'Updated Rent',
-          amount: -160000,
-        },
+        schedule: { name: 'Updated Rent', amount: -160000 },
       };
 
       await handler(mockReq, mockRes, mockNext);
 
-      expect(mockBudget.updateSchedule).toHaveBeenCalledWith('schedule1', mockReq.body.schedule);
+      expect(mockBudget.updateSchedule).toHaveBeenCalledWith(
+        'schedule1',
+        { name: 'Updated Rent', amount: -160000 },
+        undefined
+      );
       expect(mockRes.json).toHaveBeenCalledWith({
         data: expect.objectContaining({ id: 'schedule1' }),
       });
+    });
+
+    it('should update a schedule with resetNextDate=true in body', async () => {
+      const schedulesModule = require('../../../src/v1/routes/schedules');
+      schedulesModule(mockRouter);
+
+      const handler = handlers['PATCH /budgets/:budgetSyncId/schedules/:scheduleId'];
+      mockReq.params.scheduleId = 'schedule1';
+      mockReq.body = {
+        schedule: { name: 'Updated Rent', amount: -160000 },
+        resetNextDate: true,
+      };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.updateSchedule).toHaveBeenCalledWith(
+        'schedule1',
+        { name: 'Updated Rent', amount: -160000 },
+        true
+      );
     });
 
     it('should reject without schedule property', async () => {
