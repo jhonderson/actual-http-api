@@ -34,15 +34,24 @@ jobs:
         shell: bash
         run: |
           CURRENT_VERSION=$(node -p "require('./package.json').version")
-          TARGET_VERSION=$(node -p "require('./package.json').dependencies['@actual-app/api'].replace('^','')")
+          TARGET_VERSION=$(node -p "require('./package.json').dependencies['@actual-app/api'].replace(/^[^0-9]*/,'')")
 
           echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
           echo "target_version=$TARGET_VERSION" >> "$GITHUB_OUTPUT"
 
+          # If identical, nothing to do
           if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
+            exit 0
+          fi
+
+          # Use semver-aware comparison (sort -V). Only bump if TARGET_VERSION is strictly newer.
+          NEWER=$(printf "%s\n%s\n" "$CURRENT_VERSION" "$TARGET_VERSION" | sort -V | tail -n1)
+
+          if [ "$NEWER" = "$TARGET_VERSION" ]; then
             echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Update main package version
