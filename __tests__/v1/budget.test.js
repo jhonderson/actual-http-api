@@ -118,7 +118,13 @@ describe('Budget Module', () => {
       shutdown: jest.fn(),
       q: jest.fn(() => ({
         filter: jest.fn().mockReturnThis(),
-        select: jest.fn().mockReturnThis()
+        select: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        calculate: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        offset: jest.fn().mockReturnThis(),
+        options: jest.fn().mockReturnThis(),
       })),
       runQuery: jest.fn(),
       aqlQuery: jest.fn().mockResolvedValue({ data: [] }),
