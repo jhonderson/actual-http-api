@@ -107,13 +107,21 @@ describe('Budget Module', () => {
       getBudgets: jest.fn().mockResolvedValue([
         { id: 'budget1', groupId: 'sync1', name: 'Personal Budget' }
       ]),
+      getTags: jest.fn().mockResolvedValue([
+        { id: 'tag1', tag: 'important', color: '#ff0000', description: 'Important tag' }
+      ]),
+      createTag: jest.fn().mockResolvedValue({ id: 'tag2', tag: 'newtag' }),
+      updateTag: jest.fn().mockResolvedValue({ id: 'tag1', tag: 'updated' }),
+      deleteTag: jest.fn().mockResolvedValue(undefined),
+      getNote: jest.fn().mockResolvedValue({ id: 'cat1', note: 'Category note' }),
+      updateNote: jest.fn().mockResolvedValue(undefined),
       shutdown: jest.fn(),
       q: jest.fn(() => ({
-        select: jest.fn().mockReturnThis(),
         filter: jest.fn().mockReturnThis(),
-        groupBy: jest.fn().mockReturnThis()
+        select: jest.fn().mockReturnThis()
       })),
-      aqlQuery: jest.fn()
+      runQuery: jest.fn(),
+      aqlQuery: jest.fn().mockResolvedValue({ data: [] }),
     };
 
     mockArchive = {
@@ -132,7 +140,7 @@ describe('Budget Module', () => {
       name: 'Personal Budget'
     }));
     getActualDataDir.mockReturnValue('/data/actual');
-    archiver.mockReturnValue(mockArchive);
+    archiver.ZipArchive.mockImplementation(() => mockArchive);
     path.join.mockImplementation((...args) => args.join('/'));
   });
 
@@ -365,7 +373,14 @@ describe('Budget Module', () => {
     it('should create a new account', async () => {
       const newAccount = { name: 'Savings', type: 'savings' };
       const result = await budget.createAccount(newAccount);
-      expect(mockActualApi.createAccount).toHaveBeenCalledWith(newAccount);
+      expect(mockActualApi.createAccount).toHaveBeenCalledWith(newAccount, undefined);
+      expect(result.id).toBe('acc2');
+    });
+
+    it('should create a new account with initial balance', async () => {
+      const newAccount = { name: 'Savings', type: 'savings' };
+      const result = await budget.createAccount(newAccount, 10000);
+      expect(mockActualApi.createAccount).toHaveBeenCalledWith(newAccount, 10000);
       expect(result.id).toBe('acc2');
     });
 
@@ -442,10 +457,27 @@ describe('Budget Module', () => {
       });
     });
 
-    it('should import transactions', async () => {
+    it('should import transactions with default options', async () => {
       const transactions = [{ amount: 100 }];
       await budget.importTransactions('acc1', transactions);
-      expect(mockActualApi.importTransactions).toHaveBeenCalledWith('acc1', transactions);
+      expect(mockActualApi.importTransactions).toHaveBeenCalledWith('acc1', transactions, {
+        defaultCleared: true,
+        dryRun: false,
+        reimportDeleted: false,
+      });
+    });
+
+    it('should import transactions with explicit options', async () => {
+      const transactions = [{ amount: 100 }];
+      const options = {
+        defaultCleared: false,
+        dryRun: true,
+        reimportDeleted: true,
+      };
+
+      await budget.importTransactions('acc1', transactions, options);
+
+      expect(mockActualApi.importTransactions).toHaveBeenCalledWith('acc1', transactions, options);
     });
 
     it('should update a transaction', async () => {
@@ -483,8 +515,19 @@ describe('Budget Module', () => {
 
     it('should get all categories', async () => {
       const categories = await budget.getCategories();
+      expect(mockActualApi.getCategories).toHaveBeenCalledWith({ hidden: undefined });
       expect(categories).toHaveLength(1);
       expect(categories[0].id).toBe('cat1');
+    });
+
+    it('should get hidden categories when hidden=true', async () => {
+      await budget.getCategories({ hidden: true });
+      expect(mockActualApi.getCategories).toHaveBeenCalledWith({ hidden: true });
+    });
+
+    it('should get visible categories when hidden=false', async () => {
+      await budget.getCategories({ hidden: false });
+      expect(mockActualApi.getCategories).toHaveBeenCalledWith({ hidden: false });
     });
 
     it('should get a specific category', async () => {
@@ -521,8 +564,14 @@ describe('Budget Module', () => {
 
     it('should get all category groups', async () => {
       const groups = await budget.getCategoryGroups();
+      expect(mockActualApi.getCategoryGroups).toHaveBeenCalledWith({ hidden: undefined });
       expect(groups).toHaveLength(1);
       expect(groups[0].id).toBe('cg1');
+    });
+
+    it('should get hidden category groups when hidden=true', async () => {
+      await budget.getCategoryGroups({ hidden: true });
+      expect(mockActualApi.getCategoryGroups).toHaveBeenCalledWith({ hidden: true });
     });
 
     it('should create a new category group', async () => {
@@ -556,6 +605,15 @@ describe('Budget Module', () => {
       const payees = await budget.getPayees();
       expect(payees).toHaveLength(1);
       expect(payees[0].id).toBe('payee1');
+    });
+
+    it('should get common payees', async () => {
+      mockActualApi.getCommonPayees = jest.fn().mockResolvedValue([
+        { id: 'transfer-payee1', name: 'Transfer: Checking', transfer_acct: 'acc1' }
+      ]);
+      const payees = await budget.getCommonPayees();
+      expect(mockActualApi.getCommonPayees).toHaveBeenCalled();
+      expect(payees[0].transfer_acct).toBe('acc1');
     });
 
     it('should create a new payee', async () => {
@@ -722,7 +780,7 @@ describe('Budget Module', () => {
 
     it('should delete a rule', async () => {
       await budget.deleteRule('rule1');
-      expect(mockActualApi.deleteRule).toHaveBeenCalledWith({ id: 'rule1' });
+      expect(mockActualApi.deleteRule).toHaveBeenCalledWith('rule1');
     });
   });
 
@@ -765,9 +823,15 @@ describe('Budget Module', () => {
     it('should update a schedule', async () => {
       const updates = { name: 'Updated Monthly Rent', amount: -160000 };
       const result = await budget.updateSchedule('schedule1', updates);
-      expect(mockActualApi.updateSchedule).toHaveBeenCalledWith('schedule1', updates);
+      expect(mockActualApi.updateSchedule).toHaveBeenCalledWith('schedule1', updates, undefined);
       expect(result.id).toBe('schedule1');
       expect(result.name).toBe('Updated Rent');
+    });
+
+    it('should update a schedule with resetNextDate', async () => {
+      const updates = { name: 'Updated Monthly Rent', amount: -160000 };
+      await budget.updateSchedule('schedule1', updates, true);
+      expect(mockActualApi.updateSchedule).toHaveBeenCalledWith('schedule1', updates, true);
     });
 
     it('should delete a schedule', async () => {
@@ -821,6 +885,85 @@ describe('Budget Module', () => {
     it('should generate correct zip filename with date and budget name', async () => {
       const result = await budget.exportData('sync1');
       expect(result.fileName).toMatch(/\d{4}-\d{2}-\d{2}-Personal Budget\.zip/);
+    });
+  });
+
+  describe('Tags Management', () => {
+    let budget;
+
+    beforeEach(async () => {
+      budget = await Budget('sync1', undefined);
+    });
+
+    it('should get all tags', async () => {
+      const tags = await budget.getTags();
+      expect(tags).toHaveLength(1);
+      expect(tags[0].id).toBe('tag1');
+    });
+
+    it('should create a new tag', async () => {
+      const newTag = { tag: 'newtag' };
+      const result = await budget.createTag(newTag);
+
+      expect(mockActualApi.createTag).toHaveBeenCalledWith(newTag);
+      expect(result.id).toBe('tag2');
+    });
+
+    it('should update a tag', async () => {
+      const updates = { tag: 'updated' };
+      const result = await budget.updateTag('tag1', updates);
+
+      expect(mockActualApi.updateTag).toHaveBeenCalledWith('tag1', updates);
+      expect(result.id).toBe('tag1');
+    });
+
+    it('should delete a tag', async () => {
+      await budget.deleteTag('tag1');
+
+      expect(mockActualApi.deleteTag).toHaveBeenCalledWith('tag1');
+    });
+  });
+
+  describe('Notes Management', () => {
+    let budget;
+
+    beforeEach(async () => {
+      budget = await Budget('sync1', undefined);
+    });
+
+    it('should get category notes', async () => {
+      mockActualApi.getNote.mockResolvedValueOnce({ id: 'cat1', note: 'Category note' });
+
+      const result = await budget.getCategoryNotes('cat1');
+
+      expect(mockActualApi.getNote).toHaveBeenCalledWith('cat1');
+      expect(result).toBe('Category note');
+    });
+
+    it('should get account notes', async () => {
+      mockActualApi.getNote.mockResolvedValueOnce({ id: 'account-acc1', note: 'Account note' });
+
+      const result = await budget.getAccountNotes('acc1');
+
+      expect(mockActualApi.getNote).toHaveBeenCalledWith('account-acc1');
+      expect(result).toBe('Account note');
+    });
+
+    it('should get budget month notes', async () => {
+      mockActualApi.getNote.mockResolvedValueOnce({ id: 'budget-2024-01', note: 'Month note' });
+
+      const result = await budget.getBudgetMonthNotes('2024-01');
+
+      expect(mockActualApi.getNote).toHaveBeenCalledWith('budget-2024-01');
+      expect(result).toBe('Month note');
+    });
+
+    it('should return null when note not found', async () => {
+      mockActualApi.getNote.mockResolvedValueOnce(null);
+
+      const result = await budget.getCategoryNotes('cat1');
+
+      expect(result).toBeNull();
     });
   });
 

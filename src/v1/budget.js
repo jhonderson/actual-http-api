@@ -2,7 +2,6 @@
 const { currentLocalDate, formatDateToISOString, listSubDirectories, getFileContent } = require('../utils/utils');
 const { getActualApiClient, getActualDataDir, runAqlQuery } = require('./actual-client-provider');
 
-const archiver = require('archiver');
 const fs = require('fs');
 const path = require('path');
 
@@ -120,8 +119,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getAccountBalance(accountId, cutoffDate);                                                       
   } 
 
-  async function createAccount(account) {
-    return actualApi.createAccount(account);
+  async function createAccount(account, initialBalance) {
+    return actualApi.createAccount(account, initialBalance);
   }
 
   async function updateAccount(accountId, account) {
@@ -157,8 +156,16 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.addTransactions(accountId, transactions, {learnCategories, runTransfers});
   }
 
-  async function importTransactions(accountId, transactions) {
-    return actualApi.importTransactions(accountId, transactions);
+  async function importTransactions(accountId, transactions, {
+    defaultCleared = true,
+    dryRun = false,
+    reimportDeleted = false,
+  } = {}) {
+    return actualApi.importTransactions(accountId, transactions, {
+      defaultCleared,
+      dryRun,
+      reimportDeleted,
+    });
   }
 
   async function updateTransaction(transactionId, transaction) {
@@ -171,14 +178,14 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
 
   async function deleteTransactions(transactionIds = []) {
     return actualApi.batchBudgetUpdates(async () => {
-      transactionIds.forEach(async (transactionId) => {
+      for (const transactionId of transactionIds) {
         await actualApi.deleteTransaction(transactionId);
-      });
+      }
     });
   }
 
-  async function getCategories() {
-    return actualApi.getCategories();
+  async function getCategories({ hidden } = {}) {
+    return actualApi.getCategories({ hidden });
   }
 
   async function getCategory(categoryId) {
@@ -198,8 +205,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.deleteCategory(categoryId, transferCategoryId);
   }
 
-  async function getCategoryGroups() {
-    return actualApi.getCategoryGroups();
+  async function getCategoryGroups({ hidden } = {}) {
+    return actualApi.getCategoryGroups({ hidden });
   }
 
   async function createCategoryGroup(categoryGroup) {
@@ -216,6 +223,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
 
   async function getPayees() {
     return actualApi.getPayees();
+  }
+
+  async function getCommonPayees() {
+    return actualApi.getCommonPayees();
   }
 
   async function createPayee(payee) {
@@ -293,7 +304,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
   }
 
   async function deleteRule(ruleId) {
-    return actualApi.deleteRule({ id: ruleId });
+    return actualApi.deleteRule(ruleId);
   }
 
   async function getSchedules() {
@@ -309,8 +320,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.createSchedule(schedule);
   }
 
-  async function updateSchedule(scheduleId, schedule) {
-    return actualApi.updateSchedule(scheduleId, schedule);
+  async function updateSchedule(scheduleId, schedule, resetNextDate) {
+    return actualApi.updateSchedule(scheduleId, schedule, resetNextDate);
   }
 
   async function deleteSchedule(scheduleId) {
@@ -319,6 +330,57 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
 
   async function getBudgets() {
     return actualApi.getBudgets();
+  }
+
+  async function getServerVersion() {
+    return actualApi.getServerVersion();
+  }
+
+  async function getIDByName(type, name) {
+    return actualApi.getIDByName(type, name);
+  }
+
+  async function getTags() {
+    return actualApi.getTags();
+  }
+
+  async function createTag(tag) {
+    return actualApi.createTag(tag);
+  }
+
+  async function updateTag(tagId, tag) {
+    return actualApi.updateTag(tagId, tag);
+  }
+
+  async function deleteTag(tagId) {
+    return actualApi.deleteTag(tagId);
+  }
+
+  async function getCategoryNotes(categoryId) {
+    const result = await actualApi.getNote(categoryId);
+    return result?.note ?? null;
+  }
+
+  async function setCategoryNotes(categoryId, note) {
+    return actualApi.updateNote(categoryId, note);
+  }
+
+  async function getAccountNotes(accountId) {
+    const result = await actualApi.getNote(`account-${accountId}`);
+    return result?.note ?? null;
+  }
+
+  async function setAccountNotes(accountId, note) {
+    return actualApi.updateNote(`account-${accountId}`, note);
+  }
+
+  async function getBudgetMonthNotes(month) {
+    const result = await actualApi.getNote(`budget-${month}`);
+    return result?.note ?? null;
+  }
+
+  async function setBudgetMonthNotes(month, note) {
+    return actualApi.updateNote(`budget-${month}`, note);
   }
 
   async function shutdown() {
@@ -332,8 +394,13 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     try {
       const directories = listSubDirectories(actualDataDir);
       directories.forEach(subDir => {
-        const metadata = JSON.parse(getFileContent(path.join(actualDataDir, subDir, 'metadata.json')));
-        syncIdToBudgetId[metadata.groupId] = metadata.id;
+        if (fs.existsSync(path.join(actualDataDir, subDir, 'metadata.json'))) {
+          const metadataRawContent = getFileContent(path.join(actualDataDir, subDir, 'metadata.json'));
+          if (!!metadataRawContent) {
+            const metadata = JSON.parse(metadataRawContent);
+            syncIdToBudgetId[metadata.groupId] = metadata.id;
+          }
+        }
       });
     } catch(err) {
       // The system will continue working normally,the only thing is that the budget will be downloaded
@@ -350,8 +417,14 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     if (!budget) {
       throw new Error(`Budget not found for budget sync id ${budgetSyncId}`);
     }
-    // Create the archive
-    const archive = archiver('zip', { zlib: { level: 9 } });
+    let ZipArchive;
+    try {
+      // eslint-disable-next-line global-require
+      ({ ZipArchive } = require('archiver'));
+    } catch (err) {
+      ({ ZipArchive } = await import('archiver'));
+    }
+    const archive = new ZipArchive({ zlib: { level: 9 } });
     // Add files to the archive
     for (const file of ['db.sqlite', 'metadata.json']) {
       archive.file(path.join(dataDir, budget.id, file), { name: file });
@@ -363,7 +436,12 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     };
   }
 
+  async function runQuery(query) {
+    return actualApi.aqlQuery(query);
+  }
+
   return {
+    q: actualApi.q,
     getMonths: getMonths,
     getMonth: getMonth,
     getMonthCategories: getMonthCategories,
@@ -396,6 +474,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updateCategoryGroup: updateCategoryGroup,
     deleteCategoryGroup: deleteCategoryGroup,
     getPayees: getPayees,
+    getCommonPayees: getCommonPayees,
     createPayee: createPayee,
     updatePayee: updatePayee,
     deletePayee: deletePayee,
@@ -415,7 +494,20 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     updateSchedule: updateSchedule,
     deleteSchedule: deleteSchedule,
     getBudgets: getBudgets,
+    getServerVersion: getServerVersion,
+    getIDByName: getIDByName,
+    getTags: getTags,
+    createTag: createTag,
+    updateTag: updateTag,
+    deleteTag: deleteTag,
+    getCategoryNotes: getCategoryNotes,
+    setCategoryNotes: setCategoryNotes,
+    getAccountNotes: getAccountNotes,
+    setAccountNotes: setAccountNotes,
+    getBudgetMonthNotes: getBudgetMonthNotes,
+    setBudgetMonthNotes: setBudgetMonthNotes,
     exportData: exportData,
+    runQuery: runQuery,
     shutdown: shutdown,
   };
 }

@@ -1,4 +1,6 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const { config } = require('./config');
+const pkg = require('../../package.json');
 
 const openapiSpecification = swaggerJsdoc({
     definition: {
@@ -16,7 +18,7 @@ const openapiSpecification = swaggerJsdoc({
           name: 'MIT',
           url: 'http://opensource.org/licenses/MIT',
         },
-        version: '26.1.0',
+        version: pkg.version,
       },
       components: {
         securitySchemes: {
@@ -28,7 +30,25 @@ const openapiSpecification = swaggerJsdoc({
           },
         },
       },
-      servers: [
+      servers: config.swagger.customConfigProvided ? [
+        {
+          url: "{protocol}://{host}:{port}/{basePath}",
+          variables: {
+            protocol: {
+              default: config.swagger.protocol,
+            },
+            host: {
+              default: config.swagger.host,
+            },
+            port: {
+              default: config.swagger.port,
+            },
+            basePath: {
+              default: config.swagger.basePath,
+            }
+          }
+        },
+      ] : [
         {
           url: "http://localhost:5007/v1"
         },
@@ -48,7 +68,7 @@ const openapiSpecification = swaggerJsdoc({
               default: "v1"
             }
           }
-        }
+        },
       ]
     },
     // This path needs to be relative to where node was started from
@@ -56,3 +76,21 @@ const openapiSpecification = swaggerJsdoc({
   });
 
 exports.openapiSpecification = openapiSpecification;
+// If experimental operations are disabled, remove any operations marked as unofficial
+if (!config.experimentalOperationsEnabled) {
+  const { UNOFFICIAL_PREFIX } = require('./constants');
+  const paths = openapiSpecification.paths || {};
+  Object.keys(paths).forEach((p) => {
+    const methods = paths[p];
+    Object.keys(methods).forEach((m) => {
+      const op = methods[m];
+      if (op && typeof op.summary === 'string' && op.summary.startsWith(UNOFFICIAL_PREFIX)) {
+        delete methods[m];
+      }
+    });
+    // If no methods remain on the path, remove the path entirely
+    if (Object.keys(methods).length === 0) {
+      delete openapiSpecification.paths[p];
+    }
+  });
+}

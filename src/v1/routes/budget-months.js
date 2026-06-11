@@ -60,15 +60,12 @@ const { isEmpty } = require('../../utils/utils');
  *         - name
  *         - is_income
  *         - categories
- *         - budgeted
- *         - spent
- *         - balance
  *       type: object
  *       properties:
  *         id:
  *           type: string
  *         name:
- *            type: integer
+ *            type: string
  *         is_income:
  *            type: boolean
  *         hidden:
@@ -79,26 +76,28 @@ const { isEmpty } = require('../../utils/utils');
  *             $ref: '#/components/schemas/BudgetMonthCategory'
  *         budgeted:
  *           type: integer
+ *           description: Present for expense groups and income groups in tracking budgets
  *         spent:
  *           type: integer
+ *           description: Present for expense groups only
  *         balance:
  *           type: integer
+ *           description: Present for expense groups and income groups in tracking budgets
+ *         received:
+ *           type: integer
+ *           description: Present for income groups only
  *     BudgetMonthCategory:
  *       required:
  *         - id
  *         - name
  *         - is_income
  *         - group_id
- *         - budgeted
- *         - spent
- *         - balance
- *         - carryover
  *       type: object
  *       properties:
  *         id:
  *           type: string
  *         name:
- *            type: integer
+ *            type: string
  *         is_income:
  *            type: boolean
  *         hidden:
@@ -107,12 +106,19 @@ const { isEmpty } = require('../../utils/utils');
  *           type: string
  *         budgeted:
  *           type: integer
+ *           description: Present for expense categories and income categories in tracking budgets
  *         spent:
  *           type: integer
+ *           description: Present for expense categories only
  *         balance:
  *           type: integer
+ *           description: Present for expense categories and income categories in tracking budgets
  *         carryover:
  *           type: boolean
+ *           description: Present for expense categories and income categories in tracking budgets
+ *         received:
+ *           type: integer
+ *           description: Present for income categories only
  */
 
 module.exports = (router) => {
@@ -235,7 +241,8 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/months/{month}/categories:
    *   get:
-   *     summary: Returns the list of categories for the month specified
+   *     summary: "(🔧 Extended) Returns the list of categories for the month specified"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Budget Months]
    *     security:
    *       - apiKey: []
@@ -287,7 +294,8 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/months/{month}/categories/{categoryId}:
    *   get:
-   *     summary: Returns the category information for the month specified
+   *     summary: "(🔧 Extended) Returns the category information for the month specified"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Budget Months]
    *     security:
    *       - apiKey: []
@@ -326,7 +334,8 @@ module.exports = (router) => {
    *       '500':
    *         $ref: '#/components/responses/500'
    *   patch:
-   *     summary: Updates the category information for the month specified
+   *     summary: "(🔧 Extended) Updates the category information for the month specified"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Budget Months]
    *     security:
    *       - apiKey: []
@@ -407,7 +416,8 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/months/{month}/categorygroups:
    *   get:
-   *     summary: Returns the list of category groups for the month specified
+   *     summary: "(🔧 Extended) Returns the list of category groups for the month specified"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Budget Months]
    *     security:
    *       - apiKey: []
@@ -467,7 +477,8 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/months/{month}/categorygroups/{categoryGroupId}:
    *   get:
-   *     summary: Returns the category group information for the month specified
+   *     summary: "(🔧 Extended) Returns the category group information for the month specified"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Budget Months]
    *     security:
    *       - apiKey: []
@@ -533,11 +544,12 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/months/{month}/categorytransfers:
    *   post:
-   *     summary: Creates a category transfer
+   *     summary: "(🔧 Extended) Creates a category transfer"
    *     description: >-
    *       Moves money from one category to another for one specific month.<br>
    *       If the source category is not specified the money will come from available to budget.<br>
-   *       If the destination is not specified the money will go to available to budget.
+   *       If the destination is not specified the money will go to available to budget.<br>
+   *       🔧 Extended: Uses official library APIs with additional business logic or transformations.
    *     tags: [Budget Months]
    *     security:
    *       - apiKey: []

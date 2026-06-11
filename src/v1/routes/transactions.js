@@ -321,6 +321,15 @@ module.exports = (router) => {
    *                 type: array
    *                 items:
    *                   $ref: '#/components/schemas/Transaction'
+  *               defaultCleared:
+  *                 type: boolean
+  *                 default: true
+  *               dryRun:
+  *                 type: boolean
+  *                 default: false
+  *               reimportDeleted:
+  *                 type: boolean
+  *                 default: false
    *             examples:
    *               - transactions:
    *                 - account: "729cb492-4eab-468b-9522-75d455cded22"
@@ -329,6 +338,9 @@ module.exports = (router) => {
    *                   payee_name: "Remitly"
    *                   date: "2023-06-23"
    *                   cleared: false
+  *                 defaultCleared: true
+  *                 dryRun: false
+  *                 reimportDeleted: false
    *     responses:
    *       '201':
    *         description: Ids of transactions add and updated
@@ -361,12 +373,12 @@ module.exports = (router) => {
    *                            - '1fbd4467-004d-4163-8569-6f83f8db6eca'
    *               examples:
    *                 - data:
-   *                   added:
-   *                     - "1a152a80-af05-4efa-ba4a-95f814a9d1d1"
-   *                     - "f64fd861-ba21-481b-ac88-2c30c6660240"
-   *                   updated:
-   *                     - "1fbd4467-004d-4163-8569-6f83f8db6eca"
-   *                     - "34339ba3-7b38-4b3a-b90d-4a895781ea9e"
+   *                     added:
+   *                       - "1a152a80-af05-4efa-ba4a-95f814a9d1d1"
+   *                       - "f64fd861-ba21-481b-ac88-2c30c6660240"
+   *                     updated:
+   *                       - "1fbd4467-004d-4163-8569-6f83f8db6eca"
+   *                       - "34339ba3-7b38-4b3a-b90d-4a895781ea9e"
    *       '400':
    *         $ref: '#/components/responses/400'
    *       '404':
@@ -378,7 +390,12 @@ module.exports = (router) => {
     try {
       validateTransactionsArray(req.body.transactions);
       await validateAccountExists(res, req.params.accountId);
-      res.json({'data': await res.locals.budget.importTransactions(req.params.accountId, req.body.transactions)}).status(201);
+      const options = {
+        defaultCleared: req.body.defaultCleared ?? true,
+        dryRun: req.body.dryRun ?? false,
+        reimportDeleted: req.body.reimportDeleted ?? false,
+      };
+      res.json({'data': await res.locals.budget.importTransactions(req.params.accountId, req.body.transactions, options)}).status(201);
     } catch(err) {
       next(err);
     }

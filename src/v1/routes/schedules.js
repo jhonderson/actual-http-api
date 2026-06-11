@@ -268,7 +268,8 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/schedules/{scheduleId}:
    *   get:
-   *     summary: Returns a schedule
+   *     summary: "(🔧 Extended) Returns a schedule"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Schedules]
    *     security:
    *       - apiKey: []
@@ -321,10 +322,14 @@ module.exports = (router) => {
    *             properties:
    *               schedule:
    *                 $ref: '#/components/schemas/ScheduleInput'
+   *               resetNextDate:
+   *                 type: boolean
+   *                 description: When true, recalculates the next occurrence date
    *             examples:
    *               - schedule:
    *                   name: 'Updated Rent Payment'
    *                   amount: -160000
+   *                 resetNextDate: true
    *     responses:
    *       '200':
    *         description: Schedule updated
@@ -386,7 +391,7 @@ module.exports = (router) => {
   router.patch('/budgets/:budgetSyncId/schedules/:scheduleId', async (req, res, next) => {
     try {
       validateScheduleBody(req.body);
-      res.json({ 'data': await res.locals.budget.updateSchedule(req.params.scheduleId, req.body.schedule) });
+      res.json({ 'data': await res.locals.budget.updateSchedule(req.params.scheduleId, req.body.schedule, req.body.resetNextDate) });
     } catch (err) {
       next(err);
     }

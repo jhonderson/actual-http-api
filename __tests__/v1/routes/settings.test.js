@@ -74,10 +74,6 @@ describe('Settings Routes', () => {
       settingsModule(mockRouter);
 
       expect(mockRouter.get).toHaveBeenCalledWith('/budgets', expect.any(Function));
-      expect(mockRouter.get).toHaveBeenCalledWith(
-        '/budgets/:budgetSyncId/budgets',
-        expect.any(Function),
-      );
     });
 
     it('should use server instance', async () => {
@@ -104,50 +100,6 @@ describe('Settings Routes', () => {
       const error = new Error('boom');
       const getBudgets = jest.fn().mockRejectedValue(error);
       getActualApiClient.mockResolvedValue({ getBudgets });
-
-      await handler(mockReq, mockRes, mockNext);
-
-      expect(mockNext).toHaveBeenCalledWith(error);
-    });
-  });
-
-  describe('GET /budgets/:budgetSyncId/budgets', () => {
-    it('should register the route', () => {
-      const settingsModule = require('../../../src/v1/routes/settings');
-      settingsModule(mockRouter);
-
-      expect(mockRouter.get).toHaveBeenCalledWith(
-        '/budgets/:budgetSyncId/budgets',
-        expect.any(Function)
-      );
-    });
-
-    it('should return budget settings', async () => {
-      const settingsModule = require('../../../src/v1/routes/settings');
-      settingsModule(mockRouter);
-
-      const handler = handlers['GET /budgets/:budgetSyncId/budgets'];
-      mockBudget.getBudgets = jest.fn().mockResolvedValue({
-        locale: 'en-US',
-      });
-
-      await handler(mockReq, mockRes, mockNext);
-
-      expect(mockBudget.getBudgets).toHaveBeenCalled();
-      expect(mockRes.json).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          locale: 'en-US',
-        }),
-      });
-    });
-
-    it('should handle errors from getSettings', async () => {
-      const settingsModule = require('../../../src/v1/routes/settings');
-      settingsModule(mockRouter);
-
-      const handler = handlers['GET /budgets/:budgetSyncId/budgets'];
-      const error = new Error('Failed to fetch settings');
-      mockBudget.getBudgets = jest.fn().mockRejectedValueOnce(error);
 
       await handler(mockReq, mockRes, mockNext);
 

@@ -1,0 +1,75 @@
+name: Update Version
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+
+permissions:
+  contents: write
+
+jobs:
+  update-version:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ACTIONS_PAT }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - run: npm ci
+
+      - name: Get versions
+        id: versions
+        shell: bash
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          TARGET_VERSION=$(node -p "require('./package.json').dependencies['@actual-app/api'].replace(/^[^0-9]*/,'')")
+
+          echo "current_version=$CURRENT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "target_version=$TARGET_VERSION" >> "$GITHUB_OUTPUT"
+
+          # If identical, nothing to do
+          if [ "$CURRENT_VERSION" = "$TARGET_VERSION" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Use semver-aware comparison (sort -V). Only bump if TARGET_VERSION is strictly newer.
+          NEWER=$(printf "%s\n%s\n" "$CURRENT_VERSION" "$TARGET_VERSION" | sort -V | tail -n1)
+
+          if [ "$NEWER" = "$TARGET_VERSION" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update main package version
+        if: steps.versions.outputs.skip != 'true'
+        run: |
+          npm version "${{ steps.versions.outputs.target_version }}" --no-git-tag-version
+          npm install --package-lock-only
+
+      - name: Commit and tag
+        if: steps.versions.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: bump version to ${{ steps.versions.outputs.target_version }}"
+          git tag "v${{ steps.versions.outputs.target_version }}"
+          git push origin main --follow-tags
+
+      - name: Nothing to update
+        if: steps.versions.outputs.skip == 'true'
+        run: echo "Version already up to date"

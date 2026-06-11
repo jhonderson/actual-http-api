@@ -21,7 +21,7 @@ const { isEmpty, formatDateToISOString, parseBoolean } = require('../../utils/ut
  *       schema:
  *         type: string
  *       required: false
- *       description: Account balance cutoff date. Example 2023-08-01
+ *       description: Account balance cutoff date in YYYY-MM-DD format. Example 2023-08-20
  *     sinceDate:
  *       name: since_date
  *       in: query
@@ -150,7 +150,8 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/accounts/{accountId}:
    *   get:
-   *     summary: Returns account information
+   *     summary: "(🔧 Extended) Returns account information"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Accounts]
    *     security:
    *       - apiKey: []
@@ -228,7 +229,15 @@ module.exports = (router) => {
    */                                                                                                                                                                                                                                       
   router.get('/budgets/:budgetSyncId/accounts/:accountId/balance', async (req, res, next) => {
     try {
-      const balance = await res.locals.budget.getAccountBalance(req.params.accountId, req.query.cutoff_date);                                                                                                                                                      
+      let cutoff;
+      if (req.query.cutoff_date) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(req.query.cutoff_date)) {
+          throw new Error(`Bad date format, use YYYY-MM-DD: ${req.query.cutoff_date}`);
+        }
+        const [year, month, day] = req.query.cutoff_date.split('-').map(Number);
+        cutoff = new Date(year, month - 1, day);
+      }
+      const balance = await res.locals.budget.getAccountBalance(req.params.accountId, cutoff);                                                                                                                                                      
       if (balance !== undefined) {           
         // Removing any additional field in the balance response                                                                                                                                                                                                             
         res.json({ data: balance || 0 });
@@ -244,7 +253,8 @@ module.exports = (router) => {
    * @swagger                                                                                                                                                                                                                               
    * /budgets/{budgetSyncId}/accounts/{accountId}/balancehistory:                                                                                                                                                                                  
    *   get:                                                                                                                                                                                                                                 
-   *     summary: Gets the balance history for an account, from start to end date, with daily granularity. Until date is optional, defaults to today.
+   *     summary: "(🔧 Extended) Gets the balance history for an account, from start to end date, with daily granularity. Until date is optional, defaults to today."
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Accounts]
    *     security:                                                                                                                                                                                                                          
    *       - apiKey: []                                                                                                                                                                                                                     
@@ -284,14 +294,51 @@ module.exports = (router) => {
       if (isNaN(start) || isNaN(end) || start > end) {
         throw new Error('Invalid date range');
       }
-      const dailyBalance = {};
-      let current = new Date(start);
-      while (current <= end) {
-        const currentDate = formatDateToISOString(current);
-        dailyBalance[currentDate] =
-          (await res.locals.budget.getAccountBalance(req.params.accountId, currentDate)) || 0;
-        current.setDate(current.getDate() + 1);
+      // Delegate to helper that mirrors the compare script's Actual-QL method.
+      async function computeBalanceHistory(budget, accountId, start, end) {
+        const q = budget.q;
+        const startStr = formatDateToISOString(start);
+        const endStr = formatDateToISOString(end);
+
+        // compute day-before-start using simple date arithmetic and utility formatter
+        const DAY_MS = 24 * 60 * 60 * 1000;
+        const beforeStart = new Date(start.getTime() - DAY_MS);
+        const beforeStartStr = formatDateToISOString(beforeStart);
+
+        const startBalanceRes = await budget.runQuery(
+          q('transactions')
+            .filter({ account: accountId, is_parent: false, tombstone: false, date: { $lte: beforeStartStr } })
+            .calculate({ $sum: '$amount' })
+        );
+        const startingBalance = startBalanceRes && startBalanceRes.data ? startBalanceRes.data : 0;
+
+        const groupedRes = await budget.runQuery(
+          q('transactions')
+            .filter({ account: accountId, is_parent: false, tombstone: false, date: [{ $gte: startStr }, { $lte: endStr }] })
+            .groupBy('date')
+            .orderBy('date')
+            .select(['date', { amount: { $sum: '$amount' } }])
+        );
+
+        const groupedData = (groupedRes && groupedRes.data) || [];
+        const sumsByDate = {};
+        groupedData.forEach((row) => { sumsByDate[row.date] = row.amount || 0; });
+
+        const result = {};
+        let cumulative = startingBalance;
+        // iterate by day using utility formatter for date keys
+        let current = new Date(start.getTime());
+        const endDate = new Date(end.getTime());
+        while (current <= endDate) {
+          const d = formatDateToISOString(current);
+          cumulative = cumulative + (sumsByDate[d] || 0);
+          result[d] = cumulative;
+          current = new Date(current.getTime() + DAY_MS);
+        }
+        return result;
       }
+
+      const dailyBalance = await computeBalanceHistory(res.locals.budget, req.params.accountId, start, end);
       res.json({ data: dailyBalance });
     } catch(err) {
       next(err);
@@ -321,17 +368,20 @@ module.exports = (router) => {
    *               account:
    *                 required:
    *                   - name
-   *                   - offbudget
    *                 type: object
    *                 properties:
    *                   name:
    *                      type: string
    *                   offbudget:
    *                      type: boolean
+   *                   initialBalance:
+   *                      type: integer
+   *                      description: Optional initial balance in integer format (e.g. 10000 = $100.00)
    *             examples:
    *               - account:
    *                   name: 'Checking'
    *                   offbudget: false
+   *                   initialBalance: 10000
    *     responses:
    *       '200':
    *         description: Account created
@@ -351,7 +401,11 @@ module.exports = (router) => {
   router.post('/budgets/:budgetSyncId/accounts', async (req, res, next) => {
     try {
       validateAccountBody(req.body.account);
-      res.json({'data': await res.locals.budget.createAccount(req.body.account)});
+      const { initialBalance, ...account } = req.body.account;
+      if (initialBalance !== undefined && !Number.isInteger(initialBalance)) {
+        throw new Error('initialBalance must be an integer (e.g. 10000 = $100.00)');
+      }
+      res.json({'data': await res.locals.budget.createAccount(account, initialBalance)});
     } catch(err) {
       next(err);
     }

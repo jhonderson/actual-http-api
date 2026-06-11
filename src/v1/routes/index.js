@@ -22,6 +22,10 @@ require('./rules')(router);
 require('./payees')(router);
 require('./schedules')(router);
 require('./settings')(router);
+require('./run-query')(router);
+require('./tags')(router);
+require('./notes')(router);
+require('./utils')(router);
 
 router.use(errorHandler);
 
@@ -73,6 +77,14 @@ module.exports = router;
  *            $ref: '#/components/schemas/GeneralError'
  *            examples:
  *              - error: 'No budget exists for month: 2019-01'
+ *     '501':
+ *      description: Operation unsupported error
+ *      content:
+ *        application/json:
+ *          schema:
+ *            $ref: '#/components/schemas/GeneralError'
+ *            examples:
+ *              - error: 'This operation is experimental and is currently disabled.'
  *     '500':
  *      description: Internal server error
  *      content:

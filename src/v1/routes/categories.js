@@ -70,6 +70,12 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *       - in: query
+   *         name: hidden
+   *         required: false
+   *         schema:
+   *           type: boolean
+   *         description: Filter by hidden status. Omit to return all categories.
    *     responses:
    *       '200':
    *         description: The list of categories
@@ -144,7 +150,10 @@ module.exports = (router) => {
    */
   router.get('/budgets/:budgetSyncId/categories', async (req, res, next) => {
     try {
-      res.json({'data': await res.locals.budget.getCategories()});
+      const hidden = req.query.hidden === 'true' ? true
+                   : req.query.hidden === 'false' ? false
+                   : undefined;
+      res.json({'data': await res.locals.budget.getCategories({ hidden })});
     } catch(err) {
       next(err);
     }
@@ -163,7 +172,8 @@ module.exports = (router) => {
    * @swagger
    * /budgets/{budgetSyncId}/categories/{categoryId}:
    *   get:
-   *     summary: Returns a category information
+   *     summary: "(🔧 Extended) Returns a category information"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
    *     tags: [Categories]
    *     security:
    *       - apiKey: []
@@ -318,6 +328,12 @@ module.exports = (router) => {
    *     parameters:
    *       - $ref: '#/components/parameters/budgetSyncId'
    *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *       - in: query
+   *         name: hidden
+   *         required: false
+   *         schema:
+   *           type: boolean
+   *         description: Filter by hidden status. Omit to return all category groups.
    *     responses:
    *       '200':
    *         description: The list of category groups
@@ -396,7 +412,10 @@ module.exports = (router) => {
 
   router.get('/budgets/:budgetSyncId/categorygroups', async (req, res, next) => {
     try {
-      const categoryGroups = (await res.locals.budget.getCategoryGroups()) || [];
+      const hidden = req.query.hidden === 'true' ? true
+                   : req.query.hidden === 'false' ? false
+                   : undefined;
+      const categoryGroups = (await res.locals.budget.getCategoryGroups({ hidden })) || [];
       res.json({'data': categoryGroups.map(categoryGroup => {
         const categories = categoryGroup.categories || [];
         return {
