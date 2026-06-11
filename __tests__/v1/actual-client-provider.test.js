@@ -116,4 +116,67 @@ describe('Actual Client Provider', () => {
       });
     });
   });
+
+  describe('runAqlQuery', () => {
+    it('should call aqlQuery on the API client', async () => {
+      const fs = require('fs');
+      fs.existsSync = jest.fn().mockReturnValue(true);
+      
+      const mockQueryResult = { data: [{ id: 'test' }] };
+      const mockActualApi = {
+        init: jest.fn().mockResolvedValue(undefined),
+        shutdown: jest.fn().mockResolvedValue(undefined),
+        aqlQuery: jest.fn().mockResolvedValue(mockQueryResult),
+      };
+      jest.doMock('@actual-app/api', () => mockActualApi);
+
+      const mockQuery = { table: 'accounts', select: ['id'] };
+      const result = await provider.runAqlQuery(mockQuery);
+
+      expect(mockActualApi.aqlQuery).toHaveBeenCalledWith(mockQuery);
+      expect(result).toEqual(mockQueryResult);
+    });
+
+    it('should return query results', async () => {
+      const fs = require('fs');
+      fs.existsSync = jest.fn().mockReturnValue(true);
+      
+      const expectedData = { 
+        data: [
+          { account: 'acc1', total: 5000 },
+          { account: 'acc2', total: 3000 }
+        ] 
+      };
+      const mockActualApi = {
+        init: jest.fn().mockResolvedValue(undefined),
+        shutdown: jest.fn().mockResolvedValue(undefined),
+        aqlQuery: jest.fn().mockResolvedValue(expectedData),
+      };
+      jest.doMock('@actual-app/api', () => mockActualApi);
+
+      const mockQuery = { table: 'transactions', groupBy: ['account'] };
+      const result = await provider.runAqlQuery(mockQuery);
+
+      expect(result).toEqual(expectedData);
+      expect(result.data).toHaveLength(2);
+    });
+
+    it('should get API client before running query', async () => {
+      const fs = require('fs');
+      fs.existsSync = jest.fn().mockReturnValue(true);
+      
+      const mockActualApi = {
+        init: jest.fn().mockResolvedValue(undefined),
+        shutdown: jest.fn().mockResolvedValue(undefined),
+        aqlQuery: jest.fn().mockResolvedValue({ data: [] }),
+      };
+      jest.doMock('@actual-app/api', () => mockActualApi);
+
+      await provider.runAqlQuery({});
+
+      // Verify init was called (meaning getActualApiClient was invoked)
+      expect(mockActualApi.init).toHaveBeenCalled();
+      expect(mockActualApi.aqlQuery).toHaveBeenCalled();
+    });
+  });
 });
