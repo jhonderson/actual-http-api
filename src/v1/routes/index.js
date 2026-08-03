@@ -2,11 +2,16 @@ const express = require('express');
 const { Budget } = require('../budget');
 const { authorizeRequest } = require('../middlewares/api-key-authorization');
 const { errorHandler } = require('../middlewares/error-handler');
+const { config } = require('../../config/config');
 
 const router = express.Router();
 
 router.use('/budgets/:budgetSyncId', authorizeRequest, async (req, res, next) => {
     try {
+      if (config.allowedBudgetSyncIds && !config.allowedBudgetSyncIds.includes(req.params.budgetSyncId)) {
+        res.status(403).json({"error": "Forbidden"});
+        return;
+      }
       res.locals.budget = await Budget(req.params.budgetSyncId, req.get('budget-encryption-password'));
       next();
     } catch(err) {

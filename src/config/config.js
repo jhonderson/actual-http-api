@@ -27,6 +27,7 @@ exports.config = {
     serverUrl: process.env.ACTUAL_SERVER_URL,
     serverPassword: loadMandatorySecret("ACTUAL_SERVER_PASSWORD"),
   },
+  allowedBudgetSyncIds: process.env.ALLOWED_BUDGET_SYNC_IDS ? process.env.ALLOWED_BUDGET_SYNC_IDS.split(',').map(id => id.trim()).filter(Boolean) : null,
   swagger: {
     protocol: process.env.SWAGGER_PROTOCOL || "https",
     host: process.env.SWAGGER_HOST || "localhost",
