@@ -2,7 +2,8 @@ const request = require('supertest');
 const express = require('express');
 
 jest.mock('../../../src/v1/budget', () => ({
-  Budget: jest.fn()
+  Budget: jest.fn(),
+  importBudgetData: jest.fn()
 }));
 
 jest.mock('../../../src/v1/middlewares/api-key-authorization', () => ({
@@ -51,5 +52,35 @@ describe('index.js router', () => {
 
     expect(res.status).toBe(500);
     expect(res.body).toEqual({ error: 'Boom!' });
+  });
+
+  // The /budgets/:budgetSyncId middleware matches any path with a second segment, so it would
+  // capture /budgets/import with budgetSyncId set to the literal string "import". The import
+  // route is registered before that middleware to prevent it; this guards the ordering.
+  test('POST /budgets/import reaches the import route instead of the budget middleware', async () => {
+    const { Budget, importBudgetData } = require('../../../src/v1/budget');
+    importBudgetData.mockResolvedValue({
+      id: 'My-Finances-5e3e565',
+      syncId: 'a232c399-e28c-4a51-96be-d1183129d1f9',
+      name: 'Actual Bench Test'
+    });
+
+    const app = createApp();
+
+    const res = await request(app)
+      .post('/budgets/import')
+      .set('Content-Type', 'application/zip')
+      .send(Buffer.from([1, 2, 3]));
+
+    expect(Budget).not.toHaveBeenCalled();
+    expect(importBudgetData).toHaveBeenCalled();
+    expect(res.status).toBe(201);
+    expect(res.body).toEqual({
+      data: {
+        id: 'My-Finances-5e3e565',
+        syncId: 'a232c399-e28c-4a51-96be-d1183129d1f9',
+        name: 'Actual Bench Test'
+      }
+    });
   });
 });

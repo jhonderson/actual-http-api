@@ -145,5 +145,44 @@ describe('Error Handler Middleware', () => {
         error: 'Unknown error while interacting with Actual Api. See server logs for more information',
       });
     });
+
+    it.each([
+      'not-zip-file',
+      'invalid-zip-file',
+      'invalid-meta-file',
+      'zip-too-large',
+      'not-ynab4',
+      'not-ynab5',
+    ])('should return 400 for the %s budget import error', (token) => {
+      const err = new Error(`Error importing budget: ${token}`);
+
+      errorHandler(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: `Error importing budget: ${token}` });
+    });
+
+    it.each(['internal-error', 'unknown'])(
+      'should keep the %s budget import error as a 500',
+      (token) => {
+        const err = new Error(`Error importing budget: ${token}`);
+
+        errorHandler(err, req, res, next);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+          error: 'Unknown error while interacting with Actual Api. See server logs for more information',
+        });
+      }
+    );
+
+    it('should keep the message when an import cannot be uploaded to the server', () => {
+      const err = new Error('The budget was imported but could not be uploaded to the Actual server, so it has no sync id and is not reachable. Check the Actual Server connection and retry the import, retrying replaces the incomplete copy');
+
+      errorHandler(err, req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ error: err.message });
+    });
   });
 });

@@ -27,8 +27,17 @@ const errorHandler = (err, req, res, next) => {
     || err.message.includes('does not exist on table')
     || err.message.includes('convert to integer')
     || err.message.includes('must be')
+    // Errors the Actual library reports for an unusable uploaded budget file
+    || err.message.includes('not-zip-file')
+    || err.message.includes('invalid-zip-file')
+    || err.message.includes('invalid-meta-file')
+    || err.message.includes('zip-too-large')
+    || err.message.includes('not-ynab4')
+    || err.message.includes('not-ynab5')
   ) {
     clientError(res, 400, err, err.message);
+  } else if (err.message.includes('could not be uploaded to the Actual server')) {
+    serverError(res, err, err.message);
   } else {
     serverError(res, err, 'Unknown error while interacting with Actual Api. See server logs for more information');
   }

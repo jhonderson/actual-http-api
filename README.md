@@ -72,6 +72,19 @@ Notes:
 
 - `EXPERIMENTAL_OPERATIONS_ENABLED` (optional) — Toggle to enable experimental endpoints that rely on Actual internals. Defaults to enabled (true). Set to `false` to disable these endpoints; when disabled the HTTP server will respond with `501 Not Implemented` for those operations and they will be hidden from the Swagger UI.
 
+### Importing a budget
+
+`POST /v1/budgets/import` accepts an Actual export or a YNAB4/YNAB5 file as the raw request body, with `Content-Type: application/zip` or `application/octet-stream`, and returns the sync id of the imported budget.
+
+Importing a budget that already exists does **not** restore it in place. The Actual library clears the file's server identity on import, so the budget is uploaded to your Actual server as a new file and receives a **new sync id**. The original budget and its sync id are left untouched, so you end up with two budgets rather than one. Use the `syncId` returned in the response to address the imported budget.
+
+```bash
+curl -X POST 'http://localhost:5007/v1/budgets/import?type=actual' \
+  -H 'x-api-key: your-api-key' \
+  -H 'Content-Type: application/zip' \
+  --data-binary '@2026-09-06-My-Budget.zip'
+```
+
 ## Documentation
 
 When running locally with default port mapping, open:

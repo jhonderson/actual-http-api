@@ -7,6 +7,32 @@ const path = require('path');
 
 let syncIdToBudgetId = {};
 
+function clearSyncIdToBudgetIdCache() {
+  syncIdToBudgetId = {};
+}
+
+async function importBudgetData(fileBuffer, { type = 'actual', filename } = {}) {
+  const actualApi = await getActualApiClient();
+
+  const { id } = await actualApi.importBudget(fileBuffer, { type, filename });
+
+  // The imported budget gets a new sync id, so any cached entry for it is now stale
+  clearSyncIdToBudgetIdCache();
+
+  // The library swallows upload failures, leaving the budget on disk with no sync id and
+  // unreachable from every other endpoint, so treat that as a failed import
+  const importedBudget = (await actualApi.getBudgets() || []).find(budget => budget.id === id && budget.groupId);
+  if (!importedBudget) {
+    throw new Error('The budget was imported but could not be uploaded to the Actual server, so it has no sync id and is not reachable. Check the Actual Server connection and retry the import, retrying replaces the incomplete copy');
+  }
+
+  return {
+    id,
+    syncId: importedBudget.groupId,
+    name: importedBudget.name
+  };
+}
+
 async function Budget(budgetSyncId, budgetEncryptionPassword) {
   const actualApi = await getActualApiClient();
   if (budgetSyncId in syncIdToBudgetId) {
@@ -539,3 +565,5 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
 }
 
 exports.Budget = Budget;
+exports.importBudgetData = importBudgetData;
+exports.clearSyncIdToBudgetIdCache = clearSyncIdToBudgetIdCache;

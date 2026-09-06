@@ -13,7 +13,7 @@ jest.mock('../../src/utils/utils');
 jest.mock('fs');
 jest.mock('path');
 
-const { Budget } = require('../../src/v1/budget');
+const { Budget, importBudgetData } = require('../../src/v1/budget');
 const { getActualApiClient, getActualDataDir, runAqlQuery } = require('../../src/v1/actual-client-provider');
 const { 
   currentLocalDate, 
@@ -982,6 +982,112 @@ describe('Budget Module', () => {
     it('should propagate errors from getPreferences', async () => {
       mockActualApi.getPreferences.mockRejectedValueOnce(new Error('No budget file is open'));
       await expect(budget.getPreferences()).rejects.toThrow('No budget file is open');
+    });
+  });
+
+  describe('Data Import', () => {
+    beforeEach(() => {
+      mockActualApi.importBudget = jest.fn().mockResolvedValue({ id: 'My-Finances-5e3e565' });
+      mockActualApi.getBudgets.mockResolvedValue([
+        {
+          id: 'My-Finances-5e3e565',
+          cloudFileId: '4dc8876b-e7e4-4e5c-ab69-8215242c279c',
+          groupId: 'a232c399-e28c-4a51-96be-d1183129d1f9',
+          name: 'Actual Bench Test'
+        }
+      ]);
+    });
+
+    it('should import the budget and return its new sync id', async () => {
+      const fileBuffer = Buffer.from([1, 2, 3]);
+
+      const result = await importBudgetData(fileBuffer, { type: 'actual' });
+
+      expect(mockActualApi.importBudget).toHaveBeenCalledWith(fileBuffer, {
+        type: 'actual',
+        filename: undefined
+      });
+      expect(result).toEqual({
+        id: 'My-Finances-5e3e565',
+        syncId: 'a232c399-e28c-4a51-96be-d1183129d1f9',
+        name: 'Actual Bench Test'
+      });
+    });
+
+    it('should default the type to actual', async () => {
+      await importBudgetData(Buffer.from([1, 2, 3]));
+
+      expect(mockActualApi.importBudget).toHaveBeenCalledWith(expect.any(Buffer), {
+        type: 'actual',
+        filename: undefined
+      });
+    });
+
+    it('should forward the type and filename for YNAB imports', async () => {
+      await importBudgetData(Buffer.from([1, 2, 3]), { type: 'ynab5', filename: 'budget.json' });
+
+      expect(mockActualApi.importBudget).toHaveBeenCalledWith(expect.any(Buffer), {
+        type: 'ynab5',
+        filename: 'budget.json'
+      });
+    });
+
+    it('should fail when the imported budget has no sync id, meaning the upload did not reach the server', async () => {
+      mockActualApi.getBudgets.mockResolvedValue([
+        { id: 'My-Finances-5e3e565', name: 'Actual Bench Test' }
+      ]);
+
+      await expect(importBudgetData(Buffer.from([1, 2, 3]), { type: 'actual' }))
+        .rejects
+        .toThrow('could not be uploaded to the Actual server');
+    });
+
+    it('should fail when the imported budget is missing from the budget list', async () => {
+      mockActualApi.getBudgets.mockResolvedValue([]);
+
+      await expect(importBudgetData(Buffer.from([1, 2, 3]), { type: 'actual' }))
+        .rejects
+        .toThrow('could not be uploaded to the Actual server');
+    });
+
+    it('should ignore remote entries, which carry no id, when resolving the imported budget', async () => {
+      mockActualApi.getBudgets.mockResolvedValue([
+        {
+          cloudFileId: '4dc8876b-e7e4-4e5c-ab69-8215242c279c',
+          state: 'remote',
+          groupId: 'a232c399-e28c-4a51-96be-d1183129d1f9',
+          name: 'Actual Bench Test'
+        }
+      ]);
+
+      await expect(importBudgetData(Buffer.from([1, 2, 3]), { type: 'actual' }))
+        .rejects
+        .toThrow('could not be uploaded to the Actual server');
+    });
+
+    it('should propagate import failures from the official API', async () => {
+      mockActualApi.importBudget.mockRejectedValueOnce(
+        new Error('Error importing budget: not-zip-file')
+      );
+
+      await expect(importBudgetData(Buffer.from([1, 2, 3]), { type: 'actual' }))
+        .rejects
+        .toThrow('Error importing budget: not-zip-file');
+    });
+
+    it('should clear the cached sync id map so a stale entry cannot resolve the wrong budget', async () => {
+      // Populate the cache by loading a budget, then import and confirm the next call
+      // re-downloads instead of reusing the cached budget id
+      await Budget('sync1', undefined);
+      mockActualApi.downloadBudget.mockClear();
+
+      await Budget('sync1', undefined);
+      expect(mockActualApi.downloadBudget).not.toHaveBeenCalled();
+
+      await importBudgetData(Buffer.from([1, 2, 3]), { type: 'actual' });
+
+      await Budget('sync1', undefined);
+      expect(mockActualApi.downloadBudget).toHaveBeenCalledWith('sync1');
     });
   });
 

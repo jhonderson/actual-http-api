@@ -6,6 +6,11 @@ const { config } = require('../../config/config');
 
 const router = express.Router();
 
+// Must be registered before the /budgets/:budgetSyncId middleware below, otherwise
+// :budgetSyncId captures the literal string "import" and the request is treated as a
+// request for a budget with that sync id. This route applies authorizeRequest itself.
+require('./import')(router);
+
 router.use('/budgets/:budgetSyncId', authorizeRequest, async (req, res, next) => {
     try {
       if (config.allowedBudgetSyncIds && !config.allowedBudgetSyncIds.includes(req.params.budgetSyncId)) {
