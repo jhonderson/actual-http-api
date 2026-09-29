@@ -34,6 +34,8 @@ describe('Notes Routes', () => {
       setAccountNotes: jest.fn(),
       getBudgetMonthNotes: jest.fn(),
       setBudgetMonthNotes: jest.fn(),
+      getScheduleNotes: jest.fn(),
+      setScheduleNotes: jest.fn(),
     };
 
     mockReq = {
@@ -399,6 +401,157 @@ describe('Notes Routes', () => {
       expect(mockRes.json).toHaveBeenCalledWith({
         message: 'Budget month notes deleted'
       });
+    });
+
+  });
+
+
+  describe('GET /budgets/:budgetSyncId/notes/schedule/:scheduleId', () => {
+
+    it('should return schedule notes', async () => {
+      mockBudget.getScheduleNotes.mockResolvedValueOnce('Schedule note');
+
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getScheduleNotes).toHaveBeenCalledWith('sch1');
+
+      expect(mockRes.json).toHaveBeenCalledWith({
+        data: 'Schedule note'
+      });
+    });
+
+    it('should return empty string when notes are null', async () => {
+      mockBudget.getScheduleNotes.mockResolvedValueOnce(null);
+
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockRes.json).toHaveBeenCalledWith({
+        data: ""
+      });
+    });
+
+  });
+
+  describe('PUT /budgets/:budgetSyncId/notes/schedule/:scheduleId', () => {
+
+    it('should set schedule notes', async () => {
+      mockBudget.setScheduleNotes.mockResolvedValueOnce(undefined);
+
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['PUT /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+      mockReq.body = { data: 'New schedule note' };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.setScheduleNotes).toHaveBeenCalledWith('sch1', 'New schedule note');
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'Schedule notes updated'
+      });
+    });
+
+    it('should accept an empty string', async () => {
+      mockBudget.setScheduleNotes.mockResolvedValueOnce(undefined);
+
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['PUT /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+      mockReq.body = { data: '' };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.setScheduleNotes).toHaveBeenCalledWith('sch1', '');
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'Schedule notes updated'
+      });
+    });
+
+    it('should call next with an error when data is missing', async () => {
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['PUT /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+      mockReq.body = {};
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.setScheduleNotes).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    it('should call next with an error when data is not a string', async () => {
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['PUT /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+      mockReq.body = { data: 123 };
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.setScheduleNotes).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+  });
+
+  describe('DELETE /budgets/:budgetSyncId/notes/schedule/:scheduleId', () => {
+
+    it('should delete schedule notes by setting them to null', async () => {
+      mockBudget.setScheduleNotes.mockResolvedValueOnce(undefined);
+
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['DELETE /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.setScheduleNotes).toHaveBeenCalledWith('sch1', null);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        message: 'Schedule notes deleted'
+      });
+    });
+
+    it('should call next with an error when the budget setter throws', async () => {
+      const error = new Error('boom');
+      mockBudget.setScheduleNotes.mockRejectedValueOnce(error);
+
+      const module = require('../../../src/v1/routes/notes');
+      module(mockRouter);
+
+      const handler = handlers['DELETE /budgets/:budgetSyncId/notes/schedule/:scheduleId'];
+
+      mockReq.params.scheduleId = 'sch1';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
 
   });

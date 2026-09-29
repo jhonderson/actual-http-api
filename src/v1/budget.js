@@ -442,6 +442,15 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.updateNote(`budget-${month}`, note);
   }
 
+  async function getScheduleNotes(scheduleId) {
+    const result = await actualApi.getNote(`schedule-${scheduleId}`);
+    return result?.note ?? null;
+  }
+
+  async function setScheduleNotes(scheduleId, note) {
+    return actualApi.updateNote(`schedule-${scheduleId}`, note);
+  }
+
   async function shutdown() {
     actualApi.shutdown();
   }
@@ -558,6 +567,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     setAccountNotes: setAccountNotes,
     getBudgetMonthNotes: getBudgetMonthNotes,
     setBudgetMonthNotes: setBudgetMonthNotes,
+    getScheduleNotes: getScheduleNotes,
+    setScheduleNotes: setScheduleNotes,
     exportData: exportData,
     runQuery: runQuery,
     shutdown: shutdown,

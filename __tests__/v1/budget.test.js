@@ -1204,6 +1204,21 @@ describe('Budget Module', () => {
       expect(result).toBe('Month note');
     });
 
+    it('should get schedule notes', async () => {
+      mockActualApi.getNote.mockResolvedValueOnce({ id: 'schedule-sch1', note: 'Schedule note' });
+
+      const result = await budget.getScheduleNotes('sch1');
+
+      expect(mockActualApi.getNote).toHaveBeenCalledWith('schedule-sch1');
+      expect(result).toBe('Schedule note');
+    });
+
+    it('should set schedule notes', async () => {
+      await budget.setScheduleNotes('sch1', 'Schedule note');
+
+      expect(mockActualApi.updateNote).toHaveBeenCalledWith('schedule-sch1', 'Schedule note');
+    });
+
     it('should return null when note not found', async () => {
       mockActualApi.getNote.mockResolvedValueOnce(null);
 
