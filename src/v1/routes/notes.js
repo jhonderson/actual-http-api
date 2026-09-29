@@ -401,4 +401,128 @@ module.exports = (router) => {
       next(err);
     }
   });
+
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/notes/schedule/{scheduleId}:
+   *   get:
+   *     summary: "(🔧 Extended) Returns notes for a schedule"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
+   *     tags: [Notes]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/scheduleId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: Schedule notes
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               required:
+   *                 - data
+   *               properties:
+   *                 data:
+   *                   type: string
+   *                   nullable: true
+   *               examples:
+   *                 - data: "Schedule notes"
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   *   put:
+   *     summary: "(🔧 Extended) Sets (creates or replaces) notes for a schedule"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
+   *     tags: [Notes]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/scheduleId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - data
+   *             properties:
+   *               data:
+   *                 type: string
+   *             examples:
+   *               - data: "Schedule notes"
+   *     responses:
+   *       '200':
+   *         description: Schedule notes updated
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Schedule notes updated
+   *       '400':
+   *         $ref: '#/components/responses/400'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   *   delete:
+   *     summary: "(🔧 Extended) Deletes notes for a schedule"
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
+   *     tags: [Notes]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/scheduleId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: Schedule notes deleted
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Schedule notes deleted
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.get('/budgets/:budgetSyncId/notes/schedule/:scheduleId', async (req, res, next) => {
+    try {
+      const notes = await res.locals.budget.getScheduleNotes(req.params.scheduleId);
+      res.json({ data: notes ?? '' });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.put('/budgets/:budgetSyncId/notes/schedule/:scheduleId', async (req, res, next) => {
+    try {
+      if (typeof req.body?.data !== 'string') {
+        throw new Error('Request body must include a "data" string field');
+      }
+      await res.locals.budget.setScheduleNotes(req.params.scheduleId, req.body.data);
+      res.json({ message: 'Schedule notes updated' });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.delete('/budgets/:budgetSyncId/notes/schedule/:scheduleId', async (req, res, next) => {
+    try {
+      await res.locals.budget.setScheduleNotes(req.params.scheduleId, null);
+      res.json({ message: 'Schedule notes deleted' });
+    } catch (err) {
+      next(err);
+    }
+  });
 };
