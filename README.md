@@ -16,10 +16,10 @@ docker run -d --name actualhttpapi \
   -e ACTUAL_SERVER_URL="http://actual-server:5006/" \
   -e ACTUAL_SERVER_PASSWORD="your-actual-password" \
   -e API_KEY="your-api-key" \
-  jhonderson/actual-http-api:26.2.0
+  jhonderson/actual-http-api:26.10.0
 ```
 
-- Replace `jhonderson/actual-http-api:26.2.0` with the specific tag you want.
+- Replace `jhonderson/actual-http-api:26.10.0` with the specific tag you want.
 - The service exposes the Swagger UI at `http://localhost:5007/api-docs/` by default (see swagger env vars below if you need to change how docs are served).
 
 Tip: For secrets you can also mount files and use the `_PATH` variant of the environment variables (see `API_KEY_PATH` / `ACTUAL_SERVER_PASSWORD_PATH`).
