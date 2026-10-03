@@ -25,6 +25,9 @@ describe('Settings Routes', () => {
       post: jest.fn((path, handler) => {
         handlers[`POST ${path}`] = handler;
       }),
+      put: jest.fn((path, handler) => {
+        handlers[`PUT ${path}`] = handler;
+      }),
     };
 
     mockBudget = {
@@ -33,6 +36,7 @@ describe('Settings Routes', () => {
         maxMonthsOfHistory: 24,
       }),
       exportBudget: jest.fn().mockResolvedValue('exported-data'),
+      setPreference: jest.fn().mockResolvedValue(undefined),
       getPreferences: jest.fn().mockResolvedValue({
         dateFormat: 'MM/dd/yyyy',
         numberFormat: 'comma-dot',
