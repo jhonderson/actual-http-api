@@ -66,6 +66,7 @@ describe('Transactions Routes', () => {
       }),
       deleteTransaction: jest.fn().mockResolvedValue(undefined),
       deleteTransactions: jest.fn().mockResolvedValue(undefined),
+      mergeTransactions: jest.fn().mockResolvedValue('txn1'),
     };
 
     mockReq = {
@@ -637,6 +638,49 @@ describe('Transactions Routes', () => {
       expect(mockRes.json).toHaveBeenCalledWith({
         message: 'Transactions deleted',
       });
+    });
+  });
+
+  describe('POST /budgets/:budgetSyncId/transactions/merge', () => {
+    it('should merge two transactions and return the resulting id', async () => {
+      const transactionsModule = require('../../../src/v1/routes/transactions');
+      transactionsModule(mockRouter);
+
+      mockReq.body = { transactionIds: ['txn1', 'txn2'] };
+      await handlers['POST /budgets/:budgetSyncId/transactions/merge'](mockReq, mockRes, mockNext);
+
+      expect(mockBudget.mergeTransactions).toHaveBeenCalledWith(['txn1', 'txn2']);
+      expect(mockRes.json).toHaveBeenCalledWith({ data: 'txn1' });
+    });
+
+    it.each([
+      ['missing', undefined],
+      ['not an array', 'txn1'],
+      ['only one id', ['txn1']],
+      ['more than two ids', ['txn1', 'txn2', 'txn3']],
+    ])('should reject transactionIds that are %s', async (_label, transactionIds) => {
+      const transactionsModule = require('../../../src/v1/routes/transactions');
+      transactionsModule(mockRouter);
+
+      mockReq.body = { transactionIds };
+      await handlers['POST /budgets/:budgetSyncId/transactions/merge'](mockReq, mockRes, mockNext);
+
+      expect(mockBudget.mergeTransactions).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.objectContaining({
+        message: expect.stringContaining('must be'),
+      }));
+    });
+
+    it('should forward errors from mergeTransactions', async () => {
+      const transactionsModule = require('../../../src/v1/routes/transactions');
+      transactionsModule(mockRouter);
+
+      const error = new Error('Transaction not found');
+      mockBudget.mergeTransactions.mockRejectedValueOnce(error);
+      mockReq.body = { transactionIds: ['txn1', 'txn2'] };
+      await handlers['POST /budgets/:budgetSyncId/transactions/merge'](mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 

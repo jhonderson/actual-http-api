@@ -238,6 +238,66 @@ module.exports = (router) => {
 
   /**
    * @swagger
+   * /budgets/{budgetSyncId}/preferences/{preferenceId}:
+   *   put:
+   *     summary: Sets a synced budget preference
+   *     description: "Uses the official setPreference API (available from Actual 26.10.0), e.g. to set per-account CSV import column mappings."
+   *     tags: [Settings]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *       - in: path
+   *         name: preferenceId
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Preference key. Example "dateFormat"
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             required:
+   *               - value
+   *             type: object
+   *             properties:
+   *               value:
+   *                 type: string
+   *                 description: Preference value, stored as a string
+   *             examples:
+   *               - value: "dd/MM/yyyy"
+   *     responses:
+   *       '200':
+   *         description: Preference updated
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/GeneralResponseMessage'
+   *               examples:
+   *                 - message: Preference updated
+   *       '400':
+   *         $ref: '#/components/responses/400'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.put('/budgets/:budgetSyncId/preferences/:preferenceId', async (req, res, next) => {
+    try {
+      if (typeof req.body.value !== 'string') {
+        throw new Error('value is required and must be a string');
+      }
+      await res.locals.budget.setPreference(req.params.preferenceId, req.body.value);
+      res.json({ message: 'Preference updated' });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  /**
+   * @swagger
    * /budgets/{budgetSyncId}/export:
    *   get:
    *     summary: "(🔧 Extended) Exports the budget data as a zip file containing db.sqlite and metadata.json files."

@@ -227,6 +227,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.updateTransaction(transactionId, {...transaction, id: transactionId});
   }
 
+  async function mergeTransactions(transactionIds) {
+    return actualApi.mergeTransactions(transactionIds);
+  }
+
   async function deleteTransaction(transactionId) {
     return actualApi.deleteTransaction(transactionId);
   }
@@ -395,6 +399,10 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return actualApi.getPreferences();
   }
 
+  async function setPreference(preferenceId, value) {
+    return actualApi.setPreference(preferenceId, value);
+  }
+
   async function getIDByName(type, name) {
     return actualApi.getIDByName(type, name);
   }
@@ -512,6 +520,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     addTransaction: addTransaction,
     addTransactions: addTransactions,
     updateTransaction: updateTransaction,
+    mergeTransactions: mergeTransactions,
     deleteTransaction: deleteTransaction,
     deleteTransactions: deleteTransactions,
     importTransactions: importTransactions,
@@ -547,6 +556,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     getBudgets: getBudgets,
     getServerVersion: getServerVersion,
     getPreferences: getPreferences,
+    setPreference: setPreference,
     getIDByName: getIDByName,
     getTags: getTags,
     createTag: createTag,

@@ -116,6 +116,8 @@ describe('Budget Module', () => {
       createTag: jest.fn().mockResolvedValue({ id: 'tag2', tag: 'newtag' }),
       updateTag: jest.fn().mockResolvedValue({ id: 'tag1', tag: 'updated' }),
       deleteTag: jest.fn().mockResolvedValue(undefined),
+      mergeTransactions: jest.fn().mockResolvedValue('txn1'),
+      setPreference: jest.fn().mockResolvedValue(undefined),
       getPreferences: jest.fn().mockResolvedValue({
         dateFormat: 'MM/dd/yyyy',
         numberFormat: 'comma-dot',
@@ -621,6 +623,12 @@ describe('Budget Module', () => {
       await budget.deleteTransactions([]);
       expect(mockActualApi.batchBudgetUpdates).toHaveBeenCalled();
     });
+
+    it('should merge two transactions', async () => {
+      const result = await budget.mergeTransactions(['txn1', 'txn2']);
+      expect(mockActualApi.mergeTransactions).toHaveBeenCalledWith(['txn1', 'txn2']);
+      expect(result).toBe('txn1');
+    });
   });
 
   describe('Categories Management', () => {
@@ -977,6 +985,11 @@ describe('Budget Module', () => {
         dateFormat: 'MM/dd/yyyy',
         numberFormat: 'comma-dot',
       });
+    });
+
+    it('should set a preference', async () => {
+      await budget.setPreference('dateFormat', 'dd/MM/yyyy');
+      expect(mockActualApi.setPreference).toHaveBeenCalledWith('dateFormat', 'dd/MM/yyyy');
     });
 
     it('should propagate errors from getPreferences', async () => {

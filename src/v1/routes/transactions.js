@@ -413,6 +413,68 @@ module.exports = (router) => {
 
   /**
    * @swagger
+   * /budgets/{budgetSyncId}/transactions/merge:
+   *   post:
+   *     summary: Merges two duplicate transactions into one
+   *     description: "Uses the official mergeTransactions API (available from Actual 26.10.0). Exactly two transaction ids are required; the id of the transaction that is kept is returned."
+   *     tags: [Transactions]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             required:
+   *               - transactionIds
+   *             type: object
+   *             properties:
+   *               transactionIds:
+   *                 type: array
+   *                 minItems: 2
+   *                 maxItems: 2
+   *                 items:
+   *                   type: string
+   *                   description: Transaction id. Example "729cb492-4eab-468b-9522-75d455cded22"
+   *             examples:
+   *               - transactionIds:
+   *                 - "729cb492-4eab-468b-9522-75d455cded22"
+   *                 - "9fa2550c-c3ff-498b-8df6-e0fbe2a62e0e"
+   *     responses:
+   *       '200':
+   *         description: Transactions merged
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: string
+   *                   description: Id of the resulting transaction
+   *       '400':
+   *         $ref: '#/components/responses/400'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.post('/budgets/:budgetSyncId/transactions/merge', async (req, res, next) => {
+    try {
+      const transactionIds = req.body.transactionIds;
+      if (!Array.isArray(transactionIds) || transactionIds.length !== 2) {
+        throw new Error('transactionIds must be an array with exactly two transaction ids');
+      }
+      res.json({'data': await res.locals.budget.mergeTransactions(transactionIds)});
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  /**
+   * @swagger
    * /budgets/{budgetSyncId}/transactions/batch:
    *   delete:
    *     summary: Deletes a set of transactions using the transaction ids
