@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "@actual-app/api": "^26.10.0",
-    "express": "^5.2.1",
+    "express": "^5.3.0",
     "js-yaml": "^5.4.3",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1"
