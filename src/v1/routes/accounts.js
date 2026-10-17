@@ -66,6 +66,10 @@ const { isEmpty, formatDateToISOString, parseBoolean } = require('../../utils/ut
   *         workingBalance:
   *           type: integer
   *           description: Working balance (cleared + uncleared, only included when include_balances=true)
+  *         balance_current:
+  *           type: integer
+  *           nullable: true
+  *           description: Balance last reported by the bank (only included when include_bank_balance=true, null for accounts with no bank-reported balance)
   *     Amount:
   *       type: integer
   */
@@ -88,6 +92,12 @@ module.exports = (router) => {
    *           type: boolean
    *         required: false
    *         description: When true, includes account balances (cleared, uncleared, working) in the response
+   *       - name: include_bank_balance
+   *         in: query
+   *         schema:
+   *           type: boolean
+   *         required: false
+   *         description: When true, includes the balance last reported by the bank (balance_current) in the response
    *       - name: exclude_offbudget
    *         in: query
    *         schema:
@@ -136,11 +146,13 @@ module.exports = (router) => {
   router.get('/budgets/:budgetSyncId/accounts', async (req, res, next) => {
     try {
       const includeBalances = parseBoolean(req.query.include_balances);
+      const includeBankBalance = parseBoolean(req.query.include_bank_balance);
       const excludeOffbudget = parseBoolean(req.query.exclude_offbudget);
       const excludeClosed = parseBoolean(req.query.exclude_closed);
 
       res.json({ data: await res.locals.budget.getAccounts({ 
         includeBalances, 
+        includeBankBalance, 
         excludeOffbudget, 
         excludeClosed 
       }) });
