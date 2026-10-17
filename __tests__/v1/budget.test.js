@@ -350,6 +350,38 @@ describe('Budget Module', () => {
       expect(accounts[1].workingBalance).toBe(25000);
     });
 
+    it('should get the bank reported balance when includeBankBalance is true', async () => {
+      runAqlQuery.mockResolvedValueOnce({
+        data: [
+          { id: 'acc1', name: 'Checking', offbudget: false, closed: false },
+          { id: 'acc2', name: 'Brokerage', offbudget: true, closed: false }
+        ]
+      });
+      mockActualApi.getAccounts.mockResolvedValueOnce([
+        { id: 'acc1', name: 'Checking', balance_current: 10000 },
+        { id: 'acc2', name: 'Brokerage', balance_current: null }
+      ]);
+
+      const accounts = await budget.getAccounts({ includeBankBalance: true });
+
+      expect(accounts).toHaveLength(2);
+      expect(accounts[0].balance_current).toBe(10000);
+      expect(accounts[1].balance_current).toBeNull();
+    });
+
+    it('should not include the bank reported balance by default', async () => {
+      runAqlQuery.mockResolvedValueOnce({
+        data: [
+          { id: 'acc1', name: 'Checking', offbudget: false, closed: false }
+        ]
+      });
+
+      const accounts = await budget.getAccounts();
+
+      expect(mockActualApi.getAccounts).not.toHaveBeenCalled();
+      expect(accounts[0]).not.toHaveProperty('balance_current');
+    });
+
     it('should exclude offbudget accounts when excludeOffbudget is true', async () => {
       runAqlQuery.mockResolvedValueOnce({
         data: [
