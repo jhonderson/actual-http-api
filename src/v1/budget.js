@@ -99,7 +99,7 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     return categoryGroups.find((categoryGroup) => categoryGroupId == categoryGroup.id);
   }
 
-  async function getAccounts({ includeBalances = false, excludeOffbudget = false, excludeClosed = false } = {}) {
+  async function getAccounts({ includeBalances = false, includeBankBalance = false, excludeOffbudget = false, excludeClosed = false } = {}) {
     const filter = {};
     if (excludeOffbudget) filter.offbudget = false;
     if (excludeClosed) filter.closed = false;
@@ -136,6 +136,20 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
         account.clearedBalance = clearedBalances.get(account.id) || 0;
         account.unclearedBalance = unclearedBalances.get(account.id) || 0;
         account.workingBalance = account.clearedBalance + account.unclearedBalance;
+      });
+    }
+
+    if(includeBankBalance) {
+      // The AQL accounts schema has no balance field, so the balance the bank last reported
+      // is only reachable through the official api call
+      const bankBalances = new Map();
+
+      ((await actualApi.getAccounts()) || []).forEach(account => {
+        bankBalances.set(account.id, account.balance_current ?? null);
+      });
+
+      accounts.forEach(account => {
+        account.balance_current = bankBalances.get(account.id) ?? null;
       });
     }
 
