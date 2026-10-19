@@ -20,7 +20,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "dotenv": "^18.0.7",
+    "dotenv": "^18.0.8",
     "jest": "^30.5.2",
     "supertest": "^7.3.1"
   }
