@@ -395,6 +395,103 @@ module.exports = (router) => {
     }
   });
   
+  /**
+   * @swagger
+   * /budgets/{budgetSyncId}/months/{month}/categories/{categoryId}/template:
+   *   get:
+   *     summary: Returns the amount the category's goal templates would budget for the month, without budgeting it
+   *     tags: [Budget Months]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/categoryId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: The amount the category's templates compute for the month
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     budgeted:
+   *                       type: integer
+   *               examples:
+   *                 - data:
+   *                     budgeted: 3900
+   *       '400':
+   *         $ref: '#/components/responses/400'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   *   post:
+   *     summary: "(🔧 Extended) Budgets the category for the month from its goal templates, like the UI's \"Overwrite with template\""
+   *     description: "🔧 Extended: Uses official library APIs with additional business logic or transformations."
+   *     tags: [Budget Months]
+   *     security:
+   *       - apiKey: []
+   *     parameters:
+   *       - $ref: '#/components/parameters/budgetSyncId'
+   *       - $ref: '#/components/parameters/month'
+   *       - $ref: '#/components/parameters/categoryId'
+   *       - $ref: '#/components/parameters/budgetEncryptionPassword'
+   *     responses:
+   *       '200':
+   *         description: The amount budgeted for the category after applying its templates
+   *         content:
+   *           application/json:
+   *             schema:
+   *               required:
+   *                 - data
+   *               type: object
+   *               properties:
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     budgeted:
+   *                       type: integer
+   *               examples:
+   *                 - data:
+   *                     budgeted: 3900
+   *       '400':
+   *         $ref: '#/components/responses/400'
+   *       '404':
+   *         $ref: '#/components/responses/404'
+   *       '500':
+   *         $ref: '#/components/responses/500'
+   */
+  router.get('/budgets/:budgetSyncId/months/:month/categories/:categoryId/template', async (req, res, next) => {
+    const { month, categoryId } = req.params;
+    try {
+      const budgeted = await res.locals.budget.getMonthCategoryTemplateAmount(month, categoryId);
+      res.json({'data': {'budgeted': budgeted}});
+    } catch(err) {
+      next(err);
+    }
+  });
+
+  router.post('/budgets/:budgetSyncId/months/:month/categories/:categoryId/template', async (req, res, next) => {
+    const { month, categoryId } = req.params;
+    try {
+      if (!await res.locals.budget.getMonthCategory(month, categoryId)) {
+        throw new Error('Category not found');
+      }
+      await res.locals.budget.applyMonthCategoryTemplate(month, categoryId);
+      const applied = await res.locals.budget.getMonthCategory(month, categoryId);
+      res.json({'data': {'budgeted': applied.budgeted}});
+    } catch(err) {
+      next(err);
+    }
+  });
+
   router.patch('/budgets/:budgetSyncId/months/:month/categories/:categoryId', async (req, res, next) => {
     const { month, categoryId } = req.params;
     try {
