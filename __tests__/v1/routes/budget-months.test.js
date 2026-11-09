@@ -65,6 +65,8 @@ describe('Budget Months Routes', () => {
         spent: -300,
         balance: 200,
       }),
+      applyMonthCategoryTemplate: jest.fn().mockResolvedValue(undefined),
+      getMonthCategoryTemplateAmount: jest.fn().mockResolvedValue(3900),
       updateMonthCategory: jest.fn().mockResolvedValue({
         id: 'cat1',
         name: 'Groceries',
@@ -303,6 +305,107 @@ describe('Budget Months Routes', () => {
       await handler(mockReq, mockRes, mockNext);
 
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
+
+  describe('GET /budgets/:budgetSyncId/months/:month/categories/:categoryId/template', () => {
+    it('should register the route', () => {
+      const budgetMonthsModule = require('../../../src/v1/routes/budget-months');
+      budgetMonthsModule(mockRouter);
+
+      expect(mockRouter.get).toHaveBeenCalledWith(
+        '/budgets/:budgetSyncId/months/:month/categories/:categoryId/template',
+        expect.any(Function)
+      );
+    });
+
+    it('should return the amount the templates compute', async () => {
+      const budgetMonthsModule = require('../../../src/v1/routes/budget-months');
+      budgetMonthsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/months/:month/categories/:categoryId/template'];
+      mockReq.params.month = '2023-08';
+      mockReq.params.categoryId = 'cat1';
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.getMonthCategoryTemplateAmount).toHaveBeenCalledWith('2023-08', 'cat1');
+      expect(mockBudget.applyMonthCategoryTemplate).not.toHaveBeenCalled();
+      expect(mockRes.json).toHaveBeenCalledWith({ data: { budgeted: 3900 } });
+    });
+
+    it('should pass a library error on', async () => {
+      const budgetMonthsModule = require('../../../src/v1/routes/budget-months');
+      budgetMonthsModule(mockRouter);
+
+      const handler = handlers['GET /budgets/:budgetSyncId/months/:month/categories/:categoryId/template'];
+      mockReq.params.month = '2023-08';
+      mockReq.params.categoryId = 'cat1';
+      mockBudget.getMonthCategoryTemplateAmount.mockRejectedValueOnce(new Error('Category has no template'));
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+      expect(mockRes.json).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('POST /budgets/:budgetSyncId/months/:month/categories/:categoryId/template', () => {
+    it('should register the route', () => {
+      const budgetMonthsModule = require('../../../src/v1/routes/budget-months');
+      budgetMonthsModule(mockRouter);
+
+      expect(mockRouter.post).toHaveBeenCalledWith(
+        '/budgets/:budgetSyncId/months/:month/categories/:categoryId/template',
+        expect.any(Function)
+      );
+    });
+
+    it('should apply the templates and return the budgeted amount', async () => {
+      const budgetMonthsModule = require('../../../src/v1/routes/budget-months');
+      budgetMonthsModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/months/:month/categories/:categoryId/template'];
+      mockReq.params.month = '2023-08';
+      mockReq.params.categoryId = 'cat1';
+      mockBudget.getMonthCategory
+        .mockResolvedValueOnce({ id: 'cat1', budgeted: 500 })
+        .mockResolvedValueOnce({ id: 'cat1', budgeted: 3900 });
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.applyMonthCategoryTemplate).toHaveBeenCalledWith('2023-08', 'cat1');
+      expect(mockRes.json).toHaveBeenCalledWith({ data: { budgeted: 3900 } });
+    });
+
+    it('should reject an unknown category without applying', async () => {
+      const budgetMonthsModule = require('../../../src/v1/routes/budget-months');
+      budgetMonthsModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/months/:month/categories/:categoryId/template'];
+      mockReq.params.month = '2023-08';
+      mockReq.params.categoryId = 'missing';
+      mockBudget.getMonthCategory.mockResolvedValueOnce(undefined);
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockBudget.applyMonthCategoryTemplate).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.objectContaining({ message: 'Category not found' }));
+    });
+
+    it('should pass a library error on', async () => {
+      const budgetMonthsModule = require('../../../src/v1/routes/budget-months');
+      budgetMonthsModule(mockRouter);
+
+      const handler = handlers['POST /budgets/:budgetSyncId/months/:month/categories/:categoryId/template'];
+      mockReq.params.month = '2023-08';
+      mockReq.params.categoryId = 'cat1';
+      mockBudget.applyMonthCategoryTemplate.mockRejectedValueOnce(new Error('Category has no template'));
+
+      await handler(mockReq, mockRes, mockNext);
+
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+      expect(mockRes.json).not.toHaveBeenCalled();
     });
   });
 

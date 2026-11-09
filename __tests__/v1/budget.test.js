@@ -48,6 +48,8 @@ describe('Budget Module', () => {
       }),
       setBudgetAmount: jest.fn().mockResolvedValue(undefined),
       setBudgetCarryover: jest.fn().mockResolvedValue(undefined),
+      applyCategoryTemplate: jest.fn().mockResolvedValue(undefined),
+      getCategoryTemplateAmount: jest.fn().mockResolvedValue(3900),
       getAccounts: jest.fn().mockResolvedValue([
         { id: 'acc1', name: 'Checking', balance: 5000 }
       ]),
@@ -282,6 +284,21 @@ describe('Budget Module', () => {
       await expect(budget.updateMonthCategory('2024-01', 'cat1', {}))
         .rejects
         .toThrow('At least one field is required: budgeted or carryover');
+    });
+  });
+
+  describe('Month Category Templates', () => {
+    it('should apply the category templates for the month', async () => {
+      const budget = await Budget('sync1', undefined);
+      await budget.applyMonthCategoryTemplate('2024-01', 'cat1');
+      expect(mockActualApi.applyCategoryTemplate).toHaveBeenCalledWith('2024-01', 'cat1');
+    });
+
+    it('should return the amount the category templates compute', async () => {
+      const budget = await Budget('sync1', undefined);
+      const amount = await budget.getMonthCategoryTemplateAmount('2024-01', 'cat1');
+      expect(mockActualApi.getCategoryTemplateAmount).toHaveBeenCalledWith('2024-01', 'cat1');
+      expect(amount).toBe(3900);
     });
   });
 

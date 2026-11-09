@@ -87,6 +87,14 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     }
   }
 
+  async function applyMonthCategoryTemplate(month, categoryId) {
+    await actualApi.applyCategoryTemplate(month, categoryId);
+  }
+
+  async function getMonthCategoryTemplateAmount(month, categoryId) {
+    return await actualApi.getCategoryTemplateAmount(month, categoryId);
+  }
+
   async function getMonthCategoryGroups(month) {
     const budgetMonth = await actualApi.getBudgetMonth(month);
     const categoryGroups = [];
@@ -524,6 +532,8 @@ async function Budget(budgetSyncId, budgetEncryptionPassword) {
     getMonthCategories: getMonthCategories,
     getMonthCategory: getMonthCategory,
     updateMonthCategory: updateMonthCategory,
+    applyMonthCategoryTemplate: applyMonthCategoryTemplate,
+    getMonthCategoryTemplateAmount: getMonthCategoryTemplateAmount,
     getMonthCategoryGroups: getMonthCategoryGroups,
     getMonthCategoryGroup: getMonthCategoryGroup,
     getAccounts: getAccounts,
