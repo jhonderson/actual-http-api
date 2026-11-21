@@ -117,6 +117,32 @@ describe('Actual Client Provider', () => {
     });
   });
 
+  describe('getActualApiClient with an Actual session token', () => {
+    it('should sign in with the session token and no password', async () => {
+      const fs = require('fs');
+      fs.existsSync = jest.fn().mockReturnValue(true);
+      const mockActualApi = {
+        init: jest.fn().mockResolvedValue(undefined),
+        shutdown: jest.fn().mockResolvedValue(undefined),
+      };
+      jest.doMock('@actual-app/api', () => mockActualApi);
+      const cfg = require('../../src/config/config').config;
+      cfg.actual = {
+        dataDir: '/test/data',
+        serverUrl: 'http://localhost:5006',
+        serverSessionToken: 'session-token',
+      };
+
+      await provider.getActualApiClient();
+
+      expect(mockActualApi.init).toHaveBeenCalledWith({
+        dataDir: '/test/data',
+        serverURL: 'http://localhost:5006',
+        sessionToken: 'session-token',
+      });
+    });
+  });
+
   describe('runAqlQuery', () => {
     it('should call aqlQuery on the API client', async () => {
       const fs = require('fs');

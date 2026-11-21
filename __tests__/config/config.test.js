@@ -75,6 +75,60 @@ describe('Configuration', () => {
     });
   });
 
+  describe('Actual server credentials', () => {
+    beforeEach(() => {
+      process.env.API_KEY = 'test-api-key';
+      delete process.env.ACTUAL_SERVER_PASSWORD;
+      delete process.env.ACTUAL_SERVER_PASSWORD_PATH;
+      delete process.env.ACTUAL_SERVER_SESSION_TOKEN;
+      delete process.env.ACTUAL_SERVER_SESSION_TOKEN_PATH;
+    });
+
+    it('should use the password when only the password is set', () => {
+      process.env.ACTUAL_SERVER_PASSWORD = 'password';
+
+      const { config: cfg } = require('../../src/config/config');
+
+      expect(cfg.actual.serverPassword).toBe('password');
+      expect(cfg.actual.serverSessionToken).toBeUndefined();
+    });
+
+    it('should use the Actual session token when only the session token is set', () => {
+      process.env.ACTUAL_SERVER_SESSION_TOKEN = 'session-token';
+
+      const { config: cfg } = require('../../src/config/config');
+
+      expect(cfg.actual.serverSessionToken).toBe('session-token');
+      expect(cfg.actual.serverPassword).toBeUndefined();
+    });
+
+    it('should load the Actual session token from a file path', () => {
+      process.env.ACTUAL_SERVER_SESSION_TOKEN_PATH = '/path/to/session-token';
+      const fs = require('fs');
+      fs.readFileSync = jest.fn().mockReturnValue('token-from-file\n');
+
+      const { config: cfg } = require('../../src/config/config');
+
+      expect(fs.readFileSync).toHaveBeenCalledWith('/path/to/session-token', 'utf8');
+      expect(cfg.actual.serverSessionToken).toBe('token-from-file');
+    });
+
+    it('should throw if both the password and the Actual session token are set', () => {
+      process.env.ACTUAL_SERVER_PASSWORD = 'password';
+      process.env.ACTUAL_SERVER_SESSION_TOKEN = 'session-token';
+
+      expect(() => {
+        require('../../src/config/config');
+      }).toThrow('not both');
+    });
+
+    it('should throw if neither the password nor the Actual session token is set', () => {
+      expect(() => {
+        require('../../src/config/config');
+      }).toThrow('Missing required secret: ACTUAL_SERVER_PASSWORD');
+    });
+  });
+
   describe('config object', () => {
     beforeEach(() => {
       process.env.NODE_ENV = 'test';
