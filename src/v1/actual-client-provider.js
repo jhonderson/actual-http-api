@@ -10,10 +10,14 @@ function getActualDataDir() {
 
 async function initializeActualApiClient() {
   actualApi = require('@actual-app/api');
+  // A session token (or an Actual API key) signs in without the password; otherwise use the server password.
+  const credentials = config.actual.serverSessionToken
+    ? { sessionToken: config.actual.serverSessionToken }
+    : { password: config.actual.serverPassword };
   await actualApi.init({
       dataDir: getActualDataDir(),
       serverURL: config.actual.serverUrl,
-      password: config.actual.serverPassword,
+      ...credentials,
   });
   console.log('Actual api client initialized successfully');
 }
