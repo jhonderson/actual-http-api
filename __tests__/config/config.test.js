@@ -156,6 +156,23 @@ describe('Configuration', () => {
       expect(cfg.port).toBe('3000');
     });
 
+    it('should close an idle Actual client after 60 minutes by default', () => {
+      delete process.env.ACTUAL_CLIENT_IDLE_TIMEOUT_MINUTES;
+      const { config: cfg } = require('../../src/config/config');
+      expect(cfg.actualClientIdleTimeoutMinutes).toBe(60);
+    });
+
+    it('should read the idle timeout of the Actual client in minutes', () => {
+      process.env.ACTUAL_CLIENT_IDLE_TIMEOUT_MINUTES = '15';
+      const { config: cfg } = require('../../src/config/config');
+      expect(cfg.actualClientIdleTimeoutMinutes).toBe(15);
+    });
+
+    it.each(['0', '-5', 'abc'])('should reject an idle timeout of "%s"', (value) => {
+      process.env.ACTUAL_CLIENT_IDLE_TIMEOUT_MINUTES = value;
+      expect(() => require('../../src/config/config')).toThrow('ACTUAL_CLIENT_IDLE_TIMEOUT_MINUTES must be a positive number of minutes');
+    });
+
     it('should have actual configuration', () => {
       const { config: cfg } = require('../../src/config/config');
       expect(cfg.actual).toBeDefined();
