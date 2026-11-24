@@ -2,6 +2,7 @@ const { config } = require('../config/config');
 const { createDirIfDoesNotExist } = require('../utils/utils');
 
 let actualApi;
+let idleTimer;
 
 function getActualDataDir() {
   createDirIfDoesNotExist(config.actual.dataDir);
@@ -23,6 +24,7 @@ async function initializeActualApiClient() {
 }
 
 async function invalidateActualApiClient() {
+  idleTimer = null;
   await actualApi.shutdown();
   actualApi = null;
   console.log('Actual api client was shut down successfully');
@@ -33,9 +35,11 @@ exports.getActualDataDir = () => getActualDataDir();
 exports.getActualApiClient = async () => {
   if (!actualApi) {
     await initializeActualApiClient();
-    // Invalidating actual api to force closing the budget and downloading it again at least every hour
-    setTimeout(invalidateActualApiClient, 1000 * 60 * 60);
   }
+  // The client is shut down only after a period with no requests, so a long run of requests
+  // is never cut off half-way. Each request already syncs the open budget with the server.
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(invalidateActualApiClient, config.actualClientIdleTimeoutMinutes * 60 * 1000);
   return actualApi;
 };
 

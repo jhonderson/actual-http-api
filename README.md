@@ -57,6 +57,7 @@ The service reads several environment variables (from `src/config/config.js`). D
 - `ACTUAL_SERVER_URL` (required) — Base URL of your Actual server (e.g. `http://actual-server:5006/`).
 - `ACTUAL_DATA_DIR` (optional) — Path to the Actual server data directory (used if you need to point at local data).
 - `PORT` (optional) — Port this service listens on. Default: `5007`.
+- `ACTUAL_CLIENT_IDLE_TIMEOUT_MINUTES` (optional) — Minutes without a request after which the connection to the Actual server is shut down and the budget closed. The next request opens it again. Default: `60`.
 - `NODE_ENV` (optional) — Node environment (e.g. `production`, `development`). If not `production`, `.env` will be loaded by `dotenv`.
 
 Swagger / API docs configuration (defaults used to build the docs URL shown in the UI):

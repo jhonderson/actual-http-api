@@ -143,6 +143,65 @@ describe('Actual Client Provider', () => {
     });
   });
 
+  describe('idle timeout', () => {
+    const MINUTE = 60 * 1000;
+    let mockActualApi;
+
+    beforeEach(() => {
+      const fs = require('fs');
+      fs.existsSync = jest.fn().mockReturnValue(true);
+      mockActualApi = {
+        init: jest.fn().mockResolvedValue(undefined),
+        shutdown: jest.fn().mockResolvedValue(undefined),
+      };
+      jest.doMock('@actual-app/api', () => mockActualApi);
+    });
+
+    it('should shut the client down after 60 minutes without a request by default', async () => {
+      await provider.getActualApiClient();
+
+      await jest.advanceTimersByTimeAsync(60 * MINUTE - 1);
+      expect(mockActualApi.shutdown).not.toHaveBeenCalled();
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(mockActualApi.shutdown).toHaveBeenCalledTimes(1);
+    });
+
+    it('should count the timeout from the last request, not from the first one', async () => {
+      await provider.getActualApiClient();
+      await jest.advanceTimersByTimeAsync(50 * MINUTE);
+      await provider.getActualApiClient();
+
+      // 70 minutes after the client was opened, 20 after the last request
+      await jest.advanceTimersByTimeAsync(20 * MINUTE);
+      expect(mockActualApi.shutdown).not.toHaveBeenCalled();
+      expect(mockActualApi.init).toHaveBeenCalledTimes(1);
+
+      await jest.advanceTimersByTimeAsync(40 * MINUTE);
+      expect(mockActualApi.shutdown).toHaveBeenCalledTimes(1);
+    });
+
+    it('should use the configured number of minutes', async () => {
+      require('../../src/config/config').config.actualClientIdleTimeoutMinutes = 5;
+
+      await provider.getActualApiClient();
+
+      await jest.advanceTimersByTimeAsync(5 * MINUTE - 1);
+      expect(mockActualApi.shutdown).not.toHaveBeenCalled();
+      await jest.advanceTimersByTimeAsync(1);
+      expect(mockActualApi.shutdown).toHaveBeenCalledTimes(1);
+    });
+
+    it('should open a new client on the first request after the shutdown', async () => {
+      await provider.getActualApiClient();
+      await jest.advanceTimersByTimeAsync(60 * MINUTE);
+
+      await provider.getActualApiClient();
+
+      expect(mockActualApi.init).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('runAqlQuery', () => {
     it('should call aqlQuery on the API client', async () => {
       const fs = require('fs');

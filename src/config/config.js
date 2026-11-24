@@ -33,6 +33,17 @@ const loadActualCredentials = () => {
   return { serverPassword: password, serverSessionToken: sessionToken };
 }
 
+// Minutes without a request after which the Actual client is shut down and the budget closed.
+const loadClientIdleTimeoutMinutes = () => {
+  const raw = process.env.ACTUAL_CLIENT_IDLE_TIMEOUT_MINUTES;
+  if (raw === undefined || raw.trim() === '') return 60;
+  const minutes = Number(raw);
+  if (!Number.isFinite(minutes) || minutes <= 0) {
+    throw new Error(`ACTUAL_CLIENT_IDLE_TIMEOUT_MINUTES must be a positive number of minutes, got "${raw}"`);
+  }
+  return minutes;
+}
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -46,6 +57,7 @@ exports.config = {
     serverUrl: process.env.ACTUAL_SERVER_URL,
     ...loadActualCredentials(),
   },
+  actualClientIdleTimeoutMinutes: loadClientIdleTimeoutMinutes(),
   allowedBudgetSyncIds: process.env.ALLOWED_BUDGET_SYNC_IDS ? process.env.ALLOWED_BUDGET_SYNC_IDS.split(',').map(id => id.trim()).filter(Boolean) : null,
   swagger: {
     protocol: process.env.SWAGGER_PROTOCOL || "https",
